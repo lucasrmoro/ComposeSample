@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 abstract class BaseViewModel<State, Event, Effect> : ViewModel(), UiViewModel<State, Effect> {
 
-    private val effectChannel = Channel<Effect>(Channel.BUFFERED)
+    private val effectChannel = Channel<Effect>(Channel.UNLIMITED)
 
     override val uiEffect: Flow<Effect> = effectChannel.receiveAsFlow()
 
@@ -21,11 +21,12 @@ abstract class BaseViewModel<State, Event, Effect> : ViewModel(), UiViewModel<St
         viewModelScope.launch(block = block)
     }
 
-    protected suspend fun sendEffect(effect: Effect) {
-        effectChannel.send(effect)
+    protected fun sendEffect(effect: Effect) {
+        effectChannel.trySend(effect)
     }
 
     override fun onCleared() {
+        effectChannel.close()
         viewModelScope.cancel()
     }
 }

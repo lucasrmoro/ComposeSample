@@ -25,7 +25,7 @@ class ListViewModel(
     override fun sendEvent(event: ListUiEvent) {
         when (event) {
             ListUiEvent.LoadItems -> loadItems()
-            ListUiEvent.AddItemClicked -> launch { sendEffect(ListUiEffect.NavigateToForm) }
+            ListUiEvent.AddItemClicked -> sendEffect(ListUiEffect.NavigateToForm)
         }
     }
 
