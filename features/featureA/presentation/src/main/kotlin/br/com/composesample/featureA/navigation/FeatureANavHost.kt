@@ -2,13 +2,13 @@ package br.com.composesample.featureA.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.com.composesample.featureA.form.screen.FormScreen
 import br.com.composesample.featureA.form.viewModel.FormViewModel
 import br.com.composesample.featureA.list.screen.ListScreen
 import br.com.composesample.featureA.list.viewModel.ListViewModel
+import br.com.composesample.structural.navigation.core.AnimatedNavHost
 import br.com.composesample.structural.di.dependencyViewModel
 
 private object FeatureARoute {
@@ -20,7 +20,7 @@ private object FeatureARoute {
 
 @Composable
 internal fun FeatureANavHost(navController: NavHostController = rememberNavController()) {
-    NavHost(
+    AnimatedNavHost(
         navController = navController,
         startDestination = FeatureARoute.LIST
     ) {

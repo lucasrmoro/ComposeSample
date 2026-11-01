@@ -6,4 +6,6 @@ plugins {
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     api(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.animation)
+    api(libs.androidx.navigation.compose)
 }
