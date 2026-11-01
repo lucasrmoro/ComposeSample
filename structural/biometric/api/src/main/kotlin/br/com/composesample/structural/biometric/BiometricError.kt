@@ -1,0 +1,14 @@
+package br.com.composesample.structural.biometric
+
+enum class BiometricError {
+    UNAVAILABLE,
+    CANCELLED,
+    OPERATION_IN_PROGRESS,
+    LOCKED_OUT,
+    AUTHENTICATION_FAILED,
+    BIOMETRIC_REACTIVATION_REQUIRED,
+    KEY_NOT_FOUND,
+    NOT_ENROLLED,
+    ENCRYPTION_FAILED,
+    DECRYPTION_FAILED
+}

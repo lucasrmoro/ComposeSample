@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name_prd">Compose - Sample</string>
+    <string name="app_name_dev">Compose - Sample - dev</string>
+</resources>
