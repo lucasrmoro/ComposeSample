@@ -1,0 +1,70 @@
+name: Bug report
+description: Report unexpected behavior with enough detail to reproduce it.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Write the issue in English with a short, descriptive title.
+        Never include passwords, tokens, signing files, or personal data.
+        Report security vulnerabilities privately through [Security Advisories](https://github.com/lucasrmoro/ComposeSample/security/advisories/new).
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Explain the problem and its impact.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Provide numbered steps and any required setup.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: input
+    id: modules
+    attributes:
+      label: Affected modules
+      description: List module paths, or write Unknown if you cannot identify them.
+      placeholder: "features/login/data, structural/network/impl"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include the app version or commit, variant, Android version and device. For build/tooling bugs, include JDK, SDK and OS versions instead. Mark irrelevant details as N/A.
+      placeholder: "Commit: ...; variant: devDebug; Android: ...; device: ..."
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs and screenshots
+      description: Attach relevant evidence after removing credentials and personal data.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Describe the observable behavior that would confirm the fix.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Link blocking or related issues, or write None.
+    validations:
+      required: true

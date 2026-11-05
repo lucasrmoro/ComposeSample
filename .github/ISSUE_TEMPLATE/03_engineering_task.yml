@@ -1,0 +1,61 @@
+name: Engineering task
+description: Plan architecture, testing, CI, security, or maintenance work.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Write the issue in English with a short, descriptive title.
+        Never include passwords, tokens, signing files, or personal data.
+        Report security vulnerabilities privately through [Security Advisories](https://github.com/lucasrmoro/ComposeSample/security/advisories/new).
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Explain the current problem, desired outcome, and reason for the change.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: List the work required, relevant constraints, and anything explicitly outside this task.
+    validations:
+      required: true
+  - type: input
+    id: modules
+    attributes:
+      label: Affected modules
+      description: List module paths or repository configuration areas, or write To be determined.
+      placeholder: ".github, build-logic, structural/network/impl"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List specific, verifiable conditions for completing the task.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation
+      description: Describe the commands, checks, or manual verification needed to demonstrate completion. Explain when a check is not applicable.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Link blocking issues and explain the dependency, or write None. Distinguish blockers from related work.
+      placeholder: "Blocked by #2 because the testing standard must be defined first."
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Link relevant documentation, designs, or related issues if useful.
