@@ -211,7 +211,7 @@ numbers.
 | `hotfix/login-crash` | Urgent correction to a published version | `main` → `hotfix` → `main` |
 | `task/create-login-screen` | Part of a feature or bugfix | Parent `feature` or `bugfix` → `task` → same parent |
 | `docs/update-setup-guide` | Independent documentation | `main` → `docs` → `main` |
-| `ci/add-pr-validation` | Independent CI changes | `main` → `ci` → `main` |
+| `ci/add-pull-request-validation` | Independent CI changes | `main` → `ci` → `main` |
 | `refactor/simplify-navigation` | Independent restructuring | `main` → `refactor` → `main` |
 | `build/update-gradle` | Build and tooling | `main` → `build` → `main` |
 | `chore/add-repository-tests` | Maintenance and standalone test improvements | `main` → `chore` → `main` |
@@ -232,6 +232,12 @@ PR titles use `<branch-type>: <description>`, matching the source branch prefix:
 explain the resulting behavior, and record validation commands and results.
 Include screenshots for visual changes.
 
+The **Validate PR title** check runs after branch validation and reruns when the
+title is edited, without requiring a new commit. For `docs/update-guide`,
+`docs: update guide` is valid; `fix: update guide`, `docs(guide): update guide`,
+and `docs:` are invalid. The check validates format and prefix, not English prose
+quality or commit messages.
+
 ### Commits
 
 Use `type: description` in English, without a scope. Commit types are independent
@@ -241,15 +247,13 @@ Describe incompatible changes and migration in the PR body and add a
 `BREAKING CHANGE:` footer to the commit.
 
 The **Validate branch flow** check validates branch names and PR targets
-on PR creation, reopening, updates, and base edits, including fork PRs. It reads
-metadata without executing PR code. These checks validate the destination type;
+on PR creation, reopening, updates, and base edits, including fork PRs. It checks PR metadata without running application code or accessing secrets. These checks validate the destination type;
 they do not prove a task's original parent branch or creation point.
-PR title validation is tracked in [#9](https://github.com/lucasrmoro/ComposeSample/issues/9).
 Making these checks mandatory for merge is tracked in
 [#7](https://github.com/lucasrmoro/ComposeSample/issues/7); failed checks alone do
 not block merges until protection is configured. This check does not block branch
 creation. The entry point is `.github/workflows/pull-request-validation.yml`;
-branch checks are isolated in the reusable `.github/workflows/branch-validation.yml`. Fork runs
+the checks are separate composite actions under `.github/actions/`. Fork runs
 may require maintainer approval according to the repository's Actions settings.
 
 ## Validation
