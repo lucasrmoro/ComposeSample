@@ -1,0 +1,16 @@
+name: Pull request validation
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited, ready_for_review]
+
+permissions: {}
+
+concurrency:
+  group: pull-request-validation-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  branch-validation:
+    name: Branch validation
+    uses: ./.github/workflows/branch-validation.yml
