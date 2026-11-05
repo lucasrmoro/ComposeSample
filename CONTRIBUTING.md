@@ -44,6 +44,26 @@ Engineering task form.
 
 ## Architecture and validation
 
-Follow [AGENTS.md](AGENTS.md) for module boundaries, code conventions, build
-requirements, and proportional validation. Run the checks relevant to affected
-modules and record their actual results in the pull request.
+Follow the [project README](README.md) for module boundaries, build requirements,
+and validation commands. Run the checks relevant to affected modules and record
+their actual results in the pull request.
+
+## Development workflow
+
+Follow the [development workflow](README.md#development-workflow) for branch types,
+origins, and PR targets. During initial setup, independent work branches originate
+from and target `main`; `develop` is reserved for a possible future integration
+stage. Use English kebab-case branch
+descriptions without issue-number prefixes, and link the issue in the PR body.
+
+Use `task/*` for work that belongs to a feature or bugfix, including its tests or
+documentation. Task PRs target their own `feature/*` or `bugfix/*` parent and must
+declare it with `Parent branch: <branch-name>` in the description. Independent
+test improvements use `chore/*`; there is no `test/*` branch type.
+
+Branch types are separate from semantic commit and PR title types. Use short
+English messages in the format `type: description`, without a scope. Semantic
+types include `feat`, `fix`, `refactor`, `docs`, `test`, `build`, `ci`, `perf`,
+`style`, and `chore`. For breaking changes, add `!` after the type and a
+`BREAKING CHANGE:` footer to the commit. Include affected modules, issue links,
+validation results, and screenshots for visual changes in PR descriptions.

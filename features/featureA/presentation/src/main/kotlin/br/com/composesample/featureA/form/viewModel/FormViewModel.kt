@@ -23,10 +23,8 @@ class FormViewModel : BaseViewModel<FormUiState, FormUiEvent, FormUiEffect>() {
 
     private fun save() {
         _uiState.update { it.copy(isSaving = true) }
-        launch {
-            sendEffect(FormUiEffect.NavigateBack)
-            _uiState.update { it.copy(isSaving = false) }
-        }
+        sendEffect(FormUiEffect.NavigateBack)
+        _uiState.update { it.copy(isSaving = false) }
     }
 
 }
