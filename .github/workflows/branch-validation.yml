@@ -1,0 +1,58 @@
+name: Branch validation
+
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  branch-flow:
+    name: Validate branch flow
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      # Validate metadata only: never check out or execute code from the PR.
+      - name: Validate branch name and target
+        shell: python
+        run: |
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
+          pr = event["pull_request"]
+          repository = os.environ["GITHUB_REPOSITORY"].casefold()
+          head = pr["head"]["ref"]
+          base = pr["base"]["ref"]
+          pattern = re.compile(
+              r"(feature|bugfix|hotfix|task|docs|ci|refactor|build|chore)/"
+              r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*"
+          )
+          match = pattern.fullmatch(head)
+          errors = []
+
+          if pr["base"]["repo"]["full_name"].casefold() != repository:
+              errors.append("The PR must target a branch in this repository.")
+
+          if not match:
+              errors.append(
+                  "Use <type>/<lowercase-kebab-case-description>, starting with a letter. "
+                  "Allowed types: feature, bugfix, hotfix, task, docs, ci, refactor, build, chore. "
+                  "Example: ci/add-pr-validation. Issue-number prefixes are not used."
+              )
+          elif match.group(1) == "task":
+              parent_match = pattern.fullmatch(base)
+              if not parent_match or parent_match.group(1) not in ("feature", "bugfix"):
+                  errors.append("A task PR must target a feature/* or bugfix/* branch.")
+
+          elif base != "main":
+              errors.append("Independent work PRs must target main during initial setup.")
+
+          if errors:
+              print("❌ Branch flow validation failed:")
+              for error in errors:
+                  print(f"❌ {error}")
+              raise SystemExit(1)
+
+          print("✅ Branch name and PR target are valid.")

@@ -217,10 +217,9 @@ numbers.
 | `chore/add-repository-tests` | Maintenance and standalone test improvements | `main` → `chore` → `main` |
 
 For larger features or bugfixes, merge task PRs into their parent first, validate
-its combined behavior, then open the parent PR into `main`. Include
-`Parent branch: feature/add-login` (or the corresponding bugfix branch) in every
-task PR description. Tasks belonging to a feature or bugfix follow this flow even
-when they involve documentation, tests, or CI.
+its combined behavior, then open the parent PR into `main`. Tasks belonging to a
+feature or bugfix follow this flow even when they involve documentation, tests,
+or CI.
 
 ### Issues and pull requests
 
@@ -241,10 +240,17 @@ of branch types: `feat`, `fix`, `refactor`, `docs`, `test`, `build`, `ci`, `perf
 Describe incompatible changes and migration in the PR body and add a
 `BREAKING CHANGE:` footer to the commit.
 
-Branch validation and protection remain tracked in
-[#8](https://github.com/lucasrmoro/ComposeSample/issues/8) and
-[#7](https://github.com/lucasrmoro/ComposeSample/issues/7); review the flow manually
-until those checks are implemented.
+The **Validate branch flow** check validates branch names and PR targets
+on PR creation, reopening, updates, and base edits, including fork PRs. It reads
+metadata without executing PR code. These checks validate the destination type;
+they do not prove a task's original parent branch or creation point.
+PR title validation is tracked in [#9](https://github.com/lucasrmoro/ComposeSample/issues/9).
+Making these checks mandatory for merge is tracked in
+[#7](https://github.com/lucasrmoro/ComposeSample/issues/7); failed checks alone do
+not block merges until protection is configured. This check does not block branch
+creation. The entry point is `.github/workflows/pull-request-validation.yml`;
+branch checks are isolated in the reusable `.github/workflows/branch-validation.yml`. Fork runs
+may require maintainer approval according to the repository's Actions settings.
 
 ## Validation
 
