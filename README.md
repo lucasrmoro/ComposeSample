@@ -216,6 +216,79 @@ Configure real backend endpoints before expecting remote business operations to
 work. Firebase-backed capabilities also require application Firebase configuration;
 see the corresponding service READMEs for initialization and unavailable behavior.
 
+## Development workflow
+
+During initial project setup, `main` is the only long-lived branch: it integrates
+changes and holds published versions. Create work branches with the format
+`<type>/<short-description>`: use an English description in lowercase kebab-case,
+without an issue-number prefix. Link the relevant issue in the PR description
+instead.
+
+| Type | Purpose | Create from | PR target |
+| --- | --- | --- | --- |
+| `feature` | A new capability | `main` | `main` |
+| `bugfix` | A correction following the normal development cycle | `main` | `main` |
+| `hotfix` | An urgent correction to a published version | `main` | `main` |
+| `task` | Part of a feature or bugfix implementation | Its parent `feature/*` or `bugfix/*` branch | That same parent branch |
+| `docs` | Independent documentation work | `main` | `main` |
+| `ci` | Independent CI workflow changes | `main` | `main` |
+| `refactor` | Independent internal restructuring | `main` | `main` |
+| `build` | Independent build or tooling changes | `main` | `main` |
+| `chore` | Other independent maintenance, including standalone test improvements | `main` | `main` |
+
+Examples include `feature/add-login`, `bugfix/session-expiration`,
+`hotfix/login-crash`, `task/create-login-screen`, `docs/update-setup-guide`, and
+`ci/add-pr-validation`. The branch prefixes `feat`, `fix`, `test`, `perf`, and `style`
+are not part of this convention. Branch types are separate from semantic commit
+and PR title types: a `bugfix/*` branch can have a PR titled
+`fix: handle session expiration`.
+
+### Features, bugfixes, and tasks
+
+Create a feature or bugfix branch from `main`. Implement small changes directly
+on that branch; split larger work into `task/*` branches when useful. Every task
+must target its own feature or bugfix branch, never `develop`, `main`, another
+task, or a hotfix. Documentation, tests, CI, and other work that belongs to a
+feature or bugfix follows the same task flow; the corresponding standalone branch
+types are for independent work.
+
+For example, create `task/create-login-screen` from `feature/add-login` and open
+its PR against `feature/add-login`. Include the following line in the task PR
+description to record the intended parent explicitly:
+
+```text
+Parent branch: feature/add-login
+```
+
+The task PR target must match that declaration. Its issue link identifies the
+work item separately; the task name alone does not identify its parent. Merge
+completed task PRs into the parent branch, validate the combined behavior, then
+merge the parent PR into `main`. Keep the parent branch until its tasks have
+been integrated.
+
+### Releases and hotfixes
+
+During initial setup, merge reviewed work PRs into `main`. For an urgent production
+correction, use `hotfix/*` rather than `bugfix/*`, even though both currently
+target `main`. There is no synchronization PR to a retired `develop` branch.
+
+If a separate integration stage becomes necessary, reintroduce `develop` through
+an explicit workflow change. Feature, bugfix, and independent maintenance PRs
+would then target `develop`; releases would use `develop` to `main` PRs, and
+hotfixes would require `main` to `develop` synchronization. Those long-lived branch
+PRs would be explicit naming exceptions. Task PRs would still target their own
+feature or bugfix. Versioning, tags, and artifact publication are tracked in
+[#14](https://github.com/lucasrmoro/ComposeSample/issues/14) and
+[#15](https://github.com/lucasrmoro/ComposeSample/issues/15).
+
+These are the contribution rules. Automated validation of branch names, PR targets,
+and task parent declarations is tracked in
+[#8](https://github.com/lucasrmoro/ComposeSample/issues/8); required checks and branch
+protection are tracked in [#5](https://github.com/lucasrmoro/ComposeSample/issues/5)
+and [#7](https://github.com/lucasrmoro/ComposeSample/issues/7). Until those controls
+are implemented, reviewers must verify the flow manually. Any automation-specific
+branch exception must be documented before it is accepted by validation.
+
 ## Validation and development
 
 ```sh
