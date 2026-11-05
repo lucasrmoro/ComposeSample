@@ -232,5 +232,4 @@ existing structural service before introducing direct platform or vendor access.
 Every HTTP DTO field must declare `network/api`'s `@JsonName`, including nested
 fields, so protocol names remain explicit after obfuscation.
 
-Repository contribution and architecture rules are maintained in
-[`AGENTS.md`](AGENTS.md).
+Contribution guidance is maintained in [`CONTRIBUTING.md`](CONTRIBUTING.md).

@@ -44,6 +44,6 @@ Engineering task form.
 
 ## Architecture and validation
 
-Follow [AGENTS.md](AGENTS.md) for module boundaries, code conventions, build
-requirements, and proportional validation. Run the checks relevant to affected
-modules and record their actual results in the pull request.
+Follow the [project README](README.md) for module boundaries, build requirements,
+and validation commands. Run the checks relevant to affected modules and record
+their actual results in the pull request.
