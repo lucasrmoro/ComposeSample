@@ -1,0 +1,59 @@
+name: Feature request
+description: Propose a capability with a clear problem, scope, and acceptance criteria.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Write the issue in English with a short, descriptive title.
+        Never include passwords, tokens, signing files, or personal data.
+        Report security vulnerabilities privately through [Security Advisories](https://github.com/lucasrmoro/ComposeSample/security/advisories/new).
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Explain the user problem, intended outcome, and why it matters.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Describe the proposed behavior and what is outside this request.
+    validations:
+      required: true
+  - type: input
+    id: modules
+    attributes:
+      label: Affected modules
+      description: List known module paths, or write To be determined.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints and alternatives
+      description: Describe relevant architecture, compatibility, or security constraints and alternatives considered. Write None if there are no known constraints.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable conditions that must be met for this feature to be complete.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Link blocking or related issues, or write None.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add sanitized examples, screenshots, or supporting references if useful.
