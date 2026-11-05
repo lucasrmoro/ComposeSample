@@ -228,9 +228,9 @@ and write in English. Describe the problem, scope, affected modules, acceptance
 criteria, validation, and dependencies; include reproduction details for bugs.
 
 PR titles use `<branch-type>: <description>`, matching the source branch prefix:
-`docs/update-guide` → `docs: update guide`. In the description, link the issue,
-explain the resulting behavior, and record validation commands and results.
-Include screenshots for visual changes.
+`docs/update-guide` → `docs: update guide`. Fill out the PR template with the
+resulting behavior, related issues, affected modules, and validation results.
+Use N/A with a reason for irrelevant sections; attach screenshots for visual changes.
 
 The **Validate PR title** check runs after branch validation and reruns when the
 title is edited, without requiring a new commit. For `docs/update-guide`,
