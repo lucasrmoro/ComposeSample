@@ -1,0 +1,50 @@
+name: Branch validation
+description: Validate PR branch names and targets
+runs:
+  using: composite
+  steps:
+  # Validate metadata only; no application execution or secrets.
+  - name: Validate branch name and target
+    shell: python
+    run: |
+      import json
+      import os
+      import re
+      from pathlib import Path
+
+      event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
+      pull_request = event["pull_request"]
+      repository = os.environ["GITHUB_REPOSITORY"].casefold()
+      head = pull_request["head"]["ref"]
+      base = pull_request["base"]["ref"]
+      pattern = re.compile(
+          r"(feature|bugfix|hotfix|task|docs|ci|refactor|build|chore)/"
+          r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*"
+      )
+      match = pattern.fullmatch(head)
+      errors = []
+
+      if pull_request["base"]["repo"]["full_name"].casefold() != repository:
+          errors.append("The PR must target a branch in this repository.")
+
+      if not match:
+          errors.append(
+              "Use <type>/<lowercase-kebab-case-description>, starting with a letter. "
+              "Allowed types: feature, bugfix, hotfix, task, docs, ci, refactor, build, chore. "
+              "Example: ci/add-pull-request-validation. Issue-number prefixes are not used."
+          )
+      elif match.group(1) == "task":
+          parent_match = pattern.fullmatch(base)
+          if not parent_match or parent_match.group(1) not in ("feature", "bugfix"):
+              errors.append("A task PR must target a feature/* or bugfix/* branch.")
+
+      elif base != "main":
+          errors.append("Independent work PRs must target main during initial setup.")
+
+      if errors:
+          print("❌ Branch flow validation failed:")
+          for error in errors:
+              print(f"❌ {error}")
+          raise SystemExit(1)
+
+      print("✅ Branch name and PR target are valid.")
