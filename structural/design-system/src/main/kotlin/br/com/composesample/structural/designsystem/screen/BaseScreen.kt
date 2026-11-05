@@ -11,11 +11,11 @@ import br.com.composesample.structural.core.base.viewModel.UiViewModel
 abstract class BaseScreen<State, Effect>(private val viewModel: UiViewModel<State, Effect>) {
 
     @Composable
-    fun Start() {
-        val currentProcessEffect by rememberUpdatedState(::processEffect)
+    fun Init() {
+        val currentConsumeEffect by rememberUpdatedState(::consumeEffect)
 
         LaunchedEffect(viewModel.uiEffect) {
-            viewModel.uiEffect.collect { effect -> currentProcessEffect(effect) }
+            viewModel.uiEffect.collect { effect -> currentConsumeEffect(effect) }
         }
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -25,5 +25,5 @@ abstract class BaseScreen<State, Effect>(private val viewModel: UiViewModel<Stat
     @Composable
     protected abstract fun Content(uiState: State)
 
-    protected abstract fun processEffect(effect: Effect)
+    protected abstract fun consumeEffect(effect: Effect)
 }

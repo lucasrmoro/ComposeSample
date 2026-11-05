@@ -33,7 +33,7 @@ internal class FormScreen(
         )
     }
 
-    override fun processEffect(effect: FormUiEffect) {
+    override fun consumeEffect(effect: FormUiEffect) {
         when (effect) {
             FormUiEffect.NavigateBack -> onNavigateBack()
         }

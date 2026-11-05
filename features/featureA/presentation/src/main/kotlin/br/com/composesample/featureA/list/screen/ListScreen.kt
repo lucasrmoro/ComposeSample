@@ -41,7 +41,7 @@ internal class ListScreen(
         )
     }
 
-    override fun processEffect(effect: ListUiEffect) {
+    override fun consumeEffect(effect: ListUiEffect) {
         when (effect) {
             ListUiEffect.NavigateToForm -> onOpenForm()
         }

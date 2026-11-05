@@ -29,14 +29,14 @@ internal fun FeatureANavHost(navController: NavHostController = rememberNavContr
             ListScreen(
                 viewModel = viewModel,
                 onOpenForm = { navController.navigate(FeatureARoute.FORM) }
-            ).Start()
+            ).Init()
         }
         composable(FeatureARoute.FORM) {
             val viewModel: FormViewModel = dependencyViewModel()
             FormScreen(
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() }
-            ).Start()
+            ).Init()
         }
     }
 }

@@ -148,8 +148,8 @@ Screens follow MVI:
 1. A screen sends a `UiEvent` through `ViewModel.sendEvent()`.
 2. The ViewModel calls its dependencies and publishes `UiState` through `StateFlow`.
 3. One-off actions are emitted as `UiEffect` through `Flow`, using `sendEffect()`.
-4. `BaseScreen.Start()` collects state and effects, calls `Content(uiState)`, and
-   forwards effects to `processEffect()`.
+4. `BaseScreen.Init()` collects state and effects, calls `Content(uiState)`, and
+   forwards effects to `consumeEffect()`.
 
 Each screen keeps its models in a `model` package, its UI in `screen`, and its
 ViewModel in `viewModel`. The feature's `NavHost` resolves ViewModels with
