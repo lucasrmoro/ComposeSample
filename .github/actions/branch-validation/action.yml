@@ -4,7 +4,7 @@ runs:
   using: composite
   steps:
   # Validate metadata only; no application execution or secrets.
-  - name: Validate branch name and target
+  - name: Validate branch name
     shell: python
     run: |
       import json

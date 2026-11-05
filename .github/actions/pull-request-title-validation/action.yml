@@ -3,7 +3,7 @@ description: Validate PR title format and branch prefix
 runs:
   using: composite
   steps:
-  - name: Validate title format and branch prefix
+  - name: Validate title
     shell: python
     run: |
       import json
