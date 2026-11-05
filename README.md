@@ -32,8 +32,7 @@ build-logic/                 Gradle convention plugins and project configuration
 gradle/libs.versions.toml    Dependency coordinates and versions
 ```
 
-Features include only the layers they need. For example, login has no presentation
-or domain implementation module at present.
+Features include only the layers they need.
 
 Most structural services have three modules:
 
@@ -49,15 +48,10 @@ own `di` modules.
 
 ## How modules communicate
 
-There are two relationships to distinguish: which modules can import each other's
-code, and which objects call each other when the app runs.
-
 ### Code dependencies within a feature
 
-In the diagram below, `A --> B` means **module A depends on module B** and can use
-its declarations. Read the diagram from top to bottom: the feature DI module
-connects the layers, and those layers depend on the domain contracts below them.
-These arrows do not represent the order of execution.
+In the diagram, `A --> B` means module A depends on module B, rather than runtime
+execution order. The feature DI module connects the layers through domain contracts.
 
 ![Top-down diagram of feature and structural module dependencies](assets/images/module-dependencies.png)
 
@@ -71,27 +65,17 @@ service dependencies are omitted for clarity.
 | `data` | Repository contracts and business models from `domain/api` |
 | `di` | Contracts and concrete classes from all these layers, so it can register their bindings |
 
-For example, presentation can call a use case interface without importing its
-implementation. The DI module registers which implementation satisfies that
-interface and supplies its constructor dependencies. Presentation, domain, and
-data do not depend on the feature's `di` module.
+Presentation, domain, and data do not depend on the feature's `di` module.
 
 ### Dependencies on structural services
 
-The diagram shows a generic feature under `features/<feature>/` and a structural
-module under `structural/<module>/` with `api`, `impl`, and `di` modules.
+Consumers depend on `structural/<module>/api` and receive contracts through
+constructor injection. Reuse these APIs before introducing direct platform or
+vendor access. Structural DI modules depend on their own `api` and `impl` to
+register bindings; consumers do not import the implementations.
 
-A consumer declares a dependency on `structural/<module>/api` and receives a
-contract through constructor injection. The service's `impl` module implements
-that contract and keeps platform or vendor details internal. Its `di` module
-depends on both `api` and `impl` to register the binding. The consumer's DI module
-resolves the registered contract when constructing the consumer.
-
-`AppApplication` connects these pieces by loading structural DI modules and then
-feature DI modules. The app is allowed to reference implementations needed for
-startup; consumers use the service APIs. Neither a service's `api` nor its `impl`
-depends on its `di` module. All DI modules use `structural/di/api` for registration;
-the app selects the runtime backend in `structural/di/impl`.
+The app can reference implementations needed for startup. Neither a structural
+service's `api` nor its `impl` depends on its `di` module.
 
 Gradle dependencies use `implementation` by default, with `api` reserved for
 deliberate reexports.
@@ -101,7 +85,9 @@ deliberate reexports.
 For example, `GetSomethingUseCaseImpl` consumes `FeatureARepository`, declared in
 `featureA/domain/api`. `FeatureARepositoryImpl` lives in `featureA/data` and receives
 local and remote data sources. Its HTTP service consumes `network/api`'s
-`HttpClient`; Retrofit, OkHttp, and Gson remain inside `network/impl`.
+`HttpClient`; Retrofit, OkHttp, and Gson remain inside `network/impl`. Every HTTP
+DTO field, including nested fields, declares `network/api`'s `@JsonName` so protocol
+names survive obfuscation.
 
 The intended request flow is:
 
@@ -114,13 +100,8 @@ Screen event
   -> Storage or HTTP client
 ```
 
-DI supplies the concrete objects behind the contracts. Results return through
-suspending calls or flows, and the ViewModel publishes the resulting UI state.
-This describes the architecture; `featureA`'s placeholder repository operations
-do not yet execute the complete data flow.
-
-Cross-feature navigation uses shared destination contracts and registered Compose
-entry points. A feature does not need to import another feature's screen classes.
+Results return through suspending calls or flows. The placeholder operations in
+`featureA` do not yet execute this complete request flow.
 
 ## Startup and dependency injection
 
@@ -158,7 +139,8 @@ content without DI. Reusable UI components, lifecycle adapters, theme, and dimen
 tokens belong in [design-system](structural/design-system/README.md).
 
 Navigation has two levels. `ComposeSampleApp` builds the application `NavHost` from
-the shared `NavigationRegistry` and owns the backstack between features. Each
+the shared `NavigationRegistry` and owns the backstack between features. Shared
+destination contracts avoid imports of another feature's screens. Each
 feature entry point hosts its own `NavHost` and internal backstack. Feature DI
 registers entry points during startup, and one entry point supplies the start
 destination. The launcher Activity hosts `setContent`; feature screens are Compose
@@ -218,78 +200,53 @@ see the corresponding service READMEs for initialization and unavailable behavio
 
 ## Development workflow
 
-During initial project setup, `main` is the only long-lived branch: it integrates
-changes and holds published versions. Create work branches with the format
-`<type>/<short-description>`: use an English description in lowercase kebab-case,
-without an issue-number prefix. Link the relevant issue in the PR description
-instead.
+During initial setup, `main` is the only long-lived branch. Name work branches
+`<type>/<short-description>`, using English lowercase kebab-case without issue
+numbers.
 
-| Type | Purpose | Create from | PR target |
-| --- | --- | --- | --- |
-| `feature` | A new capability | `main` | `main` |
-| `bugfix` | A correction following the normal development cycle | `main` | `main` |
-| `hotfix` | An urgent correction to a published version | `main` | `main` |
-| `task` | Part of a feature or bugfix implementation | Its parent `feature/*` or `bugfix/*` branch | That same parent branch |
-| `docs` | Independent documentation work | `main` | `main` |
-| `ci` | Independent CI workflow changes | `main` | `main` |
-| `refactor` | Independent internal restructuring | `main` | `main` |
-| `build` | Independent build or tooling changes | `main` | `main` |
-| `chore` | Other independent maintenance, including standalone test improvements | `main` | `main` |
+| Branch example | Purpose | Flow through PRs |
+| --- | --- | --- |
+| `feature/add-login` | New capability | `main` → `feature` → `main` |
+| `bugfix/session-expiration` | Normal development correction | `main` → `bugfix` → `main` |
+| `hotfix/login-crash` | Urgent correction to a published version | `main` → `hotfix` → `main` |
+| `task/create-login-screen` | Part of a feature or bugfix | Parent `feature` or `bugfix` → `task` → same parent |
+| `docs/update-setup-guide` | Independent documentation | `main` → `docs` → `main` |
+| `ci/add-pr-validation` | Independent CI changes | `main` → `ci` → `main` |
+| `refactor/simplify-navigation` | Independent restructuring | `main` → `refactor` → `main` |
+| `build/update-gradle` | Build and tooling | `main` → `build` → `main` |
+| `chore/add-repository-tests` | Maintenance and standalone test improvements | `main` → `chore` → `main` |
 
-Examples include `feature/add-login`, `bugfix/session-expiration`,
-`hotfix/login-crash`, `task/create-login-screen`, `docs/update-setup-guide`, and
-`ci/add-pr-validation`. The branch prefixes `feat`, `fix`, `test`, `perf`, and `style`
-are not part of this convention. Branch types are separate from semantic commit
-and PR title types: a `bugfix/*` branch can have a PR titled
-`fix: handle session expiration`.
+For larger features or bugfixes, merge task PRs into their parent first, validate
+its combined behavior, then open the parent PR into `main`. Include
+`Parent branch: feature/add-login` (or the corresponding bugfix branch) in every
+task PR description. Tasks belonging to a feature or bugfix follow this flow even
+when they involve documentation, tests, or CI.
 
-### Features, bugfixes, and tasks
+### Issues and pull requests
 
-Create a feature or bugfix branch from `main`. Implement small changes directly
-on that branch; split larger work into `task/*` branches when useful. Every task
-must target its own feature or bugfix branch, never `develop`, `main`, another
-task, or a hotfix. Documentation, tests, CI, and other work that belongs to a
-feature or bugfix follows the same task flow; the corresponding standalone branch
-types are for independent work.
+Use the [issue forms](https://github.com/lucasrmoro/ComposeSample/issues/new/choose)
+and write in English. Describe the problem, scope, affected modules, acceptance
+criteria, validation, and dependencies; include reproduction details for bugs.
 
-For example, create `task/create-login-screen` from `feature/add-login` and open
-its PR against `feature/add-login`. Include the following line in the task PR
-description to record the intended parent explicitly:
+PR titles use `<branch-type>: <description>`, matching the source branch prefix:
+`docs/update-guide` → `docs: update guide`. In the description, link the issue,
+explain the resulting behavior, and record validation commands and results.
+Include screenshots for visual changes.
 
-```text
-Parent branch: feature/add-login
-```
+### Commits
 
-The task PR target must match that declaration. Its issue link identifies the
-work item separately; the task name alone does not identify its parent. Merge
-completed task PRs into the parent branch, validate the combined behavior, then
-merge the parent PR into `main`. Keep the parent branch until its tasks have
-been integrated.
+Use `type: description` in English, without a scope. Commit types are independent
+of branch types: `feat`, `fix`, `refactor`, `docs`, `test`, `build`, `ci`, `perf`,
+`style`, and `chore`. Examples: `feat: add login` and `fix: handle expired sessions`.
+Describe incompatible changes and migration in the PR body and add a
+`BREAKING CHANGE:` footer to the commit.
 
-### Releases and hotfixes
+Branch validation and protection remain tracked in
+[#8](https://github.com/lucasrmoro/ComposeSample/issues/8) and
+[#7](https://github.com/lucasrmoro/ComposeSample/issues/7); review the flow manually
+until those checks are implemented.
 
-During initial setup, merge reviewed work PRs into `main`. For an urgent production
-correction, use `hotfix/*` rather than `bugfix/*`, even though both currently
-target `main`. There is no synchronization PR to a retired `develop` branch.
-
-If a separate integration stage becomes necessary, reintroduce `develop` through
-an explicit workflow change. Feature, bugfix, and independent maintenance PRs
-would then target `develop`; releases would use `develop` to `main` PRs, and
-hotfixes would require `main` to `develop` synchronization. Those long-lived branch
-PRs would be explicit naming exceptions. Task PRs would still target their own
-feature or bugfix. Versioning, tags, and artifact publication are tracked in
-[#14](https://github.com/lucasrmoro/ComposeSample/issues/14) and
-[#15](https://github.com/lucasrmoro/ComposeSample/issues/15).
-
-These are the contribution rules. Automated validation of branch names, PR targets,
-and task parent declarations is tracked in
-[#8](https://github.com/lucasrmoro/ComposeSample/issues/8); required checks and branch
-protection are tracked in [#5](https://github.com/lucasrmoro/ComposeSample/issues/5)
-and [#7](https://github.com/lucasrmoro/ComposeSample/issues/7). Until those controls
-are implemented, reviewers must verify the flow manually. Any automation-specific
-branch exception must be documented before it is accepted by validation.
-
-## Validation and development
+## Validation
 
 ```sh
 ./gradlew :app:testDevDebugUnitTest
@@ -299,10 +256,9 @@ branch exception must be documented before it is accepted by validation.
 The test command runs the app module's local tests. Run the corresponding test
 tasks in affected feature or structural modules when changing those modules.
 
-When extending the project, keep business contracts in domain APIs, bindings in DI
-modules, and SDK adapters in dedicated structural implementations. Reuse an
-existing structural service before introducing direct platform or vendor access.
-Every HTTP DTO field must declare `network/api`'s `@JsonName`, including nested
-fields, so protocol names remain explicit after obfuscation.
+## Reporting security vulnerabilities
 
-Contribution guidance is maintained in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Use [private vulnerability reporting](https://github.com/lucasrmoro/ComposeSample/security/advisories/new)
+with the affected version, impact, and safe reproduction steps. Keep vulnerabilities,
+credentials, and personal data out of public issues. Exposed credentials must be
+revoked or rotated. If private reporting is unavailable, wait for a private channel.
