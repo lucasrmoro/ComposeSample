@@ -238,7 +238,7 @@ title is edited, without requiring a new commit. For `docs/update-guide`,
 and `docs:` are invalid. The check validates format and prefix, not English prose
 quality or commit messages.
 
-The **Validate branch flow** check validates branch names and PR targets on PR
+The **Validate branch name** check validates branch names and PR targets on PR
 creation, reopening, updates, and edits. It validates destination types, not a
 task's original parent or creation point, and does not prevent branch creation.
 Fork runs may require maintainer approval according to the repository's Actions

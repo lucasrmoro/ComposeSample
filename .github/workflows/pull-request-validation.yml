@@ -12,16 +12,18 @@ concurrency:
 
 jobs:
   branch-validation:
-    name: Validate branch flow
+    name: Validate branch name
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7.0.1
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - uses: ./.github/actions/branch-validation
+      - name: Validate branch name
+        uses: ./.github/actions/branch-validation
 
   pull-request-title-validation:
     name: Validate PR title
@@ -31,7 +33,9 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7.0.1
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - uses: ./.github/actions/pull-request-title-validation
+      - name: Validate title
+        uses: ./.github/actions/pull-request-title-validation
