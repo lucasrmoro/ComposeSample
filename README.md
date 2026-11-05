@@ -238,6 +238,15 @@ title is edited, without requiring a new commit. For `docs/update-guide`,
 and `docs:` are invalid. The check validates format and prefix, not English prose
 quality or commit messages.
 
+The **Validate branch flow** check validates branch names and PR targets on PR
+creation, reopening, updates, and edits. It validates destination types, not a
+task's original parent or creation point, and does not prevent branch creation.
+Fork runs may require maintainer approval according to the repository's Actions
+settings.
+
+Merge PRs using squash, then delete the source branch locally and remotely,
+except `main` and `develop`.
+
 ### Commits
 
 Use `type: description` in English, without a scope. Commit types are independent
@@ -245,16 +254,6 @@ of branch types: `feat`, `fix`, `refactor`, `docs`, `test`, `build`, `ci`, `perf
 `style`, and `chore`. Examples: `feat: add login` and `fix: handle expired sessions`.
 Describe incompatible changes and migration in the PR body and add a
 `BREAKING CHANGE:` footer to the commit.
-
-The **Validate branch flow** check validates branch names and PR targets
-on PR creation, reopening, updates, and base edits, including fork PRs. It checks PR metadata without running application code or accessing secrets. These checks validate the destination type;
-they do not prove a task's original parent branch or creation point.
-Making these checks mandatory for merge is tracked in
-[#7](https://github.com/lucasrmoro/ComposeSample/issues/7); failed checks alone do
-not block merges until protection is configured. This check does not block branch
-creation. The entry point is `.github/workflows/pull-request-validation.yml`;
-the checks are separate composite actions under `.github/actions/`. Fork runs
-may require maintainer approval according to the repository's Actions settings.
 
 ## Validation
 
