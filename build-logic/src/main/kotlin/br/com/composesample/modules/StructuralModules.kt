@@ -27,31 +27,8 @@ object StructuralModules {
         const val IMPL = "$ROOT:impl"
     }
 
-    object Media {
-        private const val ROOT = "${StructuralModules.ROOT}:media"
-
-        const val API = "$ROOT:api"
-        const val DI = "$ROOT:di"
-        const val IMPL = "$ROOT:impl"
-    }
-
-    object MediaCompression {
-        private const val ROOT = "${StructuralModules.ROOT}:media-compression"
-
-        const val API = "$ROOT:api"
-        const val DI = "$ROOT:di"
-        const val IMPL = "$ROOT:impl"
-    }
-
     object Core {
         private const val ROOT = "${StructuralModules.ROOT}:core"
-
-        const val DI = "$ROOT:di"
-        const val MAIN = ROOT
-    }
-
-    object DesignSystem {
-        private const val ROOT = "${StructuralModules.ROOT}:design-system"
 
         const val DI = "$ROOT:di"
         const val MAIN = ROOT
@@ -62,6 +39,13 @@ object StructuralModules {
 
         const val API = "$ROOT:api"
         const val IMPL = "$ROOT:impl"
+    }
+
+    object DesignSystem {
+        private const val ROOT = "${StructuralModules.ROOT}:design-system"
+
+        const val DI = "$ROOT:di"
+        const val MAIN = ROOT
     }
 
     object LocalStorage {
@@ -82,6 +66,22 @@ object StructuralModules {
 
     object Logger {
         private const val ROOT = "${StructuralModules.ROOT}:logger"
+
+        const val API = "$ROOT:api"
+        const val DI = "$ROOT:di"
+        const val IMPL = "$ROOT:impl"
+    }
+
+    object Media {
+        private const val ROOT = "${StructuralModules.ROOT}:media"
+
+        const val API = "$ROOT:api"
+        const val DI = "$ROOT:di"
+        const val IMPL = "$ROOT:impl"
+    }
+
+    object MediaCompression {
+        private const val ROOT = "${StructuralModules.ROOT}:media-compression"
 
         const val API = "$ROOT:api"
         const val DI = "$ROOT:di"
