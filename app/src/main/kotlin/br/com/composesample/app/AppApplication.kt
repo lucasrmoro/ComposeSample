@@ -1,6 +1,7 @@
 package br.com.composesample.app
 
 import android.app.Application
+import br.com.composesample.configuration.AppConfigurationModule
 import br.com.composesample.featureA.FeatureAModule
 import br.com.composesample.login.LoginModule
 import br.com.composesample.structural.analytics.di.AnalyticsModule
@@ -17,6 +18,8 @@ import br.com.composesample.structural.di.DependencyResolver
 import br.com.composesample.structural.di.get
 import br.com.composesample.structural.di.startDependencyInjection
 import br.com.composesample.structural.local_storage.di.LocalStorageModule
+import br.com.composesample.structural.localization.AppRegionProvider
+import br.com.composesample.structural.localization.di.LocalizationModule
 import br.com.composesample.structural.logger.di.LoggerModule
 import br.com.composesample.structural.logger.Logger
 import br.com.composesample.structural.navigation.di.NavigationModule
@@ -45,6 +48,7 @@ class AppApplication : Application(), PushMessagingServiceHost {
         initializeAnalytics(this)
         initializePushNotifications(this)
         dependencyResolver = setupDependencyInjection()
+        dependencyResolver.get<AppRegionProvider>().start()
         val applicationScope =
             CoroutineScope(
                 SupervisorJob() + dependencyResolver.get<CoroutineDispatcher>(DispatcherIO)
@@ -61,22 +65,24 @@ class AppApplication : Application(), PushMessagingServiceHost {
         }
 
     private fun setupStructuralModules() {
-        NavigationModule.init()
-        LoggerModule.init()
-        CoreModule.init()
+        AppConfigurationModule.init()
         AnalyticsModule.init()
-        RemoteConfigModule.init()
-        NotificationsModule.init()
-        PushNotificationsModule.init()
-        SessionModule.init()
-        PermissionsModule.init()
         BiometricModule.init()
-        MediaModule.init()
         CameraModule.init()
-        MediaCompressionModule.init()
+        CoreModule.init()
         DesignSystemModule.init()
-        NetworkModule.init()
         LocalStorageModule.init()
+        LocalizationModule.init()
+        LoggerModule.init()
+        MediaCompressionModule.init()
+        MediaModule.init()
+        NavigationModule.init()
+        NetworkModule.init()
+        NotificationsModule.init()
+        PermissionsModule.init()
+        PushNotificationsModule.init()
+        RemoteConfigModule.init()
+        SessionModule.init()
     }
 
     private fun setupFeatureModules() {
