@@ -1,7 +1,7 @@
 package br.com.composesample.app
 
 import android.app.Application
-import br.com.composesample.configuration.registerLocalizationSettings
+import br.com.composesample.configuration.AppConfigurationModule
 import br.com.composesample.featureA.FeatureAModule
 import br.com.composesample.login.LoginModule
 import br.com.composesample.structural.analytics.di.AnalyticsModule
@@ -65,7 +65,7 @@ class AppApplication : Application(), PushMessagingServiceHost {
         }
 
     private fun setupStructuralModules() {
-        registerLocalizationSettings()
+        AppConfigurationModule.init()
         NavigationModule.init()
         LoggerModule.init()
         CoreModule.init()

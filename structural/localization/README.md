@@ -4,9 +4,9 @@
 through `StateFlow`. Android configuration callbacks remain in `impl`.
 
 The app owns the fallback country in
-`app/src/main/kotlin/br/com/composesample/configuration/LocalizationSettings.kt`.
+`app/src/main/kotlin/br/com/composesample/configuration/AppConfigurationModule.kt`.
 `LocalizationConfiguration` supplies that value when the device locale has no
 country; the service does not define a default country.
 
-`AppApplication` explicitly registers the configuration, loads `LocalizationModule`
+`AppApplication` explicitly loads `AppConfigurationModule`, then `LocalizationModule`
 and calls `AppRegionProvider.start()`. DI registration does not start observation.
