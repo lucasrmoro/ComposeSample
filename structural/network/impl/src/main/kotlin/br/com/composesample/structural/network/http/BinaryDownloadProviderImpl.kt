@@ -33,14 +33,22 @@ internal class BinaryDownloadProviderImpl(private val coroutineDispatcher: Corou
             baseUrl = requireNotNull(target.resolve("/")).toString(),
             client = okHttpClient
         )
-        val result = service.get(target.toString(), emptyMap(), emptyMap()).awaitDecoded { response ->
-            if (!response.isSuccessful) throw IOException("$DOWNLOAD_FAILED_MESSAGE${response.code()}")
+        val result = service.get(target.toString()).awaitDecoded { response ->
+            if (!response.isSuccessful) {
+                throw IOException("$DOWNLOAD_FAILED_MESSAGE${response.code()}")
+            }
             val body = requireNotNull(response.body())
-            val mimeType = body.contentType()?.let { "${it.type}/${it.subtype}" } ?: BINARY_MIME_TYPE
+            val mimeType = body.contentType()?.let { type ->
+                "${type.type}/${type.subtype}"
+            } ?: BINARY_MIME_TYPE
             BinaryDownloadResult(
                 bytesWritten = body.writeTo(output, maximumBytes, context),
                 mimeType = mimeType,
-                extension = resolveExtension(url, response.headers()[CONTENT_DISPOSITION_HEADER], mimeType)
+                extension = resolveExtension(
+                    url,
+                    response.headers()[CONTENT_DISPOSITION_HEADER],
+                    mimeType
+                )
             )
         }
         emit(result)
@@ -64,7 +72,11 @@ internal class BinaryDownloadProviderImpl(private val coroutineDispatcher: Corou
         bytesWritten
     }
 
-    private fun resolveExtension(url: String, contentDisposition: String?, mimeType: String): String =
+    private fun resolveExtension(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String
+    ): String =
         URLUtil.guessFileName(url, contentDisposition, mimeType)
             .substringAfterLast(EXTENSION_SEPARATOR, missingDelimiterValue = "")
             .takeIf { it.matches(EXTENSION_PATTERN) }

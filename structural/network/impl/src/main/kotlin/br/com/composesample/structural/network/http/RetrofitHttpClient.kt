@@ -29,10 +29,10 @@ internal class RetrofitHttpClient(
         responseType: HttpResponseType<T>
     ): T = execute(responseType) {
         service.post(
-            request.resolvePath(),
-            request.query,
-            request.headers,
-            encode(body)
+            path = request.resolvePath(),
+            body = encode(body),
+            query = request.query,
+            headers = request.headers
         )
     }
 
@@ -42,10 +42,10 @@ internal class RetrofitHttpClient(
         responseType: HttpResponseType<T>
     ): T = execute(responseType) {
         service.put(
-            request.resolvePath(),
-            request.query,
-            request.headers,
-            encode(body)
+            path = request.resolvePath(),
+            body = encode(body),
+            query = request.query,
+            headers = request.headers
         )
     }
 
@@ -55,10 +55,10 @@ internal class RetrofitHttpClient(
         responseType: HttpResponseType<T>
     ): T = execute(responseType) {
         service.delete(
-            request.resolvePath(),
-            request.query,
-            request.headers,
-            encode(body)
+            path = request.resolvePath(),
+            body = encode(body),
+            query = request.query,
+            headers = request.headers
         )
     }
 
@@ -90,7 +90,9 @@ internal class RetrofitHttpClient(
         }
         try {
             return gson.fromJson<T>(body.charStream(), type)
-                ?: throw HttpSerializationException(IllegalStateException("Expected a JSON response body"))
+                ?: throw HttpSerializationException(
+                    IllegalStateException("Expected a JSON response body")
+                )
         } catch (exception: JsonParseException) {
             throw HttpSerializationException(exception)
         }
