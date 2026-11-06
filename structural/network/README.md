@@ -120,5 +120,6 @@ provider; the output stream remains owned by the caller and may contain partial
 data after a failure. Callers are responsible for discarding incomplete files.
 
 Binary downloads reuse the Retrofit streaming service and its cancellable call adapter.
+NetworkModule injects the shared HttpClientFactory into the downloader.
 HttpClientFactory owns the independent download client and its redirect configuration.
 Response bytes are copied to the output in bounded chunks.

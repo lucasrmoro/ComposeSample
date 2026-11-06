@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.flowOn
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.ResponseBody
 
-internal class BinaryDownloadProviderImpl(private val coroutineDispatcher: CoroutineDispatcher) :
-    BinaryDownloadProvider {
-
-    private val httpClientFactory = HttpClientFactory()
+internal class BinaryDownloadProviderImpl(
+    private val coroutineDispatcher: CoroutineDispatcher,
+    private val httpClientFactory: HttpClientFactory
+) : BinaryDownloadProvider {
 
     override fun download(
         url: String,
@@ -91,5 +91,7 @@ internal class BinaryDownloadProviderImpl(private val coroutineDispatcher: Corou
 
 }
 
-fun createBinaryDownloadProvider(coroutineDispatcher: CoroutineDispatcher): BinaryDownloadProvider =
-    BinaryDownloadProviderImpl(coroutineDispatcher)
+fun createBinaryDownloadProvider(
+    coroutineDispatcher: CoroutineDispatcher,
+    httpClientFactory: HttpClientFactory
+): BinaryDownloadProvider = BinaryDownloadProviderImpl(coroutineDispatcher, httpClientFactory)
