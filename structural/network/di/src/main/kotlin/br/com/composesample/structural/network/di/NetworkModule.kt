@@ -9,17 +9,28 @@ import br.com.composesample.structural.network.connectivity.NetworkConnectivityP
 import br.com.composesample.structural.network.createNetworkAuthenticator
 import br.com.composesample.structural.network.createNetworkConnectivityProvider
 import br.com.composesample.structural.network.createNetworkInterceptor
+import br.com.composesample.structural.network.http.BinaryDownloadProvider
+import br.com.composesample.structural.network.http.createBinaryDownloadProvider
 import br.com.composesample.structural.network.http.HttpClient
 import br.com.composesample.structural.network.http.HttpClientConfiguration
 import br.com.composesample.structural.network.http.HttpClientFactory
-import br.com.composesample.structural.network.impl.BuildConfig as NetworkBuildConfig
 import okhttp3.Authenticator
 import okhttp3.Interceptor
 
 object NetworkModule {
 
     private val networkModule = dependencyModule {
-        singleton { HttpClientConfiguration(baseUrl = NetworkBuildConfig.API_BASE_URL) }
+        singleton<BinaryDownloadProvider> {
+            createBinaryDownloadProvider(
+                coroutineDispatcher = dispatcherIO,
+                httpClientFactory = get()
+            )
+        }
+        singleton {
+            HttpClientConfiguration(
+                baseUrl = br.com.composesample.structural.network.impl.BuildConfig.API_BASE_URL
+            )
+        }
         singleton<NetworkConnectivityProvider> { createNetworkConnectivityProvider(context = get()) }
         singleton<Authenticator> {
             createNetworkAuthenticator(
@@ -46,8 +57,6 @@ object NetworkModule {
         }
     }
 
-    fun init() {
-        loadModules(networkModule)
-    }
+    fun init() = loadModules(networkModule)
 
 }

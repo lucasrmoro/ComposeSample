@@ -14,6 +14,13 @@ import retrofit2.Retrofit
 
 class HttpClientFactory {
 
+    private val downloadClient by lazy {
+        OkHttpClient.Builder()
+            .followRedirects(false)
+            .followSslRedirects(false)
+            .build()
+    }
+
     fun createAuthenticated(
         baseUrl: String,
         dispatcher: CoroutineDispatcher,
@@ -29,6 +36,9 @@ class HttpClientFactory {
 
     fun createUnauthenticated(baseUrl: String, dispatcher: CoroutineDispatcher): HttpClient =
         create(baseUrl, dispatcher, OkHttpClient.Builder())
+
+    internal fun createDownloadService(baseUrl: String): RetrofitHttpService =
+        createService(baseUrl, downloadClient)
 
     private fun create(
         baseUrl: String,
@@ -63,7 +73,9 @@ class HttpClientFactory {
     private fun resolveJsonName(field: Field): String {
         val name = field.getAnnotation(JsonName::class.java)?.value
         if (name.isNullOrBlank()) {
-            throw JsonParseException("Field ${field.declaringClass.name}.${field.name} requires @JsonName")
+            throw JsonParseException(
+                "Field ${field.declaringClass.name}.${field.name} requires @JsonName"
+            )
         }
         return name
     }
