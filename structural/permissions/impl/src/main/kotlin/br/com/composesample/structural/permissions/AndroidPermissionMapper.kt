@@ -1,7 +1,5 @@
 package br.com.composesample.structural.permissions
 
-import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -11,16 +9,15 @@ internal class AndroidPermissionMapper(
     private val context: Context
 ) {
 
-    @SuppressLint("InlinedApi")
     fun runtimeName(permission: Permission): String? = when (permission) {
-        Permission.CAMERA -> Manifest.permission.CAMERA
+        Permission.CAMERA -> PermissionNames.CAMERA
         Permission.NOTIFICATIONS -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Manifest.permission.POST_NOTIFICATIONS
+            PermissionNames.NOTIFICATIONS
         } else {
             null
         }
         Permission.WRITE_EXTERNAL_STORAGE -> if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
+            PermissionNames.WRITE_EXTERNAL_STORAGE
         } else {
             null
         }
