@@ -118,3 +118,6 @@ Its independent HTTP client does not attach app authentication headers.
 Cancellation cancels the underlying request. The response body is closed by the
 provider; the output stream remains owned by the caller and may contain partial
 data after a failure. Callers are responsible for discarding incomplete files.
+
+Binary downloads reuse the Retrofit streaming service and its cancellable call adapter.
+Response bytes are copied to the output in bounded chunks.

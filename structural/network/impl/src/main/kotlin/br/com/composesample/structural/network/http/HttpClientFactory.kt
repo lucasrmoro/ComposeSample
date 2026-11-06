@@ -47,7 +47,7 @@ class HttpClientFactory {
             .readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .build()
 
-    private fun createService(baseUrl: String, client: OkHttpClient): RetrofitHttpService =
+    internal fun createService(baseUrl: String, client: OkHttpClient): RetrofitHttpService =
         Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(client)
