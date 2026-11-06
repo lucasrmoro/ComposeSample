@@ -129,13 +129,11 @@ object StructuralModules {
     }
 
     object Security {
-
         private const val ROOT = "${StructuralModules.ROOT}:security"
 
         const val API = "$ROOT:api"
         const val DI = "$ROOT:di"
         const val IMPL = "$ROOT:impl"
-
     }
 
     object Session {
