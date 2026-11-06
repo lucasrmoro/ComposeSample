@@ -8,6 +8,11 @@ import java.util.TimeZone
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * Implements [ComponentCallbacks] to refresh the exposed region when Android resource
+ * configuration changes, including the application language. Registration uses the application
+ * context and begins only when [start] is called explicitly.
+ */
 internal class AndroidAppRegionProvider(context: Context) : AppRegionProvider, ComponentCallbacks {
 
     private val context = context.applicationContext
@@ -38,6 +43,10 @@ internal class AndroidAppRegionProvider(context: Context) : AppRegionProvider, C
         state.value = readRegion()
     }
 
+    /**
+     * No cleanup is needed: this provider retains only the current region state and does not own
+     * caches or memory-intensive resources. The method is required by [ComponentCallbacks].
+     */
     override fun onLowMemory() = Unit
 
     private companion object {
