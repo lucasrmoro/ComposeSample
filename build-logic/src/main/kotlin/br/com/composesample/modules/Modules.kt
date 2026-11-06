@@ -20,6 +20,7 @@ object Modules {
         val Permissions = StructuralModules.Permissions
         val PushNotifications = StructuralModules.PushNotifications
         val RemoteConfig = StructuralModules.RemoteConfig
+        val Security = StructuralModules.Security
         val Session = StructuralModules.Session
     }
 
