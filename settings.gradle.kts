@@ -80,6 +80,9 @@ include(
     ":structural:remote-config:api",
     ":structural:remote-config:di",
     ":structural:remote-config:impl",
+    ":structural:security:api",
+    ":structural:security:di",
+    ":structural:security:impl",
     ":structural:session:api",
     ":structural:session:di",
     ":structural:session:impl"

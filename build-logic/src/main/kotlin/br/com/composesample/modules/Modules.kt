@@ -1,8 +1,6 @@
 package br.com.composesample.modules
 
 object Modules {
-    const val COMMON_DOMAIN = ":common:domain"
-
     object Structural {
         val Analytics = StructuralModules.Analytics
         val Biometric = StructuralModules.Biometric
@@ -20,6 +18,7 @@ object Modules {
         val Permissions = StructuralModules.Permissions
         val PushNotifications = StructuralModules.PushNotifications
         val RemoteConfig = StructuralModules.RemoteConfig
+        val Security = StructuralModules.Security
         val Session = StructuralModules.Session
     }
 
