@@ -1,8 +1,6 @@
 package br.com.composesample.modules
 
 object Modules {
-    const val COMMON_DOMAIN = ":common:domain"
-
     object Structural {
         val Analytics = StructuralModules.Analytics
         val Biometric = StructuralModules.Biometric
