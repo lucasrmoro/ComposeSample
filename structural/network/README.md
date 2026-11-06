@@ -123,3 +123,13 @@ Binary downloads reuse the Retrofit streaming service and its cancellable call a
 NetworkModule injects the shared HttpClientFactory into the downloader.
 HttpClientFactory owns the independent download client and its redirect configuration.
 Response bytes are copied to the output in bounded chunks.
+
+## JSON codec
+
+`JsonCodec` encodes annotated objects and decodes JSON through the existing
+`HttpResponseType<T>` contract, including generic types. `NetworkModule` registers
+the codec; consumers depend on `network/api`, while Gson remains inside `impl`.
+The codec reuses the HTTP client's strict JSON and explicit `JsonName` mapping.
+Serialization is synchronous and performs no network or disk I/O; callers choose
+an appropriate dispatcher for large payloads. Invalid JSON or incompatible data
+propagates to the caller, and a decoded null result is rejected.

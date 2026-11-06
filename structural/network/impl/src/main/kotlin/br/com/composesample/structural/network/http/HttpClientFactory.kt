@@ -64,7 +64,7 @@ class HttpClientFactory {
             .build()
             .create(RetrofitHttpService::class.java)
 
-    private fun createGson(): Gson =
+    internal fun createGson(): Gson =
         GsonBuilder()
             .setStrictness(Strictness.STRICT)
             .setFieldNamingStrategy(::resolveJsonName)
