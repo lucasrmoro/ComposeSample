@@ -1,6 +1,7 @@
 package br.com.composesample.app
 
 import android.app.Application
+import br.com.composesample.configuration.registerLocalizationSettings
 import br.com.composesample.featureA.FeatureAModule
 import br.com.composesample.login.LoginModule
 import br.com.composesample.structural.analytics.di.AnalyticsModule
@@ -17,6 +18,8 @@ import br.com.composesample.structural.di.DependencyResolver
 import br.com.composesample.structural.di.get
 import br.com.composesample.structural.di.startDependencyInjection
 import br.com.composesample.structural.local_storage.di.LocalStorageModule
+import br.com.composesample.structural.localization.AppRegionProvider
+import br.com.composesample.structural.localization.di.LocalizationModule
 import br.com.composesample.structural.logger.di.LoggerModule
 import br.com.composesample.structural.logger.Logger
 import br.com.composesample.structural.navigation.di.NavigationModule
@@ -45,6 +48,7 @@ class AppApplication : Application(), PushMessagingServiceHost {
         initializeAnalytics(this)
         initializePushNotifications(this)
         dependencyResolver = setupDependencyInjection()
+        dependencyResolver.get<AppRegionProvider>().start()
         val applicationScope =
             CoroutineScope(
                 SupervisorJob() + dependencyResolver.get<CoroutineDispatcher>(DispatcherIO)
@@ -61,6 +65,7 @@ class AppApplication : Application(), PushMessagingServiceHost {
         }
 
     private fun setupStructuralModules() {
+        registerLocalizationSettings()
         NavigationModule.init()
         LoggerModule.init()
         CoreModule.init()
@@ -75,6 +80,7 @@ class AppApplication : Application(), PushMessagingServiceHost {
         CameraModule.init()
         MediaCompressionModule.init()
         DesignSystemModule.init()
+        LocalizationModule.init()
         NetworkModule.init()
         LocalStorageModule.init()
     }

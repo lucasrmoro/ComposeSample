@@ -1,3 +1,12 @@
 # Localization
 
-`AppRegionProvider` exposes the app resource language, device region (BR when absent), and timezone through StateFlow. Load `LocalizationModule` and call `start()` explicitly in AppApplication. Platform configuration callbacks remain in impl; registration does not start in a DI factory.
+`AppRegionProvider` exposes the app resource language, device country and timezone
+through `StateFlow`. Android configuration callbacks remain in `impl`.
+
+The app owns the fallback country in
+`app/src/main/kotlin/br/com/composesample/configuration/LocalizationSettings.kt`.
+`LocalizationConfiguration` supplies that value when the device locale has no
+country; the service does not define a default country.
+
+`AppApplication` explicitly registers the configuration, loads `LocalizationModule`
+and calls `AppRegionProvider.start()`. DI registration does not start observation.

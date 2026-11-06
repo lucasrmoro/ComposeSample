@@ -13,9 +13,10 @@ import kotlinx.coroutines.flow.asStateFlow
  * configuration changes, including the application language. Registration uses the application
  * context and begins only when [start] is called explicitly.
  */
-internal class AndroidAppRegionProvider(context: Context) : AppRegionProvider, ComponentCallbacks {
-
-    private val context = context.applicationContext
+internal class AndroidAppRegionProvider(
+    private val applicationContext: Context,
+    private val localizationConfiguration: LocalizationConfiguration
+) : AppRegionProvider, ComponentCallbacks {
 
     private val state = MutableStateFlow(readRegion())
 
@@ -27,14 +28,14 @@ internal class AndroidAppRegionProvider(context: Context) : AppRegionProvider, C
         if (started) return
         started = true
         state.value = readRegion()
-        context.registerComponentCallbacks(this)
+        applicationContext.registerComponentCallbacks(this)
     }
 
     private fun readRegion(): AppRegion {
-        val locale = context.resources.configuration.locales[0] ?: Locale.getDefault()
+        val locale = applicationContext.resources.configuration.locales[0] ?: Locale.getDefault()
         return AppRegion(
             languageTag = locale.toLanguageTag(),
-            countryCode = Locale.getDefault().country.ifBlank { FALLBACK_COUNTRY },
+            countryCode = Locale.getDefault().country.ifBlank { localizationConfiguration.fallbackCountryCode },
             timeZoneId = TimeZone.getDefault().id
         )
     }
@@ -49,9 +50,13 @@ internal class AndroidAppRegionProvider(context: Context) : AppRegionProvider, C
      */
     override fun onLowMemory() = Unit
 
-    private companion object {
-        const val FALLBACK_COUNTRY = "BR"
-    }
 }
 
-fun createAppRegionProvider(context: Context): AppRegionProvider = AndroidAppRegionProvider(context)
+/** Creates the provider using the application context registered by the DI service. */
+fun createAppRegionProvider(
+    applicationContext: Context,
+    localizationConfiguration: LocalizationConfiguration
+): AppRegionProvider = AndroidAppRegionProvider(
+    applicationContext = applicationContext,
+    localizationConfiguration = localizationConfiguration
+)

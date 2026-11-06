@@ -10,7 +10,9 @@ import br.com.composesample.structural.localization.createAppRegionProvider
 object LocalizationModule {
 
     private val localizationModule = dependencyModule {
-        singleton<AppRegionProvider> { createAppRegionProvider(context = get()) }
+        singleton<AppRegionProvider> {
+            createAppRegionProvider(applicationContext = get(), localizationConfiguration = get())
+        }
     }
 
     fun init() = loadModules(localizationModule)
