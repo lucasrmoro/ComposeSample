@@ -72,6 +72,16 @@ object StructuralModules {
         const val IMPL = "$ROOT:impl"
     }
 
+    object Localization {
+
+        private const val ROOT = "${StructuralModules.ROOT}:localization"
+
+        const val API = "$ROOT:api"
+        const val DI = "$ROOT:di"
+        const val IMPL = "$ROOT:impl"
+
+    }
+
     object Logger {
         private const val ROOT = "${StructuralModules.ROOT}:logger"
 

@@ -13,6 +13,7 @@ object Modules {
         val DesignSystem = StructuralModules.DesignSystem
         val DI = StructuralModules.DI
         val LocalStorage = StructuralModules.LocalStorage
+        val Localization = StructuralModules.Localization
         val Logger = StructuralModules.Logger
         val Navigation = StructuralModules.Navigation
         val Network = StructuralModules.Network
