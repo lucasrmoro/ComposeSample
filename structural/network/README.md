@@ -105,3 +105,16 @@ The core Flow extensions consume these API errors without depending on Retrofit 
 The implementation configures call/read timeouts of 30 seconds. HTTP logging is configured
 only in `src/debug`, using a `debugImplementation` dependency. `src/release` provides a
 no-op builder extension; the logging interceptor dependency is absent from release APKs.
+
+## Binary downloads
+
+`BinaryDownloadProvider.download` returns a cold Flow that streams an HTTPS
+response into a caller-owned output stream and emits `BinaryDownloadResult` with
+byte count, MIME type and extension. `NetworkModule` registers the provider with
+the injected I/O dispatcher. The caller supplies an allowed host set and a byte
+limit; the downloader rejects embedded URL credentials and does not follow redirects.
+Its independent HTTP client does not attach app authentication headers.
+
+Cancellation cancels the underlying request. The response body is closed by the
+provider; the output stream remains owned by the caller and may contain partial
+data after a failure. Callers are responsible for discarding incomplete files.
