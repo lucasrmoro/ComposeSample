@@ -24,3 +24,9 @@ services, never in `core`.
 
 HTTP Flow error handling consumes the exceptions from `network/api`. Transport SDKs
 and JSON decoding remain in `network/impl`.
+
+`onSuccess` is a terminal collector that propagates upstream failures and coroutine
+cancellation. Handle expected failures with `onError` before collecting:
+`flow.onError { /* handle error */ }.onSuccess { /* consume value */ }`. Calls that
+previously relied on silent failure handling must add an explicit error handler
+or allow the exception to reach their coroutine owner.

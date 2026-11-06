@@ -17,9 +17,9 @@ fun <T> Flow<T>.onError(
     block(it.toSampleException())
 }
 
-/** Collects emitted values and ignores upstream failures. Coroutine cancellation still propagates. */
+/** Collects values; handle upstream failures with [onError] before calling this terminal helper. */
 suspend fun <T> Flow<T>.onSuccess(block: suspend T.() -> Unit) {
-    catch { }.collect { block(it) }
+    collect { block(it) }
 }
 
 suspend fun Flow<*>.onFinish(block: suspend () -> Unit) {
