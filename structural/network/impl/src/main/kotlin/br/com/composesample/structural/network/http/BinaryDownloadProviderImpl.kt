@@ -10,15 +10,12 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 
 internal class BinaryDownloadProviderImpl(private val coroutineDispatcher: CoroutineDispatcher) :
     BinaryDownloadProvider {
 
-    private val okHttpClient by lazy {
-        OkHttpClient.Builder().followRedirects(false).followSslRedirects(false).build()
-    }
+    private val httpClientFactory = HttpClientFactory()
 
     override fun download(
         url: String,
@@ -29,9 +26,8 @@ internal class BinaryDownloadProviderImpl(private val coroutineDispatcher: Corou
         require(target.isHttps) { UNSUPPORTED_ORIGIN_MESSAGE }
         require(target.username.isEmpty() && target.password.isEmpty() && maximumBytes > 0)
         val context = currentCoroutineContext()
-        val service = HttpClientFactory().createService(
-            baseUrl = requireNotNull(target.resolve("/")).toString(),
-            client = okHttpClient
+        val service = httpClientFactory.createDownloadService(
+            baseUrl = requireNotNull(target.resolve("/")).toString()
         )
         val result = service.get(target.toString()).awaitDecoded { response ->
             if (!response.isSuccessful) {
