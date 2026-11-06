@@ -27,3 +27,5 @@ directly.
 `WRITE_EXTERNAL_STORAGE` is requested only on Android 8 and 9 for legacy public
 gallery writes. On Android 10 and later it returns `NOT_REQUIRED`; gallery
 captures use `MediaStore` scoped storage.
+
+PermissionNames centralizes compile-time identifiers for annotations such as RequiresPermission. Consumers use those constants rather than declaring Android permission strings themselves. Runtime checks and requests still use Permission and PermissionsProvider so Android-version conditions remain inside permissions/impl.
