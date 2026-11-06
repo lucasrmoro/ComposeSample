@@ -23,6 +23,7 @@ internal interface RetrofitHttpService {
         @QueryMap query: Map<String, String> = emptyMap(),
         @HeaderMap headers: Map<String, String> = emptyMap()
     ): Call<ResponseBody>
+
     @Streaming
     @POST
     fun post(
@@ -30,6 +31,7 @@ internal interface RetrofitHttpService {
         @QueryMap query: Map<String, String> = emptyMap(),
         @HeaderMap headers: Map<String, String> = emptyMap()
     ): Call<ResponseBody>
+
     @Streaming
     @POST
     fun post(
@@ -38,6 +40,7 @@ internal interface RetrofitHttpService {
         @QueryMap query: Map<String, String> = emptyMap(),
         @HeaderMap headers: Map<String, String> = emptyMap()
     ): Call<ResponseBody>
+
     @Streaming
     @PUT
     fun put(
@@ -45,6 +48,7 @@ internal interface RetrofitHttpService {
         @QueryMap query: Map<String, String> = emptyMap(),
         @HeaderMap headers: Map<String, String> = emptyMap()
     ): Call<ResponseBody>
+
     @Streaming
     @PUT
     fun put(
@@ -53,6 +57,7 @@ internal interface RetrofitHttpService {
         @QueryMap query: Map<String, String> = emptyMap(),
         @HeaderMap headers: Map<String, String> = emptyMap()
     ): Call<ResponseBody>
+
     @Streaming
     @DELETE
     fun delete(
@@ -60,6 +65,7 @@ internal interface RetrofitHttpService {
         @QueryMap query: Map<String, String> = emptyMap(),
         @HeaderMap headers: Map<String, String> = emptyMap()
     ): Call<ResponseBody>
+
     @Streaming
     @HTTP(method = "DELETE", hasBody = true)
     fun delete(
