@@ -111,8 +111,8 @@ no-op builder extension; the logging interceptor dependency is absent from relea
 `BinaryDownloadProvider.download` returns a cold Flow that streams an HTTPS
 response into a caller-owned output stream and emits `BinaryDownloadResult` with
 byte count, MIME type and extension. `NetworkModule` registers the provider with
-the injected I/O dispatcher. The caller supplies an allowed host set and a byte
-limit; the downloader rejects embedded URL credentials and does not follow redirects.
+the injected I/O dispatcher. The caller supplies a byte limit; the downloader
+rejects embedded URL credentials and does not follow redirects.
 Its independent HTTP client does not attach app authentication headers.
 
 Cancellation cancels the underlying request. The response body is closed by the

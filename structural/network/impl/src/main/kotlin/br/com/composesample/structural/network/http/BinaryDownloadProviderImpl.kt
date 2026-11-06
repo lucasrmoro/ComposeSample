@@ -26,11 +26,10 @@ internal class BinaryDownloadProviderImpl(private val coroutineDispatcher: Corou
     override fun download(
         url: String,
         output: OutputStream,
-        maximumBytes: Long,
-        allowedHosts: Set<String>
+        maximumBytes: Long
     ) = flow {
         val target = url.toHttpUrl()
-        require(target.isHttps && allowedHosts.any { it.equals(target.host, ignoreCase = true) }) {
+        require(target.isHttps) {
             UNSUPPORTED_ORIGIN_MESSAGE
         }
         require(target.username.isEmpty() && target.password.isEmpty() && maximumBytes > 0)
