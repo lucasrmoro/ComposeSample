@@ -3,6 +3,7 @@ package br.com.composesample.modules
 object Modules {
     object Structural {
         val Analytics = StructuralModules.Analytics
+        val AssetsCache = StructuralModules.AssetsCache
         val Biometric = StructuralModules.Biometric
         val Camera = StructuralModules.Camera
         val Core = StructuralModules.Core
