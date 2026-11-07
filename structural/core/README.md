@@ -24,19 +24,3 @@ services, never in `core`.
 
 HTTP Flow error handling consumes the exceptions from `network/api`. Transport SDKs
 and JSON decoding remain in `network/impl`.
-
-`onSuccess` is a terminal collector that consumes upstream failures even without
-`onError`. Add `onError` before it when a failure needs an explicit response.
-Exceptions thrown by the success callback still propagate.
-
-`onError`, `onSuccess` and `launch` propagate `CancellationException` without
-converting it to a domain failure or running error callbacks. `launch` consumes
-other upstream failures.
-
-`onFinish` is a terminal collector that invokes its cleanup callback exactly once
-when collection completes, fails or is cancelled, including flows with no values.
-It no longer invokes the callback for every emission. Cleanup runs in a
-`NonCancellable` context, allowing suspending cleanup such as releasing resources.
-A ViewModel can clear its loading state there. The original failure or cancellation
-propagates after cleanup, unless the cleanup callback itself throws. Keep cleanup
-bounded because coroutine completion waits for it.
