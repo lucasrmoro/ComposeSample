@@ -5,12 +5,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import br.com.composesample.structural.designsystem.tokens.SampleColors
-import br.com.composesample.structural.designsystem.tokens.SampleIcons
+import br.com.composesample.structural.designsystem.tokens.SampleIcon
 
 @Composable
 fun IconSample(
     modifier: Modifier = Modifier,
-    icon: SampleIcons,
+    icon: SampleIcon,
     contentDescription: String?,
     tint: SampleColors
 ) {
