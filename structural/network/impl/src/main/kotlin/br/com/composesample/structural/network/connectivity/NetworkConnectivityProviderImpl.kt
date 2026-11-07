@@ -15,7 +15,9 @@ internal class NetworkConnectivityProviderImpl(context: Context) : NetworkConnec
 
     private var currentNetwork = manager.activeNetwork
 
-    private val state = MutableStateFlow(statusOf(manager.getNetworkCapabilities(currentNetwork)))
+    private val state = MutableStateFlow(
+        statusOf(currentNetwork, manager.getNetworkCapabilities(currentNetwork))
+    )
 
     override val connectivity = state.asStateFlow()
 
@@ -26,7 +28,10 @@ internal class NetworkConnectivityProviderImpl(context: Context) : NetworkConnec
 
             override fun onAvailable(network: Network) {
                 synchronized(this@NetworkConnectivityProviderImpl) {
-                    currentNetwork = network
+                    if (currentNetwork != network) {
+                        currentNetwork = network
+                        state.value = ConnectivityStatus.CHECKING
+                    }
                 }
             }
 
@@ -45,7 +50,7 @@ internal class NetworkConnectivityProviderImpl(context: Context) : NetworkConnec
             ) {
                 synchronized(this@NetworkConnectivityProviderImpl) {
                     if (currentNetwork == network) {
-                        state.value = statusOf(capabilities)
+                        state.value = statusOf(network, capabilities)
                     }
                 }
             }
@@ -57,15 +62,22 @@ internal class NetworkConnectivityProviderImpl(context: Context) : NetworkConnec
         if (started) return
         manager.registerDefaultNetworkCallback(callback)
         currentNetwork = manager.activeNetwork
-        state.value = statusOf(manager.getNetworkCapabilities(currentNetwork))
+        state.value = statusOf(currentNetwork, manager.getNetworkCapabilities(currentNetwork))
         started = true
     }
 
-    private fun statusOf(capabilities: NetworkCapabilities?): ConnectivityStatus =
-        if (capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true) {
+    private fun statusOf(
+        network: Network?,
+        capabilities: NetworkCapabilities?
+    ): ConnectivityStatus = when {
+        network == null -> ConnectivityStatus.OFFLINE
+        capabilities == null -> ConnectivityStatus.CHECKING
+        capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) ->
             ConnectivityStatus.ONLINE
-        } else {
+        capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL) ||
+            !capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ->
             ConnectivityStatus.OFFLINE
-        }
+        else -> ConnectivityStatus.CHECKING
+    }
 
 }

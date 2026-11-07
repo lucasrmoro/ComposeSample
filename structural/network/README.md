@@ -156,9 +156,16 @@ does not guarantee that an individual API or host is reachable. Observation live
 for the application lifetime and retains no Activity.
 
 The initial state is a snapshot of the current default network, refreshed by `start()`
-during startup after callback registration. It is not hardcoded to OFFLINE: an already validated
-network starts ONLINE. OFFLINE means no validated default network was found, including
-when Android is still validating a connection or a captive portal is present. Consumers
-should use this state as a connectivity hint rather than block requests or discard data.
+after callback registration. An already validated network starts ONLINE. CHECKING
+means a default network exists but Android has not confirmed Internet validation,
+including while its capabilities are not available yet. A newly available default
+network enters CHECKING until its capabilities arrive. OFFLINE means there is no
+default network, no Internet capability, or a detected captive portal.
+
+Android does not expose a definitive validation-in-progress flag through these
+capabilities: CHECKING can persist on a network that advertises Internet access but
+never validates. Consumers should not treat CHECKING as OFFLINE, block requests,
+or discard data based on this connectivity hint.
+
 Callbacks consume the supplied capabilities instead of querying synchronous network
 snapshots; losing an obsolete network does not overwrite the replacement network state.
