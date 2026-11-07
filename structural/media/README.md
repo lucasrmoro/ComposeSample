@@ -11,3 +11,12 @@ identifier from `permissions/api`. Callers must check and request legacy storage
 permission before gallery writes on Android 9 or lower. Private cache writes and
 new gallery writes through MediaStore on Android 10+ do not require it. The
 annotation documents the contract; runtime permission checks remain in place.
+
+## Private cache files
+
+`scanCache` emits private files incrementally on the injected I/O dispatcher.
+`findCache` resolves a validated file name directly and returns null for missing
+files. `publishCache` finalizes a temporary file by renaming it with the supplied
+extension and MIME type. These operations reject gallery locations. Synchronous
+lookup and publication must run off the main thread; callers own incomplete-file
+cleanup. Cache retention and byte limits belong to the consuming service.

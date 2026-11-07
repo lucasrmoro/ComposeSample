@@ -1,11 +1,12 @@
 package br.com.composesample.structural.media.di
 
+import br.com.composesample.structural.core.ext.dispatcherIO
 import br.com.composesample.structural.di.dependencyModule
 import br.com.composesample.structural.di.get
 import br.com.composesample.structural.di.loadModules
 import br.com.composesample.structural.di.singleton
-import br.com.composesample.structural.media.createMediaStorageProvider
 import br.com.composesample.structural.media.MediaStorageProvider
+import br.com.composesample.structural.media.createMediaStorageProvider
 import br.com.composesample.structural.permissions.PermissionQualifiers
 
 object MediaModule {
@@ -14,7 +15,8 @@ object MediaModule {
         singleton<MediaStorageProvider> {
             createMediaStorageProvider(
                 context = get(),
-                permissionsProvider = get(qualifier = PermissionQualifiers.ApplicationContext)
+                permissionsProvider = get(qualifier = PermissionQualifiers.ApplicationContext),
+                coroutineDispatcher = dispatcherIO
             )
         }
     }

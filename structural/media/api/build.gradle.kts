@@ -7,4 +7,5 @@ plugins {
 dependencies {
     implementation(project(Modules.Structural.Permissions.API))
     api(libs.annotationJvm)
+    api(libs.coroutines)
 }

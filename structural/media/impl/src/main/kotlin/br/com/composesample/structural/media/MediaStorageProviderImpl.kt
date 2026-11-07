@@ -16,10 +16,15 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.UUID
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 internal class MediaStorageProviderImpl(
     context: Context,
-    private val permissionsProvider: PermissionsProvider
+    private val permissionsProvider: PermissionsProvider,
+    private val coroutineDispatcher: CoroutineDispatcher
 ) : MediaStorageProvider {
 
     private val context = context.applicationContext
@@ -36,6 +41,8 @@ internal class MediaStorageProviderImpl(
         const val NO_ROWS_UPDATED = 0
         const val EMPTY_FILE_SIZE_BYTES = 0L
         const val GALLERY_ROOT_DIRECTORY_SEGMENT_COUNT = 1
+        const val BINARY_MIME_TYPE = "application/octet-stream"
+        const val CACHE_PUBLISH_FAILURE = "Could not publish cached file"
     }
 
     override fun createOutput(
@@ -57,6 +64,64 @@ internal class MediaStorageProviderImpl(
         } else {
             createFile(location, safeName, safeExtension, mimeType)
         }
+    }
+
+    override fun scanCache(location: MediaLocation): Flow<MediaFile> = flow {
+        require(location.area == MediaStorageArea.APP_CACHE)
+        val directory = getDirectory(location)
+        directory.walkTopDown().filter(File::isFile).forEach { file ->
+            val fileLocation =
+                file.relativeTo(directory).parent?.let {
+                    location.copy(directory = "${location.directory}/$it")
+                } ?: location
+            emit(
+                StoredMediaFile(
+                    context,
+                    fileLocation,
+                    file.nameWithoutExtension,
+                    file.extension,
+                    BINARY_MIME_TYPE,
+                    file = file,
+                    pendingMediaStoreItem = false
+                )
+            )
+        }
+    }
+        .flowOn(coroutineDispatcher)
+
+    override fun findCache(
+        location: MediaLocation,
+        nameWithoutExtension: String,
+        extension: String,
+        mimeType: String
+    ): MediaFile? {
+        require(location.area == MediaStorageArea.APP_CACHE)
+        val name = requireName(nameWithoutExtension)
+        val safeExtension = requireExtension(extension)
+        val file = File(getDirectory(location), "$name.$safeExtension")
+        return file.takeIf(File::isFile)?.let {
+            StoredMediaFile(
+                context,
+                location,
+                name,
+                safeExtension,
+                mimeType,
+                file = it,
+                pendingMediaStoreItem = false
+            )
+        }
+    }
+
+    override fun publishCache(source: WritableMediaFile, extension: String, mimeType: String): MediaFile {
+        require(source.location.area == MediaStorageArea.APP_CACHE)
+        val current = requireNotNull(source.requireStoredFile().file)
+        val safeExtension = requireExtension(extension)
+        val destination = File(current.parentFile, "${source.nameWithoutExtension}.$safeExtension")
+        if (current != destination && (destination.exists() || !current.renameTo(destination))) throw IOException(CACHE_PUBLISH_FAILURE)
+        return StoredMediaFile(
+            context = context, location = source.location, nameWithoutExtension = source.nameWithoutExtension,
+            extension = safeExtension, mimeType = mimeType, file = destination, pendingMediaStoreItem = false
+        )
     }
 
     override fun replace(
