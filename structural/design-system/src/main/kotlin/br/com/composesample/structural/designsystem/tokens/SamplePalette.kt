@@ -9,11 +9,13 @@ internal object SamplePalette {
         val S700 = Color(0xFF2E7D32)
         val S900 = Color(0xFF00390A)
     }
+
     object Teal {
         val S200 = Color(0xFF80CBC4)
         val S700 = Color(0xFF008577)
         val S900 = Color(0xFF003731)
     }
+
     object Neutral {
         val S0 = Color.White
         val S50 = Color(0xFFF8F9FA)
@@ -41,6 +43,7 @@ internal object SamplePalette {
         val Outline = Color(0xFF79747E)
         val OutlineVariant = Color(0xFFCAC4D0)
     }
+
     object Dark {
         val Primary = Color(0xFFD0BCFF)
         val OnPrimary = Color(0xFF381E72)
