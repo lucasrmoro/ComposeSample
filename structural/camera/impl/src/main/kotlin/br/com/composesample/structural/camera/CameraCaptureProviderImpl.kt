@@ -23,13 +23,6 @@ internal class CameraCaptureProviderImpl(
     private val storageProvider: MediaStorageProvider
 ) : CameraCaptureProvider {
 
-    private companion object {
-        const val CAPTURE_FILE_NAME_PREFIX = "capture_"
-        const val CAMERA_CACHE_DIRECTORY = "camera"
-        const val CAMERA_GALLERY_DIRECTORY = "Camera"
-        const val ACTIVITY_RESULT_KEY_PREFIX = "camera_capture_"
-    }
-
     private val activeActivities = Collections.synchronizedSet(
         Collections.newSetFromMap(WeakHashMap<ComponentActivity, Boolean>())
     )
@@ -134,6 +127,14 @@ internal class CameraCaptureProviderImpl(
             } else if (continuation.isActive) continuation.resume(result)
         }
     }
+
+    private companion object {
+        const val CAPTURE_FILE_NAME_PREFIX = "capture_"
+        const val CAMERA_CACHE_DIRECTORY = "camera"
+        const val CAMERA_GALLERY_DIRECTORY = "Camera"
+        const val ACTIVITY_RESULT_KEY_PREFIX = "camera_capture_"
+    }
+
 }
 
 private enum class CameraMediaKind(

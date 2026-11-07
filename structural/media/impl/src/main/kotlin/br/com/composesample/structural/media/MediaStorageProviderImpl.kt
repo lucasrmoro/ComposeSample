@@ -36,25 +36,6 @@ internal class MediaStorageProviderImpl(
 
     private val context = context.applicationContext
 
-    private companion object {
-        const val FILE_PROVIDER_AUTHORITY_SUFFIX = ".structural.media.fileprovider"
-        const val BACKUP_FILE_SUFFIX = ".backup"
-        const val FILE_READ_MODE = "r"
-        const val FILE_WRITE_MODE = "w"
-        const val IMAGE_MIME_TYPE_PREFIX = "image/"
-        const val VIDEO_MIME_TYPE_PREFIX = "video/"
-        const val MEDIA_STORE_PENDING = 1
-        const val MEDIA_STORE_PUBLISHED = 0
-        const val NO_ROWS_UPDATED = 0
-        const val EMPTY_FILE_SIZE_BYTES = 0L
-        const val GALLERY_ROOT_DIRECTORY_SEGMENT_COUNT = 1
-        const val BINARY_MIME_TYPE = "application/octet-stream"
-        const val TEMPORARY_FILE_PREFIX = "media-write-"
-        const val TEMPORARY_FILE_SUFFIX = ".part"
-
-        val activeTemporaryFiles = ConcurrentHashMap.newKeySet<File>()
-    }
-
     override fun createOutput(
         location: MediaLocation,
         nameWithoutExtension: String,
@@ -450,6 +431,25 @@ internal class MediaStorageProviderImpl(
         override fun delete(): Boolean = file?.delete()
             ?: (resolver.delete(contentUri!!, null, null) > NO_ROWS_UPDATED)
 
+    }
+
+    private companion object {
+        const val FILE_PROVIDER_AUTHORITY_SUFFIX = ".structural.media.fileprovider"
+        const val BACKUP_FILE_SUFFIX = ".backup"
+        const val FILE_READ_MODE = "r"
+        const val FILE_WRITE_MODE = "w"
+        const val IMAGE_MIME_TYPE_PREFIX = "image/"
+        const val VIDEO_MIME_TYPE_PREFIX = "video/"
+        const val MEDIA_STORE_PENDING = 1
+        const val MEDIA_STORE_PUBLISHED = 0
+        const val NO_ROWS_UPDATED = 0
+        const val EMPTY_FILE_SIZE_BYTES = 0L
+        const val GALLERY_ROOT_DIRECTORY_SEGMENT_COUNT = 1
+        const val BINARY_MIME_TYPE = "application/octet-stream"
+        const val TEMPORARY_FILE_PREFIX = "media-write-"
+        const val TEMPORARY_FILE_SUFFIX = ".part"
+
+        val activeTemporaryFiles = ConcurrentHashMap.newKeySet<File>()
     }
 
 }
