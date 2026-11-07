@@ -1,10 +1,15 @@
 package br.com.composesample.structural.video_player
 
+import android.content.Context
 import java.net.URI
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 
 internal class VideoPlaybackProviderImpl(
-    private val videoPlaybackConfiguration: VideoPlaybackConfiguration
+    private val videoPlaybackConfiguration: VideoPlaybackConfiguration,
+    private val context: Context,
+    private val ioDispatcher: CoroutineDispatcher
 ) : VideoPlaybackProvider {
 
     override fun prepare(source: VideoSource) = flow {
@@ -13,11 +18,14 @@ internal class VideoPlaybackProviderImpl(
         }
         require(source.key.matches(Regex(VIDEO_KEY_PATTERN))) { INVALID_KEY_MESSAGE }
         val origin = resolveOrigin()
+        val document = withContext(ioDispatcher) {
+            context.assets.open(EMBED_ASSET).bufferedReader().use { it.readText() }
+        }
         emit(
             VideoEmbed(
                 baseUrl = origin,
                 html =
-                    EMBED_DOCUMENT.replace(VIDEO_KEY_PLACEHOLDER, source.key)
+                    document.replace(VIDEO_KEY_PLACEHOLDER, source.key)
                         .replace(ORIGIN_PLACEHOLDER, origin)
             )
         )
@@ -43,11 +51,12 @@ internal class VideoPlaybackProviderImpl(
         const val INVALID_ORIGIN_MESSAGE = "Video embed origin must be an HTTPS origin without credentials, path, query or fragment"
         const val VIDEO_KEY_PLACEHOLDER = "{{videoKey}}"
         const val ORIGIN_PLACEHOLDER = "{{origin}}"
-        const val EMBED_DOCUMENT =
-            """<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="strict-origin-when-cross-origin"><style>body{margin:0;background:black}iframe{display:block;width:100%;height:100%;border:0}</style></head><body><iframe src="https://www.youtube.com/embed/{{videoKey}}?playsinline=1&amp;autoplay=0&amp;origin={{origin}}" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe><script>function resizePlayer(){document.body.style.height=window.innerHeight+'px'}window.addEventListener('resize',resizePlayer);resizePlayer()</script></body></html>"""
+        const val EMBED_ASSET = "embed.html"
     }
 }
 
 fun createVideoPlaybackProvider(
-    videoPlaybackConfiguration: VideoPlaybackConfiguration
-): VideoPlaybackProvider = VideoPlaybackProviderImpl(videoPlaybackConfiguration)
+    videoPlaybackConfiguration: VideoPlaybackConfiguration,
+    context: Context,
+    ioDispatcher: CoroutineDispatcher
+): VideoPlaybackProvider = VideoPlaybackProviderImpl(videoPlaybackConfiguration, context, ioDispatcher)

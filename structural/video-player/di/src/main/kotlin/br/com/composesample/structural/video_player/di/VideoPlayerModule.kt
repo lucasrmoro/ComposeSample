@@ -1,5 +1,6 @@
 package br.com.composesample.structural.video_player.di
 
+import br.com.composesample.structural.core.ext.dispatcherIO
 import br.com.composesample.structural.di.dependencyModule
 import br.com.composesample.structural.di.factory
 import br.com.composesample.structural.di.get
@@ -11,7 +12,11 @@ object VideoPlayerModule {
 
     private val videoPlayerModule = dependencyModule {
         factory<VideoPlaybackProvider> {
-            createVideoPlaybackProvider(videoPlaybackConfiguration = get())
+            createVideoPlaybackProvider(
+                videoPlaybackConfiguration = get(),
+                context = get(),
+                ioDispatcher = dispatcherIO
+            )
         }
     }
 
