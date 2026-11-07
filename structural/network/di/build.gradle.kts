@@ -5,6 +5,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(Modules.Structural.Localization.API))
     implementation(project(Modules.Structural.Network.API))
     implementation(project(Modules.Structural.Network.IMPL))
     implementation(project(Modules.Structural.Core.MAIN))
