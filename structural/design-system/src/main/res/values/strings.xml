@@ -1,0 +1,5 @@
+<resources>
+    <string name="sample_play_trailer">Play trailer</string>
+    <string name="sample_video_offline">Connect to the internet to watch the trailer.</string>
+    <string name="sample_video_error">This video could not be played.</string>
+</resources>

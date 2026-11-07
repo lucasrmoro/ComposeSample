@@ -13,3 +13,11 @@ Os módulos de apresentação consomem esses componentes por `:structural:design
 O módulo também fornece `LifecycleBiometricProvider`, que cancela uma solicitação biométrica em andamento quando o escopo de coroutine da tela é cancelado. O binding fica em `:structural:design-system:di`; telas que usam biometria solicitam um provider com a `FragmentActivity` e o escopo de ciclo de vida da tela. A Activity da plataforma serve apenas como adaptador exigido pelo AndroidX BiometricPrompt, não como implementação de tela.
 
 O app carrega `DesignSystemModule.init()` depois do módulo DI de biometria durante a inicialização. O design-system consome contratos estruturais e não inicializa providers nem SDKs por conta própria.
+
+## Player de vídeo
+
+`VideoPlayerSample` apresenta o player do YouTube em proporção 16:9. Ao entrar
+em tela cheia, mantém o vídeo na janela da Activity, gira para paisagem e
+preserva a reprodução. Ao sair, restaura a orientação anterior. O componente
+encerra o WebView ao deixar a tela e mostra mensagens de erro ou falta de
+internet por meio de recursos de texto.

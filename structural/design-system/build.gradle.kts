@@ -6,16 +6,19 @@ plugins {
 }
 
 dependencies {
+    implementation(project(Modules.Structural.Biometric.API))
+    implementation(project(Modules.Structural.Core.MAIN))
+    implementation(project(Modules.Structural.DI.API))
+    implementation(project(Modules.Structural.VideoPlayer.API))
+    implementation(libs.androidx.activity.ktx)
     implementation(platform(libs.androidx.compose.bom))
-    api(libs.androidx.compose.runtime)
-    api(libs.androidx.compose.foundation)
-    api(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
+    api(libs.androidx.compose.runtime)
+    api(libs.androidx.compose.foundation)
+    api(libs.androidx.compose.material3)
     debugImplementation(libs.androidx.compose.ui.tooling)
-    implementation(project(Modules.Structural.Biometric.API))
-    implementation(project(Modules.Structural.DI.API))
-    implementation(project(Modules.Structural.Core.MAIN))
 }

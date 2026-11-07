@@ -10,6 +10,10 @@ object Dimen {
         val Medium = 40.dp
     }
 
+    object Ratio {
+        const val Video = 16f / 9f
+    }
+
     object Spacing {
         val Small = 8.dp
         val Medium = 12.dp

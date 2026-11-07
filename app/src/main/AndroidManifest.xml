@@ -22,6 +22,7 @@
 
         <activity
             android:name="br.com.composesample.activity.LauncherActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
