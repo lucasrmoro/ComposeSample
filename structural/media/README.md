@@ -18,8 +18,9 @@ annotation documents the contract; runtime permission checks remain in place.
 it rejects gallery locations and does not observe later changes. Every scan also launches
 cleanup of abandoned managed-write temporary files on the I/O dispatcher, in parallel with
 enumeration. Active writes in this process are protected from cleanup. Temporary files are
-never emitted. Collection waits for cleanup and propagates deletion failures as IOException;
-cancelling collection also cancels cleanup. `findCache` resolves a
+never emitted. Collection waits for cleanup, but access and deletion failures during cleanup do not fail
+the scan. Undeleted temporary files are retried on later scans. Cancelling collection also
+cancels cleanup. `findCache` resolves a
 validated file name directly and returns null for missing files. Synchronous lookup must
 run off the main thread. Cache retention and byte limits belong to the consuming service.
 

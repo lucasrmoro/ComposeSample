@@ -86,10 +86,15 @@ internal class MediaStorageProviderImpl(
     }.flowOn(coroutineDispatcher)
 
     private suspend fun removeAbandonedTemporaryFiles() {
-        context.cacheDir.listFiles { file ->
-            file.isFile && file.name.startsWith(TEMPORARY_FILE_PREFIX) &&
-                file.name.endsWith(TEMPORARY_FILE_SUFFIX)
-        }?.forEach { file ->
+        val temporaryFiles = try {
+            context.cacheDir.listFiles { file ->
+                file.isFile && file.name.startsWith(TEMPORARY_FILE_PREFIX) &&
+                    file.name.endsWith(TEMPORARY_FILE_SUFFIX)
+            }
+        } catch (_: SecurityException) {
+            return
+        }
+        temporaryFiles?.forEach { file ->
             currentCoroutineContext().ensureActive()
             removeAbandonedTemporaryFile(file)
         }
@@ -97,8 +102,12 @@ internal class MediaStorageProviderImpl(
 
     private fun removeAbandonedTemporaryFile(file: File) {
         synchronized(activeTemporaryFiles) {
-            if (file !in activeTemporaryFiles && !file.delete() && file.exists()) {
-                throw IOException("Could not remove abandoned media file")
+            if (file !in activeTemporaryFiles) {
+                try {
+                    file.delete()
+                } catch (_: SecurityException) {
+                    return
+                }
             }
         }
     }

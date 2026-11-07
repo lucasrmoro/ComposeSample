@@ -32,7 +32,8 @@ interface MediaStorageProvider {
      *
      * Each scan also removes abandoned temporary files from managed writes in parallel on the I/O
      * dispatcher, excluding active writes in this process. These temporary files are never emitted.
-     * Collection waits for cleanup to finish and fails with [IOException] if deletion fails.
+     * Collection waits for cleanup to finish. Cleanup access and deletion failures are ignored;
+     * remaining temporary files are retried on later scans. Cancellation is still propagated.
      *
      * Only [MediaStorageArea.APP_CACHE] is supported. Gallery locations are rejected without
      * enumerating or accessing the user's gallery media.
