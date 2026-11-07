@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import br.com.composesample.structural.designsystem.tokens.Dimen
+import br.com.composesample.structural.designsystem.tokens.SampleDimens
 import br.com.composesample.structural.assets_cache.AssetRequest
 
 @Composable
@@ -25,25 +25,25 @@ fun MediaCardSample(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier.width(Dimen.Size.PosterWidth).clickable(onClick = onClick)) {
+    Column(modifier.width(SampleDimens.Size.PosterWidth).clickable(onClick = onClick)) {
         ImageSample(
             imageRequest,
             title,
             Modifier.fillMaxWidth()
-                .height(Dimen.Size.PosterHeight)
-                .clip(RoundedCornerShape(Dimen.Radius.Medium))
+                .height(SampleDimens.Size.PosterHeight)
+                .clip(RoundedCornerShape(SampleDimens.Radius.Medium))
         )
-        Spacer(Modifier.height(Dimen.Spacing.Small))
+        Spacer(Modifier.height(SampleDimens.Spacing.Small))
         Text(title, style = MaterialTheme.typography.titleSmall)
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Dimen.Spacing.ExtraSmall)
+            horizontalArrangement = Arrangement.spacedBy(SampleDimens.Spacing.ExtraSmall)
         ) {
             rating?.let { rating ->
                 Icon(
                     Icons.Default.Star,
                     null,
-                    Modifier.size(Dimen.Size.RatingIcon),
+                    Modifier.size(SampleDimens.Size.RatingIcon),
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Text(rating, style = MaterialTheme.typography.labelSmall)
@@ -51,12 +51,12 @@ fun MediaCardSample(
             year?.let { Text(it, style = MaterialTheme.typography.labelSmall) }
             certification?.let { certification ->
                 Surface(
-                    shape = RoundedCornerShape(Dimen.Radius.Small),
-                    border = BorderStroke(Dimen.Stroke.Thin, MaterialTheme.colorScheme.outline)
+                    shape = RoundedCornerShape(SampleDimens.Radius.Small),
+                    border = BorderStroke(SampleDimens.Stroke.Thin, MaterialTheme.colorScheme.outline)
                 ) {
                     Text(
                         certification,
-                        Modifier.padding(horizontal = Dimen.Spacing.ExtraSmall),
+                        Modifier.padding(horizontal = SampleDimens.Spacing.ExtraSmall),
                         style = MaterialTheme.typography.labelSmall
                     )
                 }

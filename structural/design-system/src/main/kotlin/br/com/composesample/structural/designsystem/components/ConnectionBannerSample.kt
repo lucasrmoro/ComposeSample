@@ -14,7 +14,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import br.com.composesample.structural.design_system.R
-import br.com.composesample.structural.designsystem.tokens.Dimen
+import br.com.composesample.structural.designsystem.tokens.SampleDimens
 
 @Composable
 fun ConnectionBannerSample() {
@@ -23,7 +23,7 @@ fun ConnectionBannerSample() {
         modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }
     ) {
         Box(
-            Modifier.fillMaxWidth().padding(Dimen.Spacing.Small),
+            Modifier.fillMaxWidth().padding(SampleDimens.Spacing.Small),
             contentAlignment = Alignment.Center
         ) {
             Text(
