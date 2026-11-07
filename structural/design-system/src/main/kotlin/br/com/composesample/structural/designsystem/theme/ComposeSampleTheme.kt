@@ -1,14 +1,16 @@
 package br.com.composesample.structural.designsystem.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import br.com.composesample.structural.designsystem.tokens.Palette
 import br.com.composesample.structural.designsystem.tokens.Dimen
+import br.com.composesample.structural.designsystem.tokens.Palette
 
 data class ComposeSampleColors(
     val primary: Color,
@@ -21,27 +23,24 @@ data class ComposeSampleColors(
     val scrim: Color
 )
 
-private val LightColors = ComposeSampleColors(
-    primary = Palette.Green.S700,
-    onPrimary = Palette.White,
-    secondary = Palette.Teal.S700,
-    onSecondary = Palette.White,
-    background = Palette.Neutral.S0,
-    surface = Palette.Neutral.S0,
-    onSurface = Palette.Neutral.S900,
-    scrim = Palette.Neutral.Scrim
-)
+private fun ColorScheme.toSampleColors() =
+    ComposeSampleColors(
+        primary = primary,
+        onPrimary = onPrimary,
+        secondary = secondary,
+        onSecondary = onSecondary,
+        background = background,
+        surface = surface,
+        onSurface = onSurface,
+        scrim = Palette.Neutral.Scrim
+    )
 
-private val DarkColors = ComposeSampleColors(
-    primary = Palette.Green.S300,
-    onPrimary = Palette.Green.S900,
-    secondary = Palette.Teal.S200,
-    onSecondary = Palette.Teal.S900,
-    background = Palette.Neutral.S950,
-    surface = Palette.Neutral.S900,
-    onSurface = Palette.Neutral.S0,
-    scrim = Palette.Neutral.Scrim
-)
+private val LightColors = LightColorScheme.toSampleColors()
+
+private val SampleTypography =
+    Typography().let { typography ->
+        Typography(titleLarge = typography.titleLarge.copy(fontSize = Dimen.Text.SectionTitle))
+    }
 
 private val LocalComposeSampleColors = staticCompositionLocalOf { LightColors }
 
@@ -52,17 +51,18 @@ object CurrentTheme {
     val stroke = Dimen.Stroke
 
     val color: ComposeSampleColors
-        @Composable
-        @ReadOnlyComposable
-        get() = LocalComposeSampleColors.current
+        @Composable @ReadOnlyComposable get() = LocalComposeSampleColors.current
+
 }
 
 @Composable
-fun ComposeSampleTheme(content: @Composable () -> Unit) {
-    val colors = if (isSystemInDarkTheme()) DarkColors else LightColors
-    CompositionLocalProvider(
-        LocalComposeSampleColors provides colors
-    ) {
-        MaterialTheme(content = content)
+fun ComposeSampleTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    SystemBarsSample(darkTheme = darkTheme)
+    CompositionLocalProvider(LocalComposeSampleColors provides colorScheme.toSampleColors()) {
+        MaterialTheme(colorScheme = colorScheme, typography = SampleTypography, content = content)
     }
 }

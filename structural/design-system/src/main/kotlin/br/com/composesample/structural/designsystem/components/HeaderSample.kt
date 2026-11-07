@@ -9,9 +9,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import br.com.composesample.structural.designsystem.theme.CurrentTheme
+import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
+import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +34,7 @@ fun HeaderSample(
                 IconButton(onClick = onNavigateBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Navigate back"
+                        contentDescription = stringResource(R.string.sample_navigate_back)
                     )
                 }
             }
