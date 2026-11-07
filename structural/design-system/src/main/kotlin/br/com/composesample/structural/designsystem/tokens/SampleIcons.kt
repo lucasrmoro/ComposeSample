@@ -4,10 +4,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 
-class SampleIcon internal constructor(internal val imageVector: ImageVector)
+class IconToken internal constructor(internal val imageVector: ImageVector)
 
 internal object SampleIcons {
 
-    val Person = SampleIcon(Icons.Default.Person)
+    val Person = IconToken(Icons.Default.Person)
 
 }

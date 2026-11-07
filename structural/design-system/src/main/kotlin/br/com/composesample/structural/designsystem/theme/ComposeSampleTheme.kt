@@ -11,7 +11,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import br.com.composesample.structural.designsystem.tokens.SampleDimens
 import br.com.composesample.structural.designsystem.tokens.SampleColor
-import br.com.composesample.structural.designsystem.tokens.SampleIcon
+import br.com.composesample.structural.designsystem.tokens.IconToken
 import br.com.composesample.structural.designsystem.tokens.SampleIcons
 import br.com.composesample.structural.designsystem.tokens.SamplePalette
 
@@ -74,7 +74,7 @@ object CurrentTheme {
     }
 
     object icon {
-        val Person: SampleIcon get() = SampleIcons.Person
+        val Person: IconToken get() = SampleIcons.Person
     }
 
     object colors {
