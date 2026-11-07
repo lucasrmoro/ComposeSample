@@ -10,7 +10,12 @@ dependencies {
     implementation(project(Modules.Structural.Core.MAIN))
     implementation(project(Modules.Structural.DI.API))
     implementation(project(Modules.Structural.VideoPlayer.API))
+    implementation(project(Modules.Structural.AssetsCache.API))
+    implementation(project(Modules.Structural.Media.API))
+    implementation(project(Modules.Structural.Network.API))
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.core.ktx)
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.ui)

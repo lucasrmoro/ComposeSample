@@ -1,5 +1,14 @@
 <resources>
+    <string name="sample_navigate_back">Navigate back</string>
+    <string name="sample_search">Search</string>
+    <string name="sample_clear_search">Clear search</string>
+    <string name="sample_image_unavailable">Image unavailable</string>
+    <string name="sample_offline_notice">No internet. You can view what has already loaded.</string>
     <string name="sample_play_trailer">Play trailer</string>
     <string name="sample_video_offline">Connect to the internet to watch the trailer.</string>
     <string name="sample_video_error">This video could not be played.</string>
+    <string name="sample_refresh">Refresh</string>
+    <string name="sample_trailer">Trailer</string>
+    <string name="sample_image_loading">Loading image…</string>
+    <string name="sample_photo_not_provided">Photo not provided</string>
 </resources>
