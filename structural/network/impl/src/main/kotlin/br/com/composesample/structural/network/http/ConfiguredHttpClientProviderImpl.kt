@@ -21,7 +21,7 @@ internal class ConfiguredHttpClientProviderImpl(
             }
         )
         if (options.useAppLanguage) builder.addInterceptor(LanguageInterceptor(appRegionProvider))
-        return httpClientFactory.createConfigured(options.baseUrl, coroutineDispatcher, builder)
+        return httpClientFactory.createCustomClient(options.baseUrl, coroutineDispatcher, builder)
     }
 
 }

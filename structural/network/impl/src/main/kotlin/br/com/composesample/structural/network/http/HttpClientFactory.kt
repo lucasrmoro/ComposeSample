@@ -35,7 +35,7 @@ internal class HttpClientFactory(
     fun createUnauthenticated(baseUrl: String, dispatcher: CoroutineDispatcher): HttpClient =
         create(baseUrl, dispatcher, OkHttpClient.Builder())
 
-    internal fun createConfigured(
+    internal fun createCustomClient(
         baseUrl: String,
         dispatcher: CoroutineDispatcher,
         builder: OkHttpClient.Builder
