@@ -26,7 +26,15 @@ interface MediaStorageProvider {
         mimeType: String
     ): WritableMediaFile
 
-    /** Emits private cache files incrementally on the injected I/O dispatcher. */
+    /**
+     * Recursively emits files from the app's private cache at [location] on the injected I/O
+     * dispatcher. Each collection starts a new scan; subsequent changes are not observed.
+     *
+     * Only [MediaStorageArea.APP_CACHE] is supported. Gallery locations are rejected without
+     * enumerating or accessing the user's gallery media.
+     *
+     * @throws IllegalArgumentException When collected with a location outside the app's private cache.
+     */
     fun scanCache(location: MediaLocation): Flow<MediaFile>
 
     /** Resolves a private cache file directly, returning null when Android removed it. */
