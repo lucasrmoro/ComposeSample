@@ -1,7 +1,10 @@
 # Core
 
 Contains shared contracts and utilities, Flow extensions, and application state
-aggregation through `AppStateProvider`.
+aggregation through `AppStateProvider`. Its existing LiveData state adapts the network
+StateFlow locally with `asLiveData()`, collecting only while that adapter is active
+(with the lifecycle library’s default inactivity timeout). The network API itself
+has no LiveData dependency.
 
 `core/di` registers qualified dispatchers and `AppStateProvider`. The app loads
 `CoreModule.init()` before resolving consumers. Session and connectivity contracts

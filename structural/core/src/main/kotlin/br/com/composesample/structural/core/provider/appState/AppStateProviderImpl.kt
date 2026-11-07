@@ -2,8 +2,8 @@ package br.com.composesample.structural.core.provider.appState
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.asLiveData
 
-import br.com.composesample.structural.network.connectivity.ConnectivityStatus
 import br.com.composesample.structural.network.connectivity.NetworkConnectivityProvider
 import br.com.composesample.structural.session.AppSessionProvider
 import br.com.composesample.structural.session.SessionStatus
@@ -13,21 +13,22 @@ internal class AppStateProviderImpl(
     private val networkConnectivityProvider: NetworkConnectivityProvider
 ) : AppStateProvider {
 
+    private val connectivity = networkConnectivityProvider.connectivity.asLiveData()
+
     private val _state = MediatorLiveData<AppState>()
 
     override val state: LiveData<AppState> = _state
 
     init {
         _state.addSource(appSessionProvider.isSessionExpired) { updateState() }
-        _state.addSource(networkConnectivityProvider.isInternetAvailable) { updateState() }
+        _state.addSource(connectivity) { updateState() }
     }
 
     private fun updateState() {
-        val internetAvailable = networkConnectivityProvider.isInternetAvailable.value ?: return
         val sessionExpired = appSessionProvider.isSessionExpired.value ?: false
         val updatedState = AppState(
             session = if (sessionExpired) SessionStatus.EXPIRED else SessionStatus.ACTIVE,
-            connectivity = if (internetAvailable) ConnectivityStatus.ONLINE else ConnectivityStatus.OFFLINE
+            connectivity = networkConnectivityProvider.connectivity.value
         )
 
         if (_state.value != updatedState) {

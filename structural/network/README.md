@@ -143,13 +143,22 @@ network API contracts and share the factory through `NetworkComponents`.
 
 ## Connectivity observation
 
-`NetworkConnectivityProvider.connectivity` exposes a StateFlow alongside the legacy
-`isInternetAvailable` LiveData view. `AppApplication` calls `start()` explicitly after
+`NetworkConnectivityProvider.connectivity` exposes a StateFlow. The former
+`isInternetAvailable` LiveData contract has been removed; consumers collect connectivity
+or adapt it at their own lifecycle boundary. `AppApplication` calls `start()` explicitly after
 loading DI; resolving the provider does not register Android network callbacks.
 Repeated calls to `start()` do not duplicate registration.
 
 The provider follows the default network and reports ONLINE only when Android marks
 it validated. This includes supported default transports beyond Wi-Fi and cellular.
-Updates are immediate; the previous five-second LiveData debounce is removed. ONLINE
+Updates are immediate, without debounce. ONLINE
 does not guarantee that an individual API or host is reachable. Observation lives
 for the application lifetime and retains no Activity.
+
+The initial state is a snapshot of the current default network, refreshed by `start()`
+during startup after callback registration. It is not hardcoded to OFFLINE: an already validated
+network starts ONLINE. OFFLINE means no validated default network was found, including
+when Android is still validating a connection or a captive portal is present. Consumers
+should use this state as a connectivity hint rather than block requests or discard data.
+Callbacks consume the supplied capabilities instead of querying synchronous network
+snapshots; losing an obsolete network does not overwrite the replacement network state.
