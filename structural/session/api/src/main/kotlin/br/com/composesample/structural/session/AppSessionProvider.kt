@@ -1,11 +1,14 @@
 package br.com.composesample.structural.session
 
-import androidx.lifecycle.LiveData
+import kotlinx.coroutines.flow.StateFlow
 
+/** Tracks session expiration for the application lifetime. */
 interface AppSessionProvider {
 
-    val isSessionExpired: LiveData<Boolean>
+    /** Starts false and becomes true immediately when [expireSession] is called. */
+    val isSessionExpired: StateFlow<Boolean>
 
+    /** Marks the session expired; repeated calls preserve the expired state. */
     fun expireSession()
 
 }
