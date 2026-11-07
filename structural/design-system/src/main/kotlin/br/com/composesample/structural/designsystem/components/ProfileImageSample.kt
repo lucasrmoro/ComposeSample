@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import br.com.composesample.structural.assets_cache.AssetRequest
 import br.com.composesample.structural.design_system.R
-import br.com.composesample.structural.designsystem.tokens.SampleColorTokens
+import br.com.composesample.structural.designsystem.tokens.SampleColors
 import br.com.composesample.structural.designsystem.tokens.SampleIcons
 
 @Composable
@@ -28,7 +28,7 @@ fun ProfileImageSample(
             IconSample(
                 icon = SampleIcons.Person,
                 contentDescription = stringResource(R.string.sample_photo_not_provided),
-                tint = SampleColorTokens.OnSurfaceVariant
+                tint = SampleColors.OnSurfaceVariant
             )
         }
 }
