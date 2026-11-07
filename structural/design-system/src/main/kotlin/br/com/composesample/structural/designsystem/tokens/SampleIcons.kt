@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 class SampleIcon internal constructor(internal val imageVector: ImageVector)
 
-object SampleIcons {
+internal object SampleIcons {
 
     val Person = SampleIcon(Icons.Default.Person)
 

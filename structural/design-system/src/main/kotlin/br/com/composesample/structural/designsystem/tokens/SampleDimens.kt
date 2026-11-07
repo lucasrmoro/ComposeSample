@@ -4,7 +4,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /** Reusable dimension tokens shared across Compose Sample components. */
-object SampleDimens {
+internal object SampleDimens {
 
     object Size {
         val Small = 18.dp

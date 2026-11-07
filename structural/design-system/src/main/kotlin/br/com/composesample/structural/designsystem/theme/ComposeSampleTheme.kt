@@ -10,6 +10,9 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import br.com.composesample.structural.designsystem.tokens.SampleDimens
+import br.com.composesample.structural.designsystem.tokens.SampleColor
+import br.com.composesample.structural.designsystem.tokens.SampleIcon
+import br.com.composesample.structural.designsystem.tokens.SampleIcons
 import br.com.composesample.structural.designsystem.tokens.SamplePalette
 
 data class ComposeSampleColors(
@@ -46,9 +49,37 @@ private val LocalComposeSampleColors = staticCompositionLocalOf { LightColors }
 
 object CurrentTheme {
 
-    val size = SampleDimens.Size
-    val spacing = SampleDimens.Spacing
-    val stroke = SampleDimens.Stroke
+    object size {
+        val Small get() = SampleDimens.Size.Small
+        val Medium get() = SampleDimens.Size.Medium
+        val FloatingActionClearance get() = SampleDimens.Size.FloatingActionClearance
+        val TouchTarget get() = SampleDimens.Size.TouchTarget
+        val PosterWidth get() = SampleDimens.Size.PosterWidth
+        val PosterHeight get() = SampleDimens.Size.PosterHeight
+        val BackdropHeight get() = SampleDimens.Size.BackdropHeight
+        val Portrait get() = SampleDimens.Size.Portrait
+        val RatingIcon get() = SampleDimens.Size.RatingIcon
+    }
+
+    object spacing {
+        val ExtraSmall get() = SampleDimens.Spacing.ExtraSmall
+        val Small get() = SampleDimens.Spacing.Small
+        val Medium get() = SampleDimens.Spacing.Medium
+        val Large get() = SampleDimens.Spacing.Large
+        val ExtraLarge get() = SampleDimens.Spacing.ExtraLarge
+    }
+
+    object stroke {
+        val Thin get() = SampleDimens.Stroke.Thin
+    }
+
+    object icon {
+        val Person: SampleIcon get() = SampleIcons.Person
+    }
+
+    object colors {
+        val OnSurfaceVariant = SampleColor { MaterialTheme.colorScheme.onSurfaceVariant }
+    }
 
     val color: ComposeSampleColors
         @Composable @ReadOnlyComposable get() = LocalComposeSampleColors.current
