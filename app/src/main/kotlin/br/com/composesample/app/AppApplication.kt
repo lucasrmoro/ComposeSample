@@ -34,6 +34,7 @@ import br.com.composesample.structural.push_notifications.initializePushNotifica
 import br.com.composesample.structural.remote_config.di.RemoteConfigModule
 import br.com.composesample.structural.remote_config.initializeRemoteConfig
 import br.com.composesample.structural.session.di.SessionModule
+import br.com.composesample.structural.video_player.di.VideoPlayerModule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -85,6 +86,7 @@ class AppApplication : Application(), PushMessagingServiceHost {
         PushNotificationsModule.init()
         RemoteConfigModule.init()
         SessionModule.init()
+        VideoPlayerModule.init()
     }
 
     private fun setupFeatureModules() {

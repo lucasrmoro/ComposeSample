@@ -88,7 +88,10 @@ include(
     ":structural:security:impl",
     ":structural:session:api",
     ":structural:session:di",
-    ":structural:session:impl"
+    ":structural:session:impl",
+    ":structural:video-player:api",
+    ":structural:video-player:di",
+    ":structural:video-player:impl"
 )
 
 // Features

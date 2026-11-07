@@ -21,6 +21,7 @@ object Modules {
         val RemoteConfig = StructuralModules.RemoteConfig
         val Security = StructuralModules.Security
         val Session = StructuralModules.Session
+        val VideoPlayer = StructuralModules.VideoPlayer
     }
 
     object Feature {
