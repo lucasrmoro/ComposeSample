@@ -1,18 +1,18 @@
 <resources>
-    <!-- Navegação -->
+    <!-- Navigation -->
     <string name="sample_navigate_back">Voltar</string>
 
-    <!-- Busca -->
+    <!-- Search -->
     <string name="sample_search">Pesquisar</string>
     <string name="sample_clear_search">Limpar pesquisa</string>
 
-    <!-- Imagens -->
+    <!-- Images -->
     <string name="sample_image_unavailable">Imagem indisponível</string>
 
-    <!-- Conectividade -->
+    <!-- Connectivity -->
     <string name="sample_offline_notice">Sem internet. Você pode ver o que já foi carregado.</string>
 
-    <!-- Vídeo -->
+    <!-- Video -->
     <string name="sample_play_trailer">Assistir ao trailer</string>
     <string name="sample_video_offline">Conecte-se à internet para assistir ao trailer.</string>
     <string name="sample_video_error">Não foi possível reproduzir este vídeo.</string>
