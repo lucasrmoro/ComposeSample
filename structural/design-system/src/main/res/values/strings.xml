@@ -5,10 +5,13 @@
     <!-- Search -->
     <string name="sample_search">Search</string>
     <string name="sample_clear_search">Clear search</string>
+
     <!-- Images -->
     <string name="sample_image_unavailable">Image unavailable</string>
+
     <!-- Connectivity -->
     <string name="sample_offline_notice">No internet. You can view what has already loaded.</string>
+
     <!-- Video -->
     <string name="sample_play_trailer">Play trailer</string>
     <string name="sample_video_offline">Connect to the internet to watch the trailer.</string>
