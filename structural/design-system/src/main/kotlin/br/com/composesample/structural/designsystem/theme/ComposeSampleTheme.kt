@@ -9,8 +9,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import br.com.composesample.structural.designsystem.tokens.Dimen
-import br.com.composesample.structural.designsystem.tokens.Palette
+import br.com.composesample.structural.designsystem.tokens.SampleDimens
+import br.com.composesample.structural.designsystem.tokens.SampleColors
 
 data class ComposeSampleColors(
     val primary: Color,
@@ -32,23 +32,23 @@ private fun ColorScheme.toSampleColors() =
         background = background,
         surface = surface,
         onSurface = onSurface,
-        scrim = Palette.Neutral.Scrim
+        scrim = SampleColors.Neutral.Scrim
     )
 
 private val LightColors = LightColorScheme.toSampleColors()
 
 private val SampleTypography =
     Typography().let { typography ->
-        Typography(titleLarge = typography.titleLarge.copy(fontSize = Dimen.Text.SectionTitle))
+        Typography(titleLarge = typography.titleLarge.copy(fontSize = SampleDimens.Text.SectionTitle))
     }
 
 private val LocalComposeSampleColors = staticCompositionLocalOf { LightColors }
 
 object CurrentTheme {
 
-    val size = Dimen.Size
-    val spacing = Dimen.Spacing
-    val stroke = Dimen.Stroke
+    val size = SampleDimens.Size
+    val spacing = SampleDimens.Spacing
+    val stroke = SampleDimens.Stroke
 
     val color: ComposeSampleColors
         @Composable @ReadOnlyComposable get() = LocalComposeSampleColors.current

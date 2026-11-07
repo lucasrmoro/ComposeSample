@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import br.com.composesample.structural.assets_cache.AssetRequest
 import br.com.composesample.structural.design_system.R
+import br.com.composesample.structural.designsystem.tokens.SampleColorTokens
+import br.com.composesample.structural.designsystem.tokens.SampleIcons
 
 @Composable
 fun ProfileImageSample(
@@ -23,9 +25,10 @@ fun ProfileImageSample(
             modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
-            PersonIconSample(
+            IconSample(
+                icon = SampleIcons.Person,
                 contentDescription = stringResource(R.string.sample_photo_not_provided),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = SampleColorTokens.OnSurfaceVariant
             )
         }
 }
