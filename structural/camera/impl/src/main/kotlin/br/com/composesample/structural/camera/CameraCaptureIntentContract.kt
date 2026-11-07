@@ -10,10 +10,6 @@ import androidx.activity.result.contract.ActivityResultContract
 
 internal class CameraCaptureIntentContract : ActivityResultContract<CameraCaptureRequest, Boolean>() {
 
-    private companion object {
-        const val CAMERA_CAPTURE_CLIP_LABEL = "camera_capture"
-    }
-
     override fun createIntent(context: Context, input: CameraCaptureRequest): Intent =
         Intent(input.action).apply {
             putExtra(MediaStore.EXTRA_OUTPUT, input.outputUri)
@@ -22,6 +18,10 @@ internal class CameraCaptureIntentContract : ActivityResultContract<CameraCaptur
         }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Boolean = resultCode == Activity.RESULT_OK
+
+    private companion object {
+        const val CAMERA_CAPTURE_CLIP_LABEL = "camera_capture"
+    }
 
 }
 

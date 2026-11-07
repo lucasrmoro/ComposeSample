@@ -120,6 +120,23 @@ provider; the output stream remains owned by the caller and may contain partial
 data after a failure. Callers are responsible for discarding incomplete files.
 
 Binary downloads reuse the Retrofit streaming service and its cancellable call adapter.
-NetworkModule injects the shared HttpClientFactory into the downloader.
+NetworkModule passes shared network components into the downloader composition function.
 HttpClientFactory owns the independent download client and its redirect configuration.
 Response bytes are copied to the output in bounded chunks.
+
+## JSON codec
+
+`JsonCodec` encodes annotated objects and decodes JSON through the existing
+`HttpResponseType<T>` contract, including generic types. `NetworkModule` registers
+the codec; consumers depend on `network/api`, while Gson remains inside `impl`.
+The codec reuses the HTTP client's strict JSON and explicit `JsonName` mapping.
+Serialization is synchronous and performs no network or disk I/O; callers choose
+an appropriate dispatcher for large payloads. Invalid JSON or incompatible data
+propagates to the caller, and a decoded null result is rejected.
+
+`NetworkModule` registers a single `NetworkComponents` holder, which keeps Gson
+inside `impl`. Its configured Gson instance is injected into both `HttpClientFactory`
+and `GsonJsonCodec`. The builder is used only to construct that shared instance.
+
+`HttpClientFactory` is internal to `impl`. DI uses composition functions that return
+network API contracts and share the factory through `NetworkComponents`.
