@@ -11,7 +11,7 @@ import br.com.composesample.structural.designsystem.tokens.SampleDimens
 
 /** Reusable chip for an action with a short label. */
 @Composable
-fun ChipSample(label: String, onClick: () -> Unit) {
+fun SampleChip(label: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier.height(SampleDimens.Size.TouchTarget),
         contentAlignment = Alignment.CenterStart

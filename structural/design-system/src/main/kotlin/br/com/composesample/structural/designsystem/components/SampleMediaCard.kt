@@ -15,7 +15,7 @@ import br.com.composesample.structural.designsystem.tokens.SampleDimens
 import br.com.composesample.structural.assets_cache.AssetRequest
 
 @Composable
-fun MediaCardSample(
+fun SampleMediaCard(
     title: String,
     imageRequest: AssetRequest?,
     rating: String?,
@@ -26,7 +26,7 @@ fun MediaCardSample(
     modifier: Modifier = Modifier
 ) {
     Column(modifier.width(SampleDimens.Size.PosterWidth).clickable(onClick = onClick)) {
-        ImageSample(
+        SampleImage(
             imageRequest,
             title,
             Modifier.fillMaxWidth()

@@ -13,7 +13,7 @@ import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
-fun TextFieldSample(
+fun SampleTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
@@ -46,7 +46,7 @@ fun TextFieldSample(
 @Preview(showBackground = true)
 @Composable
 private fun SampleTextFieldPreview() {
-    TextFieldSample(
+    SampleTextField(
         value = "",
         onValueChange = {},
         label = "Message",

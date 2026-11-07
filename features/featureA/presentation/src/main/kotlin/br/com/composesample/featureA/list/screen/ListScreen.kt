@@ -20,7 +20,7 @@ import br.com.composesample.featureA.list.model.ListUiEvent
 import br.com.composesample.featureA.list.model.ListUiState
 import br.com.composesample.featureA.list.viewModel.ListViewModel
 import br.com.composesample.structural.designsystem.components.LoadingState
-import br.com.composesample.structural.designsystem.components.ScreenSample
+import br.com.composesample.structural.designsystem.components.SampleScreen
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 import br.com.composesample.structural.designsystem.screen.BaseScreen
@@ -53,7 +53,7 @@ private fun ListScreenContent(
     state: ListUiState,
     sendEvent: (ListUiEvent) -> Unit
 ) {
-    ScreenSample(
+    SampleScreen(
         title = "Compose - Sample",
         canNavigateBack = false,
         onNavigateBack = {},

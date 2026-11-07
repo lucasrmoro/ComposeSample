@@ -19,7 +19,7 @@ import androidx.compose.ui.platform.LocalViewConfiguration
 
 /** Clears focus when a tap lands outside the focused element. */
 @Composable
-fun ClearFocusOnOutsideTapSample(content: @Composable () -> Unit) {
+fun SampleClearFocusOnOutsideTap(content: @Composable () -> Unit) {
     val focusManager = LocalFocusManager.current
     val viewConfiguration = LocalViewConfiguration.current
     val focusedBounds = remember { mutableStateOf<Rect?>(null) }

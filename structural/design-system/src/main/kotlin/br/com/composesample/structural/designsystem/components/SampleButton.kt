@@ -14,7 +14,7 @@ import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
-fun ButtonSample(
+fun SampleButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -31,7 +31,7 @@ fun ButtonSample(
         )
     ) {
         if (isLoading) {
-            CircularProgressIndicatorSample(
+            SampleCircularProgressIndicator(
                 modifier = Modifier.size(CurrentTheme.size.Small),
                 color = CurrentTheme.color.onPrimary
             )
@@ -45,6 +45,6 @@ fun ButtonSample(
 @Composable
 private fun SampleButtonPreview() {
     ComposeSampleTheme {
-        ButtonSample(text = "Continue", onClick = {})
+        SampleButton(text = "Continue", onClick = {})
     }
 }
