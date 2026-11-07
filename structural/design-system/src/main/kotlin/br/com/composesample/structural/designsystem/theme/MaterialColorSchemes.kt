@@ -7,11 +7,11 @@ import br.com.composesample.structural.designsystem.tokens.SamplePalette
 internal val LightColorScheme =
     lightColorScheme(
         primary = SamplePalette.Purple.S40,
-        onPrimary = SamplePalette.Neutral.S0,
+        onPrimary = SamplePalette.Neutral.White,
         primaryContainer = SamplePalette.Purple.S10,
         onPrimaryContainer = SamplePalette.Purple.S100,
         secondary = SamplePalette.VioletGray.S40,
-        onSecondary = SamplePalette.Neutral.S0,
+        onSecondary = SamplePalette.Neutral.White,
         secondaryContainer = SamplePalette.VioletGray.S10,
         onSecondaryContainer = SamplePalette.VioletGray.S100,
         background = SamplePalette.Surfaces.WarmWhite,

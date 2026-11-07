@@ -17,14 +17,13 @@ internal object SamplePalette {
     }
 
     object Neutral {
-        val S0 = Color.White
+        val Black = Color.Black
+        val White = Color.White
         val S50 = Color(0xFFF8F9FA)
         val S900 = Color(0xFF202124)
         val S950 = Color(0xFF121212)
         val Scrim = Color(0x52000000)
     }
-
-    val White = Color.White
 
     object Purple {
         val S10 = Color(0xFFEADDFF)
@@ -64,7 +63,4 @@ internal object SamplePalette {
         val Lavender = Color(0xFFCAC4D0)
         val Plum = Color(0xFF49424F)
     }
-
-
-
 }
