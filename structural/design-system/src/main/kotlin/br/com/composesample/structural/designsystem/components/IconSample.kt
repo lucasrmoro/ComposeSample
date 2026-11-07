@@ -1,10 +1,9 @@
 package br.com.composesample.structural.designsystem.components
 
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import br.com.composesample.structural.designsystem.tokens.SampleColors
+import br.com.composesample.structural.designsystem.tokens.SampleColor
 import br.com.composesample.structural.designsystem.tokens.SampleIcon
 
 @Composable
@@ -12,16 +11,12 @@ fun IconSample(
     modifier: Modifier = Modifier,
     icon: SampleIcon,
     contentDescription: String?,
-    tint: SampleColors
+    tint: SampleColor
 ) {
-    val tintColor =
-        when (tint) {
-            SampleColors.OnSurfaceVariant -> MaterialTheme.colorScheme.onSurfaceVariant
-        }
     Icon(
         imageVector = icon.imageVector,
         contentDescription = contentDescription,
         modifier = modifier,
-        tint = tintColor
+        tint = tint.color()
     )
 }
