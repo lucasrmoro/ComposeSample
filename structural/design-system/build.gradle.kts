@@ -15,7 +15,6 @@ dependencies {
     implementation(project(Modules.Structural.Network.API))
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.core.ktx)
-
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.ui)
