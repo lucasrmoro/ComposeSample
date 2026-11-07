@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.material3.Surface
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import br.com.composesample.structural.designsystem.components.ClearFocusOnOutsideTapSample
+import br.com.composesample.structural.designsystem.components.SampleClearFocusOnOutsideTap
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.navigation.core.AnimatedNavHost
 import br.com.composesample.structural.navigation.core.FeatureDestination
@@ -24,7 +24,7 @@ fun ComposeSampleApp(navigationRegistry: NavigationRegistry) {
     }
 
     ComposeSampleTheme {
-        ClearFocusOnOutsideTapSample {
+        SampleClearFocusOnOutsideTap {
             Surface(modifier = Modifier.fillMaxSize()) {
                 AnimatedNavHost(
                     navController = navController,

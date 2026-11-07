@@ -12,13 +12,13 @@ import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
-fun ProfileImageSample(
+fun ProfileSampleImage(
     request: AssetRequest?,
     contentDescription: String,
     modifier: Modifier = Modifier
 ) {
     request?.let {
-        ImageSample(request = it, contentDescription = contentDescription, modifier = modifier)
+        SampleImage(request = it, contentDescription = contentDescription, modifier = modifier)
     }
         ?: Box(
             modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant),

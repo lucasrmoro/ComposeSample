@@ -10,7 +10,7 @@ import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
-fun CircularProgressIndicatorSample(
+fun SampleCircularProgressIndicator(
     color: Color,
     modifier: Modifier = Modifier
 ) {
@@ -23,9 +23,9 @@ fun CircularProgressIndicatorSample(
 
 @Preview(showBackground = true)
 @Composable
-private fun CircularProgressIndicatorSamplePreview() {
+private fun SampleCircularProgressIndicatorPreview() {
     ComposeSampleTheme {
-        CircularProgressIndicatorSample(
+        SampleCircularProgressIndicator(
             modifier = Modifier.size(CurrentTheme.size.Medium),
             color = CurrentTheme.color.primary
         )

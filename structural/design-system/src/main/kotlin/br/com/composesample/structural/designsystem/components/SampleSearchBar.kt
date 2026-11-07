@@ -16,7 +16,7 @@ import androidx.compose.ui.text.input.ImeAction
 import br.com.composesample.structural.design_system.R
 
 @Composable
-fun SearchBarSample(
+fun SampleSearchBar(
     value: String,
     placeholder: String,
     onValueChange: (String) -> Unit,

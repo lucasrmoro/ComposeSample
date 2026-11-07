@@ -17,7 +17,7 @@ import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HeaderSample(
+fun SampleHeader(
     title: String,
     canNavigateBack: Boolean,
     onNavigateBack: () -> Unit
@@ -46,6 +46,6 @@ fun HeaderSample(
 @Composable
 private fun HeaderPreview() {
     ComposeSampleTheme {
-        HeaderSample(title = "Compose - Sample", canNavigateBack = true, onNavigateBack = {})
+        SampleHeader(title = "Compose - Sample", canNavigateBack = true, onNavigateBack = {})
     }
 }

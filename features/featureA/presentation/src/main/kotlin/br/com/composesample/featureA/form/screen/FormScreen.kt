@@ -12,9 +12,9 @@ import br.com.composesample.featureA.form.model.FormUiEffect
 import br.com.composesample.featureA.form.model.FormUiEvent
 import br.com.composesample.featureA.form.model.FormUiState
 import br.com.composesample.featureA.form.viewModel.FormViewModel
-import br.com.composesample.structural.designsystem.components.ButtonSample
-import br.com.composesample.structural.designsystem.components.ScreenSample
-import br.com.composesample.structural.designsystem.components.TextFieldSample
+import br.com.composesample.structural.designsystem.components.SampleButton
+import br.com.composesample.structural.designsystem.components.SampleScreen
+import br.com.composesample.structural.designsystem.components.SampleTextField
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 import br.com.composesample.structural.designsystem.screen.BaseScreen
@@ -46,7 +46,7 @@ private fun FormScreenContent(
     sendEvent: (FormUiEvent) -> Unit,
     onNavigateBack: () -> Unit
 ) {
-    ScreenSample(
+    SampleScreen(
         title = "Compose - Sample",
         canNavigateBack = true,
         onNavigateBack = onNavigateBack
@@ -57,13 +57,13 @@ private fun FormScreenContent(
                 .padding(bottom = CurrentTheme.spacing.ExtraLarge),
             verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.Large)
         ) {
-            TextFieldSample(
+            SampleTextField(
                 value = state.message,
                 onValueChange = { sendEvent(FormUiEvent.MessageChanged(it)) },
                 label = "Message",
                 placeholder = "Type something here"
             )
-            ButtonSample(
+            SampleButton(
                 modifier = Modifier.fillMaxWidth(),
                 text = "Save",
                 onClick = { sendEvent(FormUiEvent.SaveClicked) },

@@ -11,7 +11,7 @@ import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
-fun DialogSample(
+fun SampleDialog(
     title: String,
     message: String,
     confirmText: String,
@@ -49,7 +49,7 @@ fun DialogSample(
 @Composable
 private fun SampleDialogPreview() {
     ComposeSampleTheme {
-        DialogSample(
+        SampleDialog(
             title = "Discard changes?",
             message = "Your changes will be lost.",
             confirmText = "Discard",

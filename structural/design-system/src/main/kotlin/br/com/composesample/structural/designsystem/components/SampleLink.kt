@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 
 /** Opens a web destination only after an explicit user action. */
 @Composable
-fun LinkSample(url: String, label: String) {
+fun SampleLink(url: String, label: String) {
     val handler = LocalUriHandler.current
     if (url.startsWith(HTTPS_SCHEME))
         TextButton(onClick = { runCatching { handler.openUri(url) } }) { Text(label) }

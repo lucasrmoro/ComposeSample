@@ -30,7 +30,7 @@ enum class LoadingState {
 }
 
 @Composable
-fun ScreenSample(
+fun SampleScreen(
     title: String,
     canNavigateBack: Boolean,
     onNavigateBack: () -> Unit,
@@ -42,7 +42,7 @@ fun ScreenSample(
         containerColor = CurrentTheme.color.background,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(WindowInsets.ime),
         topBar = {
-            HeaderSample(
+            SampleHeader(
                 title = title,
                 canNavigateBack = canNavigateBack,
                 onNavigateBack = onNavigateBack
@@ -66,7 +66,7 @@ fun ScreenSample(
                         modifier = contentModifier,
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicatorSample(
+                        SampleCircularProgressIndicator(
                             modifier = Modifier.size(CurrentTheme.size.Medium),
                             color = CurrentTheme.color.primary
                         )
@@ -82,7 +82,7 @@ fun ScreenSample(
                                 .background(CurrentTheme.color.scrim),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicatorSample(
+                            SampleCircularProgressIndicator(
                                 modifier = Modifier.size(CurrentTheme.size.Medium),
                                 color = CurrentTheme.color.primary
                             )
@@ -100,7 +100,7 @@ fun ScreenSample(
 @Composable
 private fun SampleScreenPreview() {
     ComposeSampleTheme {
-        ScreenSample(
+        SampleScreen(
             title = "Compose - Sample",
             canNavigateBack = true,
             onNavigateBack = {}

@@ -17,7 +17,7 @@ import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.tokens.SampleDimens
 
 @Composable
-fun ConnectionBannerSample() {
+fun SampleConnectionBanner() {
     Surface(
         color = MaterialTheme.colorScheme.secondaryContainer,
         modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }
