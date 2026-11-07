@@ -50,15 +50,6 @@ fun VideoPlayerSample(source: VideoSource, online: Boolean, modifier: Modifier =
     }
 }
 
-private sealed interface VideoPlaybackState {
-
-    data object Ready : VideoPlaybackState
-    data object Loading : VideoPlaybackState
-    data object Failed : VideoPlaybackState
-    data class Playing(val embed: VideoEmbed) : VideoPlaybackState
-
-}
-
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 private fun VideoWebView(embed: VideoEmbed, onPause: () -> Unit) {
