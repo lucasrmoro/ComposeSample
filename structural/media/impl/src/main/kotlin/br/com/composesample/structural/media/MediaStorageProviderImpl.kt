@@ -142,47 +142,75 @@ internal class MediaStorageProviderImpl(
     ): Flow<MediaFile> = flow {
         require(location.area == MediaStorageArea.APP_CACHE)
         val name = requireName(nameWithoutExtension)
-        val directory = getDirectory(location)
-        if (!directory.exists() && !directory.mkdirs()) {
-            throw IOException("Could not create media directory")
-        }
-        val temporaryFile = synchronized(activeTemporaryFiles) {
-            File.createTempFile(TEMPORARY_FILE_PREFIX, TEMPORARY_FILE_SUFFIX, context.cacheDir).also {
-                activeTemporaryFiles.add(it)
-            }
-        }
+        val directory = prepareDirectory(location)
+        val temporaryFile = createTemporaryFile()
         var ownedFile = temporaryFile
         try {
-            val format = ownedFile.outputStream().use { writer.write(it).single() }
+            val format = writeContent(temporaryFile, writer)
             currentCoroutineContext().ensureActive()
-            val extension = requireExtension(format.extension)
-            val destination = File(directory, "$name.$extension")
-            Files.move(ownedFile.toPath(), destination.toPath())
-            ownedFile = destination
-            emit(
-                StoredMediaFile(
-                    context = context,
-                    location = location,
-                    nameWithoutExtension = name,
-                    extension = extension,
-                    mimeType = format.mimeType,
-                    file = destination,
-                    pendingMediaStoreItem = false
-                )
-            )
+            ownedFile = finalizeCacheFile(temporaryFile, directory, name, format)
+            emit(completedCacheFile(ownedFile, location, name, format))
         } catch (failure: Throwable) {
-            try {
-                if (!ownedFile.delete() && ownedFile.exists()) {
-                    failure.addSuppressed(IOException("Could not remove incomplete media file"))
-                }
-            } catch (cleanupFailure: Throwable) {
-                failure.addSuppressed(cleanupFailure)
-            }
+            discardFailedWrite(ownedFile, failure)
             throw failure
         } finally {
             activeTemporaryFiles.remove(temporaryFile)
         }
     }.flowOn(coroutineDispatcher)
+
+    private fun prepareDirectory(location: MediaLocation): File {
+        val directory = getDirectory(location)
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw IOException("Could not create media directory")
+        }
+        return directory
+    }
+
+    private fun createTemporaryFile(): File = synchronized(activeTemporaryFiles) {
+        File.createTempFile(TEMPORARY_FILE_PREFIX, TEMPORARY_FILE_SUFFIX, context.cacheDir).also {
+            activeTemporaryFiles.add(it)
+        }
+    }
+
+    private suspend fun writeContent(file: File, writer: MediaContentWriter): MediaFormat =
+        file.outputStream().use { writer.write(it).single() }
+
+    private fun finalizeCacheFile(
+        temporaryFile: File,
+        directory: File,
+        name: String,
+        format: MediaFormat
+    ): File {
+        val extension = requireExtension(format.extension)
+        val destination = File(directory, "$name.$extension")
+        Files.move(temporaryFile.toPath(), destination.toPath())
+        return destination
+    }
+
+    private fun completedCacheFile(
+        file: File,
+        location: MediaLocation,
+        name: String,
+        format: MediaFormat
+    ): MediaFile = StoredMediaFile(
+        context = context,
+        location = location,
+        nameWithoutExtension = name,
+        extension = file.extension,
+        mimeType = format.mimeType,
+        file = file,
+        pendingMediaStoreItem = false
+    )
+
+    private fun discardFailedWrite(file: File, failure: Throwable) {
+        try {
+            if (!file.delete() && file.exists()) {
+                failure.addSuppressed(IOException("Could not remove incomplete media file"))
+            }
+        } catch (cleanupFailure: Throwable) {
+            failure.addSuppressed(cleanupFailure)
+        }
+    }
 
     override fun replace(
         source: MediaFile,
