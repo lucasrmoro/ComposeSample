@@ -64,3 +64,21 @@ cycles with the database implementation.
 During development, keep `exportSchema = false` and do not create Room migrations.
 Inject dispatchers through DI; storage initialization and operations must stay off
 the main thread.
+
+## File cache metadata
+
+`FileCacheMetadataDataSource` stores file metadata in a separate Room database,
+`file_cache_metadata`, without changing the feature database or preferences.
+`LocalStorageModule` registers its data source. Each cold Flow emits one result
+and runs on the injected I/O dispatcher through BaseDataSource.
+
+Queries address one namespace/key, compute total bytes in SQL, or select one
+oldest entry by last-use timestamp while excluding a supplied key. Asset bytes
+remain in private files; no full metadata catalog is retained in memory.
+
+Saving replaces the complete entry for the same namespace/key pair. Namespace registration
+is idempotent and independent of metadata storage. Missing entries yield null for lookup and
+oldest-entry queries, zero for byte totals, and no changes for touch/remove. Equal last-use
+timestamps are resolved by ascending key. Timestamps use epoch milliseconds; file names exclude
+the extension. Removing metadata does not delete the referenced file. Storage errors propagate
+to Flow collectors. Entity construction and conversion are centralized in the metadata mapper.

@@ -8,11 +8,15 @@ import br.com.composesample.structural.di.get
 import br.com.composesample.structural.di.loadModules
 import br.com.composesample.structural.di.singleton
 import br.com.composesample.structural.local_storage.LocalStorageFactory
+import br.com.composesample.structural.local_storage.cache.FileCacheMetadataDataSource
 import br.com.composesample.structural.local_storage.prefs.PreferencesDataSource
 
 object LocalStorageModule {
 
     private val localStorageModule = dependencyModule {
+        singleton<FileCacheMetadataDataSource> {
+            get<LocalStorageFactory>().createFileCacheMetadataDataSource()
+        }
         singleton { LocalStorageFactory(context = get(), ioDispatcher = dispatcherIO) }
         singleton<PreferencesDataSource> { get<LocalStorageFactory>().createPreferencesDataSource() }
         factory<SomeDao> { get<LocalStorageFactory>().someDao() }
