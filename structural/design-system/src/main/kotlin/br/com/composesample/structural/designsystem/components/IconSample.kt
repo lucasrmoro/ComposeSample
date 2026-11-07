@@ -8,9 +8,9 @@ import br.com.composesample.structural.designsystem.tokens.SampleIcons
 
 @Composable
 fun IconSample(
+    modifier: Modifier = Modifier,
     icon: SampleIcons,
     contentDescription: String?,
-    modifier: Modifier = Modifier,
     tint: SampleColorToken
 ) {
     Icon(
