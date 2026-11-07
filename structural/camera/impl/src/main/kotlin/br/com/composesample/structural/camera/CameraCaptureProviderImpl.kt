@@ -80,6 +80,7 @@ internal class CameraCaptureProviderImpl(
         private val output: WritableMediaFile,
         private val continuation: CancellableContinuation<CameraCaptureResult>
     ) {
+
         private var launcher: ActivityResultLauncher<CameraCaptureRequest>? = null
         private var finished = false
         private var resultReceived = false
@@ -126,6 +127,7 @@ internal class CameraCaptureProviderImpl(
                 if (continuation.isActive) continuation.cancel()
             } else if (continuation.isActive) continuation.resume(result)
         }
+
     }
 
     private companion object {

@@ -28,5 +28,4 @@ internal class PushMessageHandlerImpl(
         const val DEFAULT_CHANNEL_NAME = "Push notifications"
         const val DEFAULT_CHANNEL_DESCRIPTION = "Notifications received from push messages"
     }
-
 }
