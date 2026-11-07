@@ -1,15 +1,16 @@
 package br.com.composesample.structural.session
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 internal class AppSessionProviderImpl : AppSessionProvider {
 
-    private val _isSessionExpired = MutableLiveData(false)
-    override val isSessionExpired: LiveData<Boolean> = _isSessionExpired
+    private val sessionExpired = MutableStateFlow(false)
+
+    override val isSessionExpired = sessionExpired.asStateFlow()
 
     override fun expireSession() {
-        _isSessionExpired.postValue(true)
+        sessionExpired.value = true
     }
 
 }

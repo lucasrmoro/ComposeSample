@@ -23,6 +23,7 @@ import br.com.composesample.structural.localization.di.LocalizationModule
 import br.com.composesample.structural.logger.di.LoggerModule
 import br.com.composesample.structural.logger.Logger
 import br.com.composesample.structural.navigation.di.NavigationModule
+import br.com.composesample.structural.network.connectivity.NetworkConnectivityProvider
 import br.com.composesample.structural.network.di.NetworkModule
 import br.com.composesample.structural.notifications.di.NotificationsModule
 import br.com.composesample.structural.permissions.di.PermissionsModule
@@ -49,6 +50,7 @@ class AppApplication : Application(), PushMessagingServiceHost {
         initializePushNotifications(this)
         dependencyResolver = setupDependencyInjection()
         dependencyResolver.get<AppRegionProvider>().start()
+        dependencyResolver.get<NetworkConnectivityProvider>().start()
         val applicationScope =
             CoroutineScope(
                 SupervisorJob() + dependencyResolver.get<CoroutineDispatcher>(DispatcherIO)

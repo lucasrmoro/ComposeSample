@@ -141,6 +141,35 @@ and `GsonJsonCodec`. The builder is used only to construct that shared instance.
 `HttpClientFactory` is internal to `impl`. DI uses composition functions that return
 network API contracts and share the factory through `NetworkComponents`.
 
+## Connectivity observation
+
+`NetworkConnectivityProvider.connectivity` exposes a StateFlow. The former
+`isInternetAvailable` LiveData contract has been removed; consumers collect connectivity
+or adapt it at their own lifecycle boundary. `AppApplication` calls `start()` explicitly after
+loading DI; resolving the provider does not register Android network callbacks.
+Repeated calls to `start()` do not duplicate registration.
+
+The provider follows the default network and reports ONLINE only when Android marks
+it validated. This includes supported default transports beyond Wi-Fi and cellular.
+Updates are immediate, without debounce. ONLINE
+does not guarantee that an individual API or host is reachable. Observation lives
+for the application lifetime and retains no Activity.
+
+The initial state is a snapshot of the current default network, refreshed by `start()`
+after callback registration. An already validated network starts ONLINE. CHECKING
+means a default network exists but Android has not confirmed Internet validation,
+including while its capabilities are not available yet. A newly available default
+network enters CHECKING until its capabilities arrive. OFFLINE means there is no
+default network, no Internet capability, or a detected captive portal.
+
+Android does not expose a definitive validation-in-progress flag through these
+capabilities: CHECKING can persist on a network that advertises Internet access but
+never validates. Consumers should not treat CHECKING as OFFLINE, block requests,
+or discard data based on this connectivity hint.
+
+Callbacks consume the supplied capabilities instead of querying synchronous network
+snapshots; losing an obsolete network does not overwrite the replacement network state.
+
 ## Configured HTTP clients
 
 `ConfiguredHttpClientProvider` builds independent clients from `HttpClientOptions`

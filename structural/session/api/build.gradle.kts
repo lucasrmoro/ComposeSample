@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    api(libs.androidx.lifecycle.livedata.core.ktx)
+    api(libs.coroutines)
 }

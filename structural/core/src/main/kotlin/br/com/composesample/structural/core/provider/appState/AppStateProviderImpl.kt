@@ -1,38 +1,25 @@
 package br.com.composesample.structural.core.provider.appState
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-
-import br.com.composesample.structural.network.connectivity.ConnectivityStatus
 import br.com.composesample.structural.network.connectivity.NetworkConnectivityProvider
 import br.com.composesample.structural.session.AppSessionProvider
 import br.com.composesample.structural.session.SessionStatus
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 internal class AppStateProviderImpl(
-    private val appSessionProvider: AppSessionProvider,
-    private val networkConnectivityProvider: NetworkConnectivityProvider
+    appSessionProvider: AppSessionProvider,
+    networkConnectivityProvider: NetworkConnectivityProvider
 ) : AppStateProvider {
 
-    private val _state = MediatorLiveData<AppState>()
-
-    override val state: LiveData<AppState> = _state
-
-    init {
-        _state.addSource(appSessionProvider.isSessionExpired) { updateState() }
-        _state.addSource(networkConnectivityProvider.isInternetAvailable) { updateState() }
-    }
-
-    private fun updateState() {
-        val internetAvailable = networkConnectivityProvider.isInternetAvailable.value ?: return
-        val sessionExpired = appSessionProvider.isSessionExpired.value ?: false
-        val updatedState = AppState(
+    override val state: Flow<AppState> = combine(
+        appSessionProvider.isSessionExpired,
+        networkConnectivityProvider.connectivity
+    ) { sessionExpired, connectivity ->
+        AppState(
             session = if (sessionExpired) SessionStatus.EXPIRED else SessionStatus.ACTIVE,
-            connectivity = if (internetAvailable) ConnectivityStatus.ONLINE else ConnectivityStatus.OFFLINE
+            connectivity = connectivity
         )
-
-        if (_state.value != updatedState) {
-            _state.value = updatedState
-        }
-    }
+    }.distinctUntilChanged()
 
 }

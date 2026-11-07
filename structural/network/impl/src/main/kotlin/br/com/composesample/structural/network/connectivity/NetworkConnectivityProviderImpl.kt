@@ -2,50 +2,86 @@ package br.com.composesample.structural.network.connectivity
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
-import android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
-import android.net.NetworkCapabilities.TRANSPORT_CELLULAR
-import android.net.NetworkCapabilities.TRANSPORT_WIFI
-import android.net.NetworkRequest
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import br.com.composesample.structural.core.ext.FIVE
-import br.com.composesample.structural.core.ext.debounce
-import java.util.concurrent.TimeUnit
+import android.net.NetworkCapabilities
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
-internal class NetworkConnectivityProviderImpl(context: Context) : NetworkConnectivityProvider,
-    NetworkCallback() {
+internal class NetworkConnectivityProviderImpl(context: Context) : NetworkConnectivityProvider {
 
-    private val connectivityManager =
-        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val manager =
+        context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
+            as ConnectivityManager
 
-    private val networkRequest = NetworkRequest.Builder()
-        .addCapability(NET_CAPABILITY_INTERNET)
-        .addTransportType(TRANSPORT_WIFI)
-        .addTransportType(TRANSPORT_CELLULAR)
-        .build()
+    private var currentNetwork = manager.activeNetwork
 
-    private val _isInternetAvailable =
-        MutableLiveData(connectivityManager.activeNetwork.isInternetAvailable())
-    override val isInternetAvailable: LiveData<Boolean> =
-        _isInternetAvailable.debounce(Long.FIVE, TimeUnit.SECONDS)
+    private val state = MutableStateFlow(
+        statusOf(currentNetwork, manager.getNetworkCapabilities(currentNetwork))
+    )
 
-    init {
-        connectivityManager.registerNetworkCallback(networkRequest, this)
+    override val connectivity = state.asStateFlow()
+
+    private var started = false
+
+    private val callback =
+        object : ConnectivityManager.NetworkCallback() {
+
+            override fun onAvailable(network: Network) {
+                synchronized(this@NetworkConnectivityProviderImpl) {
+                    if (currentNetwork != network) {
+                        currentNetwork = network
+                        state.value = ConnectivityStatus.CHECKING
+                    }
+                }
+            }
+
+            override fun onLost(network: Network) {
+                synchronized(this@NetworkConnectivityProviderImpl) {
+                    if (currentNetwork == network) {
+                        currentNetwork = null
+                        state.value = ConnectivityStatus.OFFLINE
+                    }
+                }
+            }
+
+            override fun onCapabilitiesChanged(
+                network: Network,
+                capabilities: NetworkCapabilities
+            ) {
+                synchronized(this@NetworkConnectivityProviderImpl) {
+                    if (currentNetwork == network) {
+                        state.value = statusOf(network, capabilities)
+                    }
+                }
+            }
+
+        }
+
+    @Synchronized
+    override fun start() {
+        if (started) return
+        manager.registerDefaultNetworkCallback(callback)
+        currentNetwork = manager.activeNetwork
+        state.value = statusOf(currentNetwork, manager.getNetworkCapabilities(currentNetwork))
+        started = true
     }
 
-    override fun onAvailable(network: Network) {
-        _isInternetAvailable.postValue(network.isInternetAvailable())
-    }
+    private fun statusOf(
+        network: Network?,
+        capabilities: NetworkCapabilities?
+    ): ConnectivityStatus = when {
+        network == null -> ConnectivityStatus.OFFLINE
 
-    override fun onLost(network: Network) {
-        _isInternetAvailable.postValue(network.isInternetAvailable())
-    }
+        capabilities == null -> ConnectivityStatus.CHECKING
 
-    private fun Network?.isInternetAvailable() = this?.let {
-        connectivityManager.getNetworkCapabilities(it)
-            ?.hasCapability(NET_CAPABILITY_INTERNET) == true
-    } ?: false
+        capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) ->
+            ConnectivityStatus.ONLINE
+
+        capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL) ||
+            !capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ->
+            ConnectivityStatus.OFFLINE
+
+        else -> ConnectivityStatus.CHECKING
+    }
 
 }
