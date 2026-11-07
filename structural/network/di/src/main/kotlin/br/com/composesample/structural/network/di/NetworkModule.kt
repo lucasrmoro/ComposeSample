@@ -12,23 +12,23 @@ import br.com.composesample.structural.network.createNetworkInterceptor
 import br.com.composesample.structural.network.http.BinaryDownloadProvider
 import br.com.composesample.structural.network.http.HttpClient
 import br.com.composesample.structural.network.http.HttpClientConfiguration
-import br.com.composesample.structural.network.http.HttpClientFactory
 import br.com.composesample.structural.network.http.JsonCodec
-import br.com.composesample.structural.network.http.NetworkSerialization
+import br.com.composesample.structural.network.http.NetworkComponents
+import br.com.composesample.structural.network.http.createAuthenticatedHttpClient
 import br.com.composesample.structural.network.http.createBinaryDownloadProvider
-import br.com.composesample.structural.network.http.createHttpClientFactory
 import br.com.composesample.structural.network.http.createJsonCodec
+import br.com.composesample.structural.network.http.createUnauthenticatedHttpClient
 import okhttp3.Authenticator
 import okhttp3.Interceptor
 
 object NetworkModule {
 
     private val networkModule = dependencyModule {
-        singleton<JsonCodec> { createJsonCodec(serialization = get()) }
+        singleton<JsonCodec> { createJsonCodec(components = get()) }
         singleton<BinaryDownloadProvider> {
             createBinaryDownloadProvider(
                 coroutineDispatcher = dispatcherIO,
-                httpClientFactory = get()
+                components = get()
             )
         }
         singleton {
@@ -45,10 +45,10 @@ object NetworkModule {
             )
         }
         singleton<Interceptor> { createNetworkInterceptor(preferencesDataSource = get()) }
-        singleton { NetworkSerialization() }
-        singleton { createHttpClientFactory(serialization = get()) }
+        singleton { NetworkComponents() }
         singleton<HttpClient>(AuthenticatedHttpClient) {
-            get<HttpClientFactory>().createAuthenticated(
+            createAuthenticatedHttpClient(
+                components = get(),
                 baseUrl = get<HttpClientConfiguration>().baseUrl,
                 dispatcher = dispatcherIO,
                 authenticator = get(),
@@ -56,7 +56,8 @@ object NetworkModule {
             )
         }
         singleton<HttpClient>(UnauthenticatedHttpClient) {
-            get<HttpClientFactory>().createUnauthenticated(
+            createUnauthenticatedHttpClient(
+                components = get(),
                 baseUrl = get<HttpClientConfiguration>().baseUrl,
                 dispatcher = dispatcherIO
             )

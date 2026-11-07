@@ -8,7 +8,7 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 
-class HttpClientFactory internal constructor(
+internal class HttpClientFactory(
     private val gson: Gson
 ) {
 
@@ -72,5 +72,18 @@ class HttpClientFactory internal constructor(
 
 }
 
-fun createHttpClientFactory(serialization: NetworkSerialization): HttpClientFactory =
-    HttpClientFactory(serialization.gson)
+fun createAuthenticatedHttpClient(
+    components: NetworkComponents,
+    baseUrl: String,
+    dispatcher: CoroutineDispatcher,
+    authenticator: Authenticator,
+    interceptor: Interceptor
+): HttpClient = components.httpClientFactory.createAuthenticated(
+    baseUrl, dispatcher, authenticator, interceptor
+)
+
+fun createUnauthenticatedHttpClient(
+    components: NetworkComponents,
+    baseUrl: String,
+    dispatcher: CoroutineDispatcher
+): HttpClient = components.httpClientFactory.createUnauthenticated(baseUrl, dispatcher)

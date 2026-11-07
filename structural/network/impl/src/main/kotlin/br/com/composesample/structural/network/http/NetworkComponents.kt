@@ -6,14 +6,16 @@ import com.google.gson.JsonParseException
 import com.google.gson.Strictness
 import java.lang.reflect.Field
 
-/** Holds the shared JSON serializer without exposing vendor types to the DI module. */
-class NetworkSerialization {
+/** Owns shared network components without exposing implementation or vendor types to DI. */
+class NetworkComponents {
 
     internal val gson: Gson =
         GsonBuilder()
             .setStrictness(Strictness.STRICT)
             .setFieldNamingStrategy(::resolveJsonName)
             .create()
+
+    internal val httpClientFactory: HttpClientFactory by lazy { HttpClientFactory(gson) }
 
     private fun resolveJsonName(field: Field): String {
         val name = field.getAnnotation(JsonName::class.java)?.value

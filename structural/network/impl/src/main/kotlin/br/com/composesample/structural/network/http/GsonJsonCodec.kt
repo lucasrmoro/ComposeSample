@@ -17,5 +17,5 @@ internal class GsonJsonCodec(
 
 }
 
-fun createJsonCodec(serialization: NetworkSerialization): JsonCodec =
-    GsonJsonCodec(serialization.gson)
+fun createJsonCodec(components: NetworkComponents): JsonCodec =
+    GsonJsonCodec(components.gson)

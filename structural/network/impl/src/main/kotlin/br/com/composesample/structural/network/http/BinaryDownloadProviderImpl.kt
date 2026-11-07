@@ -93,5 +93,5 @@ internal class BinaryDownloadProviderImpl(
 
 fun createBinaryDownloadProvider(
     coroutineDispatcher: CoroutineDispatcher,
-    httpClientFactory: HttpClientFactory
-): BinaryDownloadProvider = BinaryDownloadProviderImpl(coroutineDispatcher, httpClientFactory)
+    components: NetworkComponents
+): BinaryDownloadProvider = BinaryDownloadProviderImpl(coroutineDispatcher, components.httpClientFactory)
