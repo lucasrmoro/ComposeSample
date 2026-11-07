@@ -17,9 +17,10 @@ object StructuralModules {
     object AssetsCache {
 
         private const val ROOT = "${StructuralModules.ROOT}:assets-cache"
+
         const val API = "$ROOT:api"
-        const val IMPL = "$ROOT:impl"
         const val DI = "$ROOT:di"
+        const val IMPL = "$ROOT:impl"
 
     }
 
@@ -81,10 +82,13 @@ object StructuralModules {
     }
 
     object Localization {
+
         private const val ROOT = "${StructuralModules.ROOT}:localization"
+
         const val API = "$ROOT:api"
-        const val IMPL = "$ROOT:impl"
         const val DI = "$ROOT:di"
+        const val IMPL = "$ROOT:impl"
+
     }
 
     object Logger {
@@ -178,10 +182,13 @@ object StructuralModules {
     }
 
     object Security {
+
         private const val ROOT = "${StructuralModules.ROOT}:security"
+
         const val API = "$ROOT:api"
-        const val IMPL = "$ROOT:impl"
         const val DI = "$ROOT:di"
+        const val IMPL = "$ROOT:impl"
+
     }
 
     object Session {
@@ -193,7 +200,9 @@ object StructuralModules {
         const val IMPL = "$ROOT:impl"
 
     }
+
     object VideoPlayer {
+
         private const val ROOT = "${StructuralModules.ROOT}:video-player"
 
         const val API = "$ROOT:api"
