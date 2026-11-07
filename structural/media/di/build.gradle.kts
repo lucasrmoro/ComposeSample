@@ -5,6 +5,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(Modules.Structural.Core.MAIN))
     implementation(project(Modules.Structural.Media.API))
     implementation(project(Modules.Structural.Media.IMPL))
     implementation(project(Modules.Structural.DI.API))
