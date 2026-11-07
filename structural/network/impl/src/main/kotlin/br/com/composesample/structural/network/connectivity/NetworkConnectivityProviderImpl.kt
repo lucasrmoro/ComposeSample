@@ -71,12 +71,16 @@ internal class NetworkConnectivityProviderImpl(context: Context) : NetworkConnec
         capabilities: NetworkCapabilities?
     ): ConnectivityStatus = when {
         network == null -> ConnectivityStatus.OFFLINE
+
         capabilities == null -> ConnectivityStatus.CHECKING
+
         capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) ->
             ConnectivityStatus.ONLINE
+
         capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL) ||
             !capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ->
             ConnectivityStatus.OFFLINE
+
         else -> ConnectivityStatus.CHECKING
     }
 
