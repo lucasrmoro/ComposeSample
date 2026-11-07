@@ -169,3 +169,16 @@ or discard data based on this connectivity hint.
 
 Callbacks consume the supplied capabilities instead of querying synchronous network
 snapshots; losing an obsolete network does not overwrite the replacement network state.
+
+## Configured HTTP clients
+
+`ConfiguredHttpClientProvider` builds independent clients from `HttpClientOptions`
+without replacing the login clients or attaching their authenticator. Client headers
+are applied only to that client's requests and redirects are disabled. Authorization
+is redacted from debug HTTP logs.
+
+When `useAppLanguage` is enabled, the interceptor reads the current language from
+`AppRegionProvider` for each request and adds the language query parameter only
+when it is absent. Load `LocalizationModule` and its app-owned configuration before
+resolving the configured client provider. The provider shares the existing internal
+HTTP factory and Gson through `NetworkComponents`.
