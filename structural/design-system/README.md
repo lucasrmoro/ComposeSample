@@ -21,3 +21,4 @@ em tela cheia, mantém o vídeo na janela da Activity, gira para paisagem e
 preserva a reprodução. Ao sair, restaura a orientação anterior. O componente
 encerra o WebView ao deixar a tela e mostra mensagens de erro ou falta de
 internet por meio de recursos de texto.
+UiText.asString() resolves UiText.StringResource with Compose stringResource and positional arguments, using the current configuration. UiText.Raw returns its dynamic value unchanged. This keeps resource lookup out of ViewModels.
