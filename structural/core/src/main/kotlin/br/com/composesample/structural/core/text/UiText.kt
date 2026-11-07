@@ -3,6 +3,9 @@ package br.com.composesample.structural.core.text
 /** Defers resource resolution to the UI so state does not retain a Context or a resolved locale. */
 sealed class UiText {
 
+    /** Represents the absence of text. */
+    data object None : UiText()
+
     /** Runtime content, such as user input, that is not application-owned translatable copy. */
     data class Raw(val value: String) : UiText()
 
