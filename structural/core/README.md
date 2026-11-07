@@ -29,8 +29,14 @@ and JSON decoding remain in `network/impl`.
 `onError`. Add `onError` before it when a failure needs an explicit response.
 Exceptions thrown by the success callback still propagate.
 
-`onError`, `onSuccess`, `onFinish` and `launch` propagate `CancellationException`
-without converting it to a domain failure or running failure callbacks.
-`launch` consumes other upstream failures. `onFinish` retains its existing behavior:
-it invokes the callback for each emitted value and again on a non-cancellation
-exception; it is not a completion-only hook.
+`onError`, `onSuccess` and `launch` propagate `CancellationException` without
+converting it to a domain failure or running error callbacks. `launch` consumes
+other upstream failures.
+
+`onFinish` is a terminal collector that invokes its cleanup callback exactly once
+when collection completes, fails or is cancelled, including flows with no values.
+It no longer invokes the callback for every emission. Cleanup runs in a
+`NonCancellable` context, allowing suspending cleanup such as releasing resources.
+A ViewModel can clear its loading state there. The original failure or cancellation
+propagates after cleanup, unless the cleanup callback itself throws. Keep cleanup
+bounded because coroutine completion waits for it.

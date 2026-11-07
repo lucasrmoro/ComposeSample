@@ -4,9 +4,11 @@ import br.com.composesample.structural.network.exception.HttpException
 import br.com.composesample.structural.network.exception.SampleException
 import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.withContext
 
 fun <T> Flow<T>.onError(
     ignoreUnauthorized: Boolean = true,
@@ -26,13 +28,18 @@ suspend fun <T> Flow<T>.onSuccess(block: suspend T.() -> Unit) {
     }.collect { block(it) }
 }
 
-/** Invokes [block] for each value and on failure, but propagates cancellation without invoking it. */
+/**
+ * Collects the flow and invokes [block] once on completion, failure or cancellation.
+ * Cleanup runs in a non-cancellable context so it may suspend; the original failure or
+ * cancellation propagates afterward unless cleanup itself throws.
+ */
 suspend fun Flow<*>.onFinish(block: suspend () -> Unit) {
     try {
-        collect { block.invoke() }
-    } catch (exception: Exception) {
-        if (exception is CancellationException) throw exception
-        block.invoke()
+        collect {}
+    } finally {
+        withContext(NonCancellable) {
+            block()
+        }
     }
 }
 
