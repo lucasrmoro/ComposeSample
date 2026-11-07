@@ -1,0 +1,12 @@
+package br.com.composesample.stream.useCase
+
+import br.com.composesample.stream.model.*
+import br.com.composesample.stream.repository.StreamRepository
+
+class RefreshGenresUseCaseImpl(private val streamRepository: StreamRepository) :
+    RefreshGenresUseCase {
+
+    override fun invoke(type: MediaType, region: CatalogRegion) =
+        streamRepository.refreshGenres(type, region)
+
+}

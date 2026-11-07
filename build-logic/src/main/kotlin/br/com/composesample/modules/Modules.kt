@@ -28,5 +28,6 @@ object Modules {
     object Feature {
         val FeatureA = FeatureModules.FeatureA
         val Login = FeatureModules.Login
+        val Stream = FeatureModules.Stream
     }
 }
