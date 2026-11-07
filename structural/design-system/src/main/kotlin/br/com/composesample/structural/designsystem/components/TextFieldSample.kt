@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
@@ -18,11 +19,13 @@ fun TextFieldSample(
     label: String,
     placeholder: String,
     modifier: Modifier = Modifier,
-    maxLength: Int = Int.MAX_VALUE
+    maxLength: Int = Int.MAX_VALUE,
+    enabled: Boolean = true
 ) {
     OutlinedTextField(
         modifier = modifier.fillMaxWidth(),
         value = value,
+        enabled = enabled,
         onValueChange = { newValue ->
             if (newValue.length <= maxLength) onValueChange(newValue)
         },

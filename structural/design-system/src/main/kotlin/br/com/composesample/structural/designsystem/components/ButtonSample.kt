@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
@@ -44,6 +45,6 @@ fun ButtonSample(
 @Composable
 private fun SampleButtonPreview() {
     ComposeSampleTheme {
-    ButtonSample(text = "Continue", onClick = {})
+        ButtonSample(text = "Continue", onClick = {})
     }
 }

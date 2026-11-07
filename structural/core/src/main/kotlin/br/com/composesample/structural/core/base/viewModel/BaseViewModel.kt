@@ -29,4 +29,5 @@ abstract class BaseViewModel<State, Event, Effect> : ViewModel(), UiViewModel<St
         effectChannel.close()
         viewModelScope.cancel()
     }
+
 }

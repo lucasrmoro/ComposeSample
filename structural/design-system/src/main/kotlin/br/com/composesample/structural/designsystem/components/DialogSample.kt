@@ -5,9 +5,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import br.com.composesample.structural.designsystem.theme.CurrentTheme
 import androidx.compose.ui.tooling.preview.Preview
+import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
+import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
 fun DialogSample(

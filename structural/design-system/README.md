@@ -4,7 +4,7 @@ Fornece componentes reutilizáveis em Jetpack Compose e o tema visual usado pelo
 
 ## Componentes Compose
 
-`ComposeSampleTheme` seleciona `ComposeSampleColors` para modo claro ou escuro e expõe a paleta pela API `CurrentTheme.color`, sem exigir que consumidores consultem `MaterialTheme` diretamente. `ScreenSample` fornece a estrutura de tela com edge to edge e aplica somente os insets do `Scaffold`, das barras de navegação e do teclado por `navigationBarsPadding` e `imePadding`. Seu `LoadingState` oferece `ONLY_LOADING`, `LOADING_DIM_BG` e `NONE`. `BaseScreen` recebe um `UiViewModel`; o `NavHost` inicia a tela com `Init()`, que coleta automaticamente o `StateFlow` `uiState` e o `Flow` `uiEffect`, chama `consumeEffect` para cada efeito e entrega o estado ao método `Content(uiState)` sobrescrito pela tela. `CircularProgressIndicatorSample` encapsula o indicador Material e usa as dimensões e espessura do tema. `ButtonSample` aceita estado de carregamento, `TextFieldSample` aplica o comportamento de entrada de texto do exemplo e `DialogSample` apresenta um diálogo de confirmação padrão.
+`ComposeSampleTheme` seleciona `ComposeSampleColors` para modo claro ou escuro e expõe a paleta pela API `CurrentTheme.color`, sem exigir que consumidores consultem `MaterialTheme` diretamente. `ScreenSample` fornece a estrutura de tela com edge to edge e aplica somente os insets do `Scaffold`, das barras de navegação e do teclado por `navigationBarsPadding` e `imePadding`. Seu `LoadingState` oferece `ONLY_LOADING`, `LOADING_DIM_BG` e `NONE`. `BaseScreen` recebe um `UiViewModel`; o `NavHost` inicia a tela com `Init()`, que coleta automaticamente o `StateFlow` `uiState` e o `Flow` `uiEffect`, chama `consumeEffect` para cada efeito e entrega o estado ao méstream `Content(uiState)` sobrescrito pela tela. `CircularProgressIndicatorSample` encapsula o indicador Material e usa as dimensões e espessura do tema. `ButtonSample` aceita estado de carregamento, `TextFieldSample` aplica o comportamento de entrada de texto do exemplo e `DialogSample` apresenta um diálogo de confirmação padrão.
 
 Os módulos de apresentação consomem esses componentes por `:structural:design-system`. O estado e os callbacks da tela permanecem na feature; componentes reutilizáveis recebem valores e lambdas de eventos e não dependem de ViewModels de feature.
 
@@ -14,11 +14,18 @@ O módulo também fornece `LifecycleBiometricProvider`, que cancela uma solicita
 
 O app carrega `DesignSystemModule.init()` depois do módulo DI de biometria durante a inicialização. O design-system consome contratos estruturais e não inicializa providers nem SDKs por conta própria.
 
-## Player de vídeo
 
-`VideoPlayerSample` apresenta o player do YouTube em proporção 16:9. Ao entrar
-em tela cheia, mantém o vídeo na janela da Activity, gira para paisagem e
-preserva a reprodução. Ao sair, restaura a orientação anterior. O componente
-encerra o WebView ao deixar a tela e mostra mensagens de erro ou falta de
-internet por meio de recursos de texto.
-UiText.asString() resolves UiText.StringResource with Compose stringResource and positional arguments, using the current configuration. UiText.Raw returns its dynamic value unchanged. This keeps resource lookup out of ViewModels.
+## Textos e localização
+
+Textos estáticos, incluindo acessibilidade e previews, vêm de string resources.
+ViewModels expõem mensagens com `UiText` de `core`, sem resolver recursos ou reter
+Context. A extensão composable `UiText.asString()` resolve `Raw` e
+`StringResource(id, vararg params)` na configuração atual do Compose. Parâmetros
+seguem a formatação posicional de resources (`%1$s`, `%2$d`). `Raw` é reservado a
+conteúdo dinâmico, como texto digitado pelo usuário.
+
+## Stream components
+
+SearchBarSample uses search/clear icons and a keyboard search action. MediaCardSample displays artwork and optional metadata. ImageSample observes assets-cache and decodes local media on the injected IO dispatcher. VideoPlayerSample is the visual/lifecycle adapter for video-player embeds, uses a 16:9 player, opens fullscreen playback in landscape, and destroys the WebView when leaving the screen. ConnectionBannerSample is rendered once by the app host when offline, above navigation. All static copy is in resources, including pt-BR translations.
+
+ComposeSampleTheme now provides one shared Material 3 color scheme to MaterialTheme and CurrentTheme for both light and dark mode, including system bar contrast. ClearFocusOnOutsideTapSample is installed once in the app host and observes taps without consuming child clicks or scrolling gestures. It leaves taps inside the focused field intact.

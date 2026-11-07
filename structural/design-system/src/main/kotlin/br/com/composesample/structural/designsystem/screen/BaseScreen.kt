@@ -26,4 +26,5 @@ abstract class BaseScreen<State, Effect>(private val viewModel: UiViewModel<Stat
     protected abstract fun Content(uiState: State)
 
     protected abstract fun consumeEffect(effect: Effect)
+
 }
