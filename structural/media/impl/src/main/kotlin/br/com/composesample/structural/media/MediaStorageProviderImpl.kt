@@ -16,7 +16,14 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
+import java.nio.file.Files
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -42,7 +49,10 @@ internal class MediaStorageProviderImpl(
         const val EMPTY_FILE_SIZE_BYTES = 0L
         const val GALLERY_ROOT_DIRECTORY_SEGMENT_COUNT = 1
         const val BINARY_MIME_TYPE = "application/octet-stream"
-        const val CACHE_PUBLISH_FAILURE = "Could not publish cached file"
+        const val TEMPORARY_FILE_PREFIX = "media-write-"
+        const val TEMPORARY_FILE_SUFFIX = ".part"
+
+        val activeTemporaryFiles = ConcurrentHashMap.newKeySet<File>()
     }
 
     override fun createOutput(
@@ -68,26 +78,49 @@ internal class MediaStorageProviderImpl(
 
     override fun scanCache(location: MediaLocation): Flow<MediaFile> = flow {
         require(location.area == MediaStorageArea.APP_CACHE)
-        val directory = getDirectory(location)
-        directory.walkTopDown().filter(File::isFile).forEach { file ->
-            val fileLocation =
-                file.relativeTo(directory).parent?.let {
-                    location.copy(directory = "${location.directory}/$it")
-                } ?: location
-            emit(
-                StoredMediaFile(
-                    context,
-                    fileLocation,
-                    file.nameWithoutExtension,
-                    file.extension,
-                    BINARY_MIME_TYPE,
-                    file = file,
-                    pendingMediaStoreItem = false
+        coroutineScope {
+            launch(coroutineDispatcher) {
+                removeAbandonedTemporaryFiles()
+            }
+            val directory = getDirectory(location)
+            directory.walkTopDown().filter(File::isFile).forEach { file ->
+                currentCoroutineContext().ensureActive()
+                val fileLocation =
+                    file.relativeTo(directory).parent?.let {
+                        location.copy(directory = "${location.directory}/$it")
+                    } ?: location
+                emit(
+                    StoredMediaFile(
+                        context,
+                        fileLocation,
+                        file.nameWithoutExtension,
+                        file.extension,
+                        BINARY_MIME_TYPE,
+                        file = file,
+                        pendingMediaStoreItem = false
+                    )
                 )
-            )
+            }
+        }
+    }.flowOn(coroutineDispatcher)
+
+    private suspend fun removeAbandonedTemporaryFiles() {
+        context.cacheDir.listFiles { file ->
+            file.isFile && file.name.startsWith(TEMPORARY_FILE_PREFIX) &&
+                file.name.endsWith(TEMPORARY_FILE_SUFFIX)
+        }?.forEach { file ->
+            currentCoroutineContext().ensureActive()
+            removeAbandonedTemporaryFile(file)
         }
     }
-        .flowOn(coroutineDispatcher)
+
+    private fun removeAbandonedTemporaryFile(file: File) {
+        synchronized(activeTemporaryFiles) {
+            if (file !in activeTemporaryFiles && !file.delete() && file.exists()) {
+                throw IOException("Could not remove abandoned media file")
+            }
+        }
+    }
 
     override fun findCache(
         location: MediaLocation,
@@ -112,17 +145,54 @@ internal class MediaStorageProviderImpl(
         }
     }
 
-    override fun publishCache(source: WritableMediaFile, extension: String, mimeType: String): MediaFile {
-        require(source.location.area == MediaStorageArea.APP_CACHE)
-        val current = requireNotNull(source.requireStoredFile().file)
-        val safeExtension = requireExtension(extension)
-        val destination = File(current.parentFile, "${source.nameWithoutExtension}.$safeExtension")
-        if (current != destination && (destination.exists() || !current.renameTo(destination))) throw IOException(CACHE_PUBLISH_FAILURE)
-        return StoredMediaFile(
-            context = context, location = source.location, nameWithoutExtension = source.nameWithoutExtension,
-            extension = safeExtension, mimeType = mimeType, file = destination, pendingMediaStoreItem = false
-        )
-    }
+    override fun createOutput(
+        location: MediaLocation,
+        nameWithoutExtension: String,
+        writer: MediaContentWriter
+    ): Flow<MediaFile> = flow {
+        require(location.area == MediaStorageArea.APP_CACHE)
+        val name = requireName(nameWithoutExtension)
+        val directory = getDirectory(location)
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw IOException("Could not create media directory")
+        }
+        val temporaryFile = synchronized(activeTemporaryFiles) {
+            File.createTempFile(TEMPORARY_FILE_PREFIX, TEMPORARY_FILE_SUFFIX, context.cacheDir).also {
+                activeTemporaryFiles.add(it)
+            }
+        }
+        var ownedFile = temporaryFile
+        try {
+            val format = ownedFile.outputStream().use { writer.write(it).single() }
+            currentCoroutineContext().ensureActive()
+            val extension = requireExtension(format.extension)
+            val destination = File(directory, "$name.$extension")
+            Files.move(ownedFile.toPath(), destination.toPath())
+            ownedFile = destination
+            emit(
+                StoredMediaFile(
+                    context = context,
+                    location = location,
+                    nameWithoutExtension = name,
+                    extension = extension,
+                    mimeType = format.mimeType,
+                    file = destination,
+                    pendingMediaStoreItem = false
+                )
+            )
+        } catch (failure: Throwable) {
+            try {
+                if (!ownedFile.delete() && ownedFile.exists()) {
+                    failure.addSuppressed(IOException("Could not remove incomplete media file"))
+                }
+            } catch (cleanupFailure: Throwable) {
+                failure.addSuppressed(cleanupFailure)
+            }
+            throw failure
+        } finally {
+            activeTemporaryFiles.remove(temporaryFile)
+        }
+    }.flowOn(coroutineDispatcher)
 
     override fun replace(
         source: MediaFile,

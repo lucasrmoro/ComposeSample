@@ -30,6 +30,10 @@ interface MediaStorageProvider {
      * Recursively emits files from the app's private cache at [location] on the injected I/O
      * dispatcher. Each collection starts a new scan; subsequent changes are not observed.
      *
+     * Each scan also removes abandoned temporary files from managed writes in parallel on the I/O
+     * dispatcher, excluding active writes in this process. These temporary files are never emitted.
+     * Collection waits for cleanup to finish and fails with [IOException] if deletion fails.
+     *
      * Only [MediaStorageArea.APP_CACHE] is supported. Gallery locations are rejected without
      * enumerating or accessing the user's gallery media.
      *
@@ -45,8 +49,25 @@ interface MediaStorageProvider {
         mimeType: String
     ): MediaFile?
 
-    /** Finalizes a private temporary file with the downloaded MIME type and validated extension. */
-    fun publishCache(source: WritableMediaFile, extension: String, mimeType: String): MediaFile
+    /**
+     * Writes and finalizes a private cache file on the injected I/O dispatcher when collected.
+     * [writer] must emit exactly one final format and finish all writes before its flow completes.
+     * The provider closes the stream before committing the file and emits one completed reference.
+     * Each collection performs a new write; an existing destination is never overwritten.
+     *
+     * Temporary files are outside the scanned media cache. Failure or cancellation removes the
+     * temporary file, or the committed file if delivery fails, and propagates the original error.
+     * Cleanup failures are attached as suppressed exceptions; an undeleted temporary file remains
+     * outside cache scans. The writer must cooperate with coroutine cancellation.
+     *
+     * @throws IllegalArgumentException If [location] is not private cache or the name/format is invalid.
+     * @throws IOException If creation, writing or finalization fails.
+     */
+    fun createOutput(
+        location: MediaLocation,
+        nameWithoutExtension: String,
+        writer: MediaContentWriter
+    ): Flow<MediaFile>
 
     /**
      * Replaces [source] with [replacement] in the same location and returns its new reference.
