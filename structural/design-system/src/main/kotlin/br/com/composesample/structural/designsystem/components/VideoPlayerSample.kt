@@ -19,7 +19,7 @@ import br.com.composesample.structural.video_player.*
 import kotlinx.coroutines.flow.catch
 
 @Composable
-fun VideoPlayerSample(source: VideoSource, online: Boolean, modifier: Modifier = Modifier) {
+fun VideoPlayerSample(modifier: Modifier = Modifier, source: VideoSource, online: Boolean) {
     var playbackState by remember(source) {
         mutableStateOf<VideoPlaybackState>(VideoPlaybackState.Ready)
     }
