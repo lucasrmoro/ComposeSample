@@ -140,3 +140,16 @@ and `GsonJsonCodec`. The builder is used only to construct that shared instance.
 
 `HttpClientFactory` is internal to `impl`. DI uses composition functions that return
 network API contracts and share the factory through `NetworkComponents`.
+
+## Connectivity observation
+
+`NetworkConnectivityProvider.connectivity` exposes a StateFlow alongside the legacy
+`isInternetAvailable` LiveData view. `AppApplication` calls `start()` explicitly after
+loading DI; resolving the provider does not register Android network callbacks.
+Repeated calls to `start()` do not duplicate registration.
+
+The provider follows the default network and reports ONLINE only when Android marks
+it validated. This includes supported default transports beyond Wi-Fi and cellular.
+Updates are immediate; the previous five-second LiveData debounce is removed. ONLINE
+does not guarantee that an individual API or host is reachable. Observation lives
+for the application lifetime and retains no Activity.

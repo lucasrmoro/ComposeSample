@@ -6,6 +6,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(Modules.Structural.Network.API))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.fragment.ktx)
