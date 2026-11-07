@@ -2,11 +2,11 @@ package br.com.composesample.structural.local_storage
 
 import android.content.Context
 import androidx.room.Room
-import br.com.composesample.structural.local_storage.cache.FileCacheMetadataDatabase
+import br.com.composesample.featureA.dao.SomeDao
 import br.com.composesample.structural.local_storage.cache.FileCacheMetadataDataSource
 import br.com.composesample.structural.local_storage.cache.FileCacheMetadataDataSourceImpl
-import br.com.composesample.structural.local_storage.cache.FileCacheMetadataMapper
-import br.com.composesample.featureA.dao.SomeDao
+import br.com.composesample.structural.local_storage.cache.FileCacheMetadataDatabase
+import br.com.composesample.structural.local_storage.cache.FileCacheMetadataMapperImpl
 import br.com.composesample.structural.local_storage.db.LocalDatabase
 import br.com.composesample.structural.local_storage.prefs.PreferencesDataSource
 import br.com.composesample.structural.local_storage.prefs.PreferencesDataSourceImpl
@@ -34,7 +34,7 @@ class LocalStorageFactory(context: Context, private val ioDispatcher: CoroutineD
     fun createFileCacheMetadataDataSource(): FileCacheMetadataDataSource =
         FileCacheMetadataDataSourceImpl(
             fileCacheMetadataDao = fileCacheMetadataDatabase.fileCacheMetadataDao(),
-            fileCacheMetadataMapper = FileCacheMetadataMapper(),
+            fileCacheMetadataMapper = FileCacheMetadataMapperImpl(),
             coroutineDispatcher = ioDispatcher
         )
 
@@ -45,7 +45,6 @@ class LocalStorageFactory(context: Context, private val ioDispatcher: CoroutineD
 
     private companion object {
         const val FILE_CACHE_DATABASE_NAME = "file_cache_metadata"
-
         const val ROOM_DATABASE_NAME = "sample_data_base"
     }
 
