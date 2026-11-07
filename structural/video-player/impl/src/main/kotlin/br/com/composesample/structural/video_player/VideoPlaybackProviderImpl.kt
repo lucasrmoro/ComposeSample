@@ -44,7 +44,7 @@ internal class VideoPlaybackProviderImpl(
         const val VIDEO_KEY_PLACEHOLDER = "{{videoKey}}"
         const val ORIGIN_PLACEHOLDER = "{{origin}}"
         const val EMBED_DOCUMENT =
-            """<html><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="strict-origin-when-cross-origin"><style>body{margin:0;background:black}iframe{width:100%;height:100%;border:0}</style></head><body><iframe src="https://www.youtube.com/embed/{{videoKey}}?playsinline=1&amp;autoplay=0&amp;origin={{origin}}" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></body></html>"""
+            """<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="strict-origin-when-cross-origin"><style>body{margin:0;background:black}iframe{display:block;width:100%;height:100%;border:0}</style></head><body><iframe src="https://www.youtube.com/embed/{{videoKey}}?playsinline=1&amp;autoplay=0&amp;origin={{origin}}" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe><script>function resizePlayer(){document.body.style.height=window.innerHeight+'px'}window.addEventListener('resize',resizePlayer);resizePlayer()</script></body></html>"""
     }
 }
 
