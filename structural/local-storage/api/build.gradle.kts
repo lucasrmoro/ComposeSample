@@ -6,4 +6,5 @@ plugins {
 
 dependencies {
     api(project(Modules.Structural.Biometric.API))
+    api(libs.coroutines)
 }
