@@ -1,40 +1,21 @@
 package br.com.composesample.structural.media
 
-import android.content.ContentResolver
-import android.content.ContentValues
 import android.content.Context
-import android.media.MediaScannerConnection
-import android.net.Uri
 import android.os.Build
-import android.os.Environment
-import android.provider.MediaStore
-import androidx.core.content.FileProvider
 import br.com.composesample.structural.permissions.Permission
 import br.com.composesample.structural.permissions.PermissionsProvider
 import java.io.File
 import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
 import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
-import java.nio.file.Files
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.single
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 
 internal class MediaStorageProviderImpl(
-    context: Context,
+    private val context: Context,
     private val permissionsProvider: PermissionsProvider,
-    private val coroutineDispatcher: CoroutineDispatcher
+    private val paths: MediaStoragePaths,
+    private val cacheStore: MediaCacheStore,
+    private val galleryStore: MediaGalleryStore
 ) : MediaStorageProvider {
-
-    private val context = context.applicationContext
 
     override fun createOutput(
         location: MediaLocation,
@@ -42,8 +23,8 @@ internal class MediaStorageProviderImpl(
         extension: String,
         mimeType: String
     ): WritableMediaFile {
-        val safeName = requireName(nameWithoutExtension)
-        val safeExtension = requireExtension(extension)
+        val safeName = paths.requireName(nameWithoutExtension)
+        val safeExtension = paths.requireExtension(extension)
         if (location.area == MediaStorageArea.GALLERY && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
             !permissionsProvider.isGranted(Permission.WRITE_EXTERNAL_STORAGE)
         ) {
@@ -51,166 +32,26 @@ internal class MediaStorageProviderImpl(
         }
 
         return if (location.area == MediaStorageArea.GALLERY && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            createMediaStoreFile(location, safeName, safeExtension, mimeType)
+            galleryStore.create(location, safeName, safeExtension, mimeType)
         } else {
             createFile(location, safeName, safeExtension, mimeType)
         }
     }
 
-    override fun scanCache(location: MediaLocation): Flow<MediaFile> = flow {
-        require(location.area == MediaStorageArea.APP_CACHE)
-        coroutineScope {
-            launch(coroutineDispatcher) {
-                removeAbandonedTemporaryFiles()
-            }
-            val directory = getDirectory(location)
-            directory.walkTopDown().filter(File::isFile).forEach { file ->
-                currentCoroutineContext().ensureActive()
-                val fileLocation =
-                    file.relativeTo(directory).parent?.let {
-                        location.copy(directory = "${location.directory}/$it")
-                    } ?: location
-                emit(
-                    StoredMediaFile(
-                        context,
-                        fileLocation,
-                        file.nameWithoutExtension,
-                        file.extension,
-                        BINARY_MIME_TYPE,
-                        file = file,
-                        pendingMediaStoreItem = false
-                    )
-                )
-            }
-        }
-    }.flowOn(coroutineDispatcher)
-
-    private suspend fun removeAbandonedTemporaryFiles() {
-        val temporaryFiles = try {
-            context.cacheDir.listFiles { file ->
-                file.isFile && file.name.startsWith(TEMPORARY_FILE_PREFIX) &&
-                    file.name.endsWith(TEMPORARY_FILE_SUFFIX)
-            }
-        } catch (_: SecurityException) {
-            return
-        }
-        temporaryFiles?.forEach { file ->
-            currentCoroutineContext().ensureActive()
-            removeAbandonedTemporaryFile(file)
-        }
-    }
-
-    private fun removeAbandonedTemporaryFile(file: File) {
-        synchronized(activeTemporaryFiles) {
-            if (file !in activeTemporaryFiles) {
-                try {
-                    file.delete()
-                } catch (_: SecurityException) {
-                    return
-                }
-            }
-        }
-    }
+    override fun scanCache(location: MediaLocation): Flow<MediaFile> = cacheStore.scanCache(location)
 
     override fun findCache(
         location: MediaLocation,
         nameWithoutExtension: String,
         extension: String,
         mimeType: String
-    ): MediaFile? {
-        require(location.area == MediaStorageArea.APP_CACHE)
-        val name = requireName(nameWithoutExtension)
-        val safeExtension = requireExtension(extension)
-        val file = File(getDirectory(location), "$name.$safeExtension")
-        return file.takeIf(File::isFile)?.let {
-            StoredMediaFile(
-                context,
-                location,
-                name,
-                safeExtension,
-                mimeType,
-                file = it,
-                pendingMediaStoreItem = false
-            )
-        }
-    }
+    ): MediaFile? = cacheStore.findCache(location, nameWithoutExtension, extension, mimeType)
 
     override fun createOutput(
         location: MediaLocation,
         nameWithoutExtension: String,
         writer: MediaContentWriter
-    ): Flow<MediaFile> = flow {
-        require(location.area == MediaStorageArea.APP_CACHE)
-        val name = requireName(nameWithoutExtension)
-        val directory = prepareDirectory(location)
-        val temporaryFile = createTemporaryFile()
-        var ownedFile = temporaryFile
-        try {
-            val format = writeContent(temporaryFile, writer)
-            currentCoroutineContext().ensureActive()
-            ownedFile = finalizeCacheFile(temporaryFile, directory, name, format)
-            emit(completedCacheFile(ownedFile, location, name, format))
-        } catch (failure: Throwable) {
-            discardFailedWrite(ownedFile, failure)
-            throw failure
-        } finally {
-            activeTemporaryFiles.remove(temporaryFile)
-        }
-    }.flowOn(coroutineDispatcher)
-
-    private fun prepareDirectory(location: MediaLocation): File {
-        val directory = getDirectory(location)
-        if (!directory.exists() && !directory.mkdirs()) {
-            throw IOException("Could not create media directory")
-        }
-        return directory
-    }
-
-    private fun createTemporaryFile(): File = synchronized(activeTemporaryFiles) {
-        File.createTempFile(TEMPORARY_FILE_PREFIX, TEMPORARY_FILE_SUFFIX, context.cacheDir).also {
-            activeTemporaryFiles.add(it)
-        }
-    }
-
-    private suspend fun writeContent(file: File, writer: MediaContentWriter): MediaFormat =
-        file.outputStream().use { writer.write(it).single() }
-
-    private fun finalizeCacheFile(
-        temporaryFile: File,
-        directory: File,
-        name: String,
-        format: MediaFormat
-    ): File {
-        val extension = requireExtension(format.extension)
-        val destination = File(directory, "$name.$extension")
-        Files.move(temporaryFile.toPath(), destination.toPath())
-        return destination
-    }
-
-    private fun completedCacheFile(
-        file: File,
-        location: MediaLocation,
-        name: String,
-        format: MediaFormat
-    ): MediaFile = StoredMediaFile(
-        context = context,
-        location = location,
-        nameWithoutExtension = name,
-        extension = file.extension,
-        mimeType = format.mimeType,
-        file = file,
-        pendingMediaStoreItem = false
-    )
-
-    private fun discardFailedWrite(file: File, failure: Throwable) {
-        try {
-            if (!file.delete() && file.exists()) {
-                failure.addSuppressed(IOException("Could not remove incomplete media file"))
-            }
-        } catch (cleanupFailure: Throwable) {
-            failure.addSuppressed(cleanupFailure)
-        }
-    }
+    ): Flow<MediaFile> = cacheStore.createOutput(location, nameWithoutExtension, writer)
 
     override fun replace(
         source: MediaFile,
@@ -224,11 +65,11 @@ internal class MediaStorageProviderImpl(
         }
         require(source.uri != replacement.uri) { "Source and replacement must be different media files" }
 
-        val safeName = requireName(nameWithoutExtension)
+        val safeName = paths.requireName(nameWithoutExtension)
         return if (sourceFile.file != null && replacementFile.file != null) {
             replaceFile(sourceFile, replacementFile, safeName)
         } else {
-            replaceMediaStoreFile(sourceFile, replacementFile, safeName)
+            galleryStore.replace(sourceFile, replacementFile, safeName)
         }
     }
 
@@ -238,7 +79,7 @@ internal class MediaStorageProviderImpl(
         extension: String,
         mimeType: String
     ): StoredMediaFile {
-        val directory = getDirectory(location)
+        val directory = paths.getDirectory(location)
         if (!directory.exists() && !directory.mkdirs()) {
             throw IOException("Could not create media directory")
         }
@@ -253,36 +94,6 @@ internal class MediaStorageProviderImpl(
             mimeType = mimeType,
             file = file,
             pendingMediaStoreItem = false
-        )
-    }
-
-    private fun createMediaStoreFile(
-        location: MediaLocation,
-        name: String,
-        extension: String,
-        mimeType: String
-    ): StoredMediaFile {
-        val collection = when {
-            mimeType.startsWith(IMAGE_MIME_TYPE_PREFIX) -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            mimeType.startsWith(VIDEO_MIME_TYPE_PREFIX) -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-            else -> throw IOException("Gallery storage does not support $mimeType")
-        }
-        val values = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, "$name.$extension")
-            put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
-            put(MediaStore.MediaColumns.RELATIVE_PATH, "${requireGalleryPath(location.directory)}/")
-            put(MediaStore.MediaColumns.IS_PENDING, MEDIA_STORE_PENDING)
-        }
-        val uri = context.contentResolver.insert(collection, values)
-            ?: throw IOException("Could not create gallery media entry")
-        return StoredMediaFile(
-            context = context,
-            location = location,
-            nameWithoutExtension = name,
-            extension = extension,
-            mimeType = mimeType,
-            contentUri = uri,
-            pendingMediaStoreItem = true
         )
     }
 
@@ -314,179 +125,11 @@ internal class MediaStorageProviderImpl(
         return replacement
     }
 
-    private fun getDirectory(location: MediaLocation): File {
-        val parts = requireRelativePath(location.directory)
-        return when (location.area) {
-            MediaStorageArea.APP_CACHE -> File(
-                File(context.cacheDir, MediaLocation.DEFAULT_CACHE_DIRECTORY),
-                parts.joinToString("/")
-            )
-            MediaStorageArea.GALLERY -> {
-                val rootName = parts.firstOrNull()
-                if (rootName != Environment.DIRECTORY_PICTURES && rootName != Environment.DIRECTORY_MOVIES) {
-                    throw IOException("Gallery media must be stored under Pictures or Movies")
-                }
-                val root = Environment.getExternalStoragePublicDirectory(rootName)
-                File(
-                    root,
-                    parts.drop(GALLERY_ROOT_DIRECTORY_SEGMENT_COUNT).joinToString("/")
-                )
-            }
-        }
-    }
-
-    private fun requireName(value: String): String {
-        val name = value.trim()
-        require(name.isNotEmpty() && name != "." && name != ".." &&
-            '/' !in name && '\\' !in name && '.' !in name
-        ) { "Media names must be a single base name without an extension" }
-        return name
-    }
-
-    private fun requireExtension(value: String): String {
-        val extension = value.removePrefix(".")
-        require(extension.isNotBlank() && extension.all { it.isLetterOrDigit() }) {
-            "Media extensions may contain only letters and digits"
-        }
-        return extension
-    }
-
-    private fun requireRelativePath(value: String): List<String> {
-        val parts = value.split('/').filter(String::isNotBlank)
-        require(parts.isNotEmpty() && parts.none { it == "." || it == ".." }) {
-            "Media locations must use a non-empty relative directory"
-        }
-        return parts
-    }
-
-    private fun requireGalleryPath(value: String): String {
-        val parts = requireRelativePath(value)
-        require(parts.first() == Environment.DIRECTORY_PICTURES ||
-            parts.first() == Environment.DIRECTORY_MOVIES
-        ) { "Gallery media must be stored under Pictures or Movies" }
-        return parts.joinToString("/")
-    }
-
     private fun MediaFile.requireStoredFile(): StoredMediaFile = this as? StoredMediaFile
         ?: throw IllegalArgumentException("Media was not created by this storage provider")
 
-    private fun WritableMediaFile.requireStoredFile(): StoredMediaFile = this as? StoredMediaFile
-        ?: throw IllegalArgumentException("Media was not created by this storage provider")
-
-    private fun StoredMediaFile.updateFile(file: File, name: String) {
-        this.file = file
-        updateName(name)
-    }
-
-    private fun StoredMediaFile.updateName(name: String) {
-        nameWithoutExtension = name
-    }
-
-    private fun StoredMediaFile.rename(name: String) {
-        val uri = contentUri ?: return
-        val renamed = "$name.$extension"
-        if (context.contentResolver.update(
-                uri,
-                ContentValues().apply { put(MediaStore.MediaColumns.DISPLAY_NAME, renamed) },
-                null,
-                null
-            ) <= NO_ROWS_UPDATED
-        ) throw IOException("Could not rename replacement media")
-        updateName(name)
-    }
-
-    private fun StoredMediaFile.publishToMediaScanner() {
-        val currentFile = file ?: return
-        MediaScannerConnection.scanFile(context, arrayOf(currentFile.absolutePath), arrayOf(mimeType), null)
-    }
-
-    private fun replaceMediaStoreFile(
-        source: StoredMediaFile,
-        replacement: StoredMediaFile,
-        name: String
-    ): MediaFile {
-        replacement.rename(name)
-        if (!replacement.publish()) throw IOException("Could not publish compressed gallery media")
-        if (!source.delete()) {
-            replacement.delete()
-            throw IOException("Could not remove original gallery media")
-        }
-        return replacement
-    }
-
-    private inner class StoredMediaFile(
-        val context: Context,
-        override val location: MediaLocation,
-        override var nameWithoutExtension: String,
-        override val extension: String,
-        override val mimeType: String,
-        var file: File? = null,
-        val contentUri: Uri? = null,
-        private val pendingMediaStoreItem: Boolean
-    ) : WritableMediaFile {
-
-        private val resolver: ContentResolver = context.contentResolver
-
-        override val uri: String
-            get() = file?.let {
-                FileProvider.getUriForFile(
-                    context,
-                    context.packageName + FILE_PROVIDER_AUTHORITY_SUFFIX,
-                    it
-                ).toString()
-            } ?: contentUri.toString()
-
-        override val sizeBytes: Long
-            get() = file?.length() ?: runCatching {
-                resolver.openFileDescriptor(contentUri!!, FILE_READ_MODE)?.use { it.statSize } ?: EMPTY_FILE_SIZE_BYTES
-            }.getOrDefault(0L)
-
-        override fun openStream(): InputStream = file?.inputStream()
-            ?: resolver.openInputStream(contentUri!!)
-            ?: throw IOException("Media file is not readable")
-
-        override fun openOutputStream(): OutputStream = file?.outputStream()
-            ?: resolver.openOutputStream(contentUri!!, FILE_WRITE_MODE)
-            ?: throw IOException("Media file is not writable")
-
-        override fun publish(): Boolean = if (!pendingMediaStoreItem) {
-            if (location.area == MediaStorageArea.GALLERY && file != null) {
-                publishToMediaScanner()
-            }
-            true
-        } else {
-            resolver.update(
-                contentUri!!,
-                ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, MEDIA_STORE_PUBLISHED) },
-                null,
-                null
-            ) > NO_ROWS_UPDATED
-        }
-
-        override fun discard(): Boolean = delete()
-
-        override fun delete(): Boolean = file?.delete()
-            ?: (resolver.delete(contentUri!!, null, null) > NO_ROWS_UPDATED)
-
-    }
-
     private companion object {
-        const val FILE_PROVIDER_AUTHORITY_SUFFIX = ".structural.media.fileprovider"
         const val BACKUP_FILE_SUFFIX = ".backup"
-        const val FILE_READ_MODE = "r"
-        const val FILE_WRITE_MODE = "w"
-        const val IMAGE_MIME_TYPE_PREFIX = "image/"
-        const val VIDEO_MIME_TYPE_PREFIX = "video/"
-        const val MEDIA_STORE_PENDING = 1
-        const val MEDIA_STORE_PUBLISHED = 0
-        const val NO_ROWS_UPDATED = 0
-        const val EMPTY_FILE_SIZE_BYTES = 0L
-        const val GALLERY_ROOT_DIRECTORY_SEGMENT_COUNT = 1
-        const val BINARY_MIME_TYPE = "application/octet-stream"
-        const val TEMPORARY_FILE_PREFIX = "media-write-"
-        const val TEMPORARY_FILE_SUFFIX = ".part"
-
-        val activeTemporaryFiles = ConcurrentHashMap.newKeySet<File>()
     }
 
 }

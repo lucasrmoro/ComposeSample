@@ -8,5 +8,14 @@ fun createMediaStorageProvider(
     context: Context,
     permissionsProvider: PermissionsProvider,
     coroutineDispatcher: CoroutineDispatcher
-): MediaStorageProvider =
-    MediaStorageProviderImpl(context, permissionsProvider, coroutineDispatcher)
+): MediaStorageProvider {
+    val applicationContext = context.applicationContext
+    val paths = MediaStoragePaths(applicationContext)
+    return MediaStorageProviderImpl(
+        context = applicationContext,
+        permissionsProvider = permissionsProvider,
+        paths = paths,
+        cacheStore = MediaCacheStore(applicationContext, paths, coroutineDispatcher),
+        galleryStore = MediaGalleryStore(applicationContext, paths)
+    )
+}

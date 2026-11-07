@@ -38,3 +38,12 @@ so incomplete files left by cleanup failure or process termination are not cache
 There is no public `publishCache` step. The original writable-output overload remains for
 external writers such as camera capture and for replacement workflows; those consumers
 still own publication and discard.
+
+## Internal organization
+
+`MediaStorageProviderImpl` coordinates permission checks and storage routing. `MediaCacheStore`
+owns cache scanning, managed writes and temporary-file recovery; `MediaGalleryStore` owns
+MediaStore creation and replacement. `MediaStoragePaths` centralizes path and name validation.
+`StoredMediaFile` encapsulates streams, URIs, publication and deletion. All collaborators remain
+internal to `media/impl`. The factory supplies the application context and collaborators through
+constructor injection, sharing the same path validator. Construction starts no background work.
