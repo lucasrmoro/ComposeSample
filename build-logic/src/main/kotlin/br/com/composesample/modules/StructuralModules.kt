@@ -151,4 +151,12 @@ object StructuralModules {
         const val DI = "$ROOT:di"
         const val IMPL = "$ROOT:impl"
     }
+    object VideoPlayer {
+        private const val ROOT = "${StructuralModules.ROOT}:video-player"
+
+        const val API = "$ROOT:api"
+        const val DI = "$ROOT:di"
+        const val IMPL = "$ROOT:impl"
+    }
+
 }
