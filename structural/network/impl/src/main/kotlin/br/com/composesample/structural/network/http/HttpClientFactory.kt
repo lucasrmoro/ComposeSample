@@ -35,6 +35,12 @@ internal class HttpClientFactory(
     fun createUnauthenticated(baseUrl: String, dispatcher: CoroutineDispatcher): HttpClient =
         create(baseUrl, dispatcher, OkHttpClient.Builder())
 
+    internal fun createConfigured(
+        baseUrl: String,
+        dispatcher: CoroutineDispatcher,
+        builder: OkHttpClient.Builder
+    ): HttpClient = create(baseUrl, dispatcher, builder)
+
     internal fun createDownloadService(baseUrl: String): RetrofitHttpService =
         createService(baseUrl, downloadClient)
 

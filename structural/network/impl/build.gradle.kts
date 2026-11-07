@@ -11,6 +11,7 @@ android {
 }
 
 dependencies {
+    implementation(project(Modules.Structural.Localization.API))
     implementation(project(Modules.Structural.Session.API))
     implementation(project(Modules.Feature.Login.DOMAIN_API))
     implementation(project(Modules.Structural.Core.MAIN))
