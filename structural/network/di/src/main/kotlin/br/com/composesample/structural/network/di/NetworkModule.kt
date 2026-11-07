@@ -10,19 +10,21 @@ import br.com.composesample.structural.network.createNetworkAuthenticator
 import br.com.composesample.structural.network.createNetworkConnectivityProvider
 import br.com.composesample.structural.network.createNetworkInterceptor
 import br.com.composesample.structural.network.http.BinaryDownloadProvider
-import br.com.composesample.structural.network.http.createBinaryDownloadProvider
-import br.com.composesample.structural.network.http.JsonCodec
-import br.com.composesample.structural.network.http.createJsonCodec
 import br.com.composesample.structural.network.http.HttpClient
 import br.com.composesample.structural.network.http.HttpClientConfiguration
 import br.com.composesample.structural.network.http.HttpClientFactory
+import br.com.composesample.structural.network.http.JsonCodec
+import br.com.composesample.structural.network.http.NetworkSerialization
+import br.com.composesample.structural.network.http.createBinaryDownloadProvider
+import br.com.composesample.structural.network.http.createHttpClientFactory
+import br.com.composesample.structural.network.http.createJsonCodec
 import okhttp3.Authenticator
 import okhttp3.Interceptor
 
 object NetworkModule {
 
     private val networkModule = dependencyModule {
-        singleton<JsonCodec> { createJsonCodec() }
+        singleton<JsonCodec> { createJsonCodec(serialization = get()) }
         singleton<BinaryDownloadProvider> {
             createBinaryDownloadProvider(
                 coroutineDispatcher = dispatcherIO,
@@ -43,7 +45,8 @@ object NetworkModule {
             )
         }
         singleton<Interceptor> { createNetworkInterceptor(preferencesDataSource = get()) }
-        singleton { HttpClientFactory() }
+        singleton { NetworkSerialization() }
+        singleton { createHttpClientFactory(serialization = get()) }
         singleton<HttpClient>(AuthenticatedHttpClient) {
             get<HttpClientFactory>().createAuthenticated(
                 baseUrl = get<HttpClientConfiguration>().baseUrl,

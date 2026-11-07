@@ -133,3 +133,7 @@ The codec reuses the HTTP client's strict JSON and explicit `JsonName` mapping.
 Serialization is synchronous and performs no network or disk I/O; callers choose
 an appropriate dispatcher for large payloads. Invalid JSON or incompatible data
 propagates to the caller, and a decoded null result is rejected.
+
+`NetworkModule` registers a single `NetworkSerialization` holder, which keeps Gson
+inside `impl`. Its configured Gson instance is injected into both `HttpClientFactory`
+and `GsonJsonCodec`. The builder is used only to construct that shared instance.

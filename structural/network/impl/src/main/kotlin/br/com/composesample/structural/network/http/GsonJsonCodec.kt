@@ -1,10 +1,11 @@
 package br.com.composesample.structural.network.http
 
+import com.google.gson.Gson
 import java.lang.reflect.ParameterizedType
 
-internal class GsonJsonCodec : JsonCodec {
-
-    private val gson by lazy { HttpClientFactory().createGson() }
+internal class GsonJsonCodec(
+    private val gson: Gson
+) : JsonCodec {
 
     override fun encode(value: Any): String = gson.toJson(value)
 
@@ -16,4 +17,5 @@ internal class GsonJsonCodec : JsonCodec {
 
 }
 
-fun createJsonCodec(): JsonCodec = GsonJsonCodec()
+fun createJsonCodec(serialization: NetworkSerialization): JsonCodec =
+    GsonJsonCodec(serialization.gson)
