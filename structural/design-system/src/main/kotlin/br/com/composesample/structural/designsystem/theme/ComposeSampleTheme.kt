@@ -10,7 +10,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import br.com.composesample.structural.designsystem.tokens.SampleDimens
-import br.com.composesample.structural.designsystem.tokens.SampleColors
+import br.com.composesample.structural.designsystem.tokens.SamplePalette
 
 data class ComposeSampleColors(
     val primary: Color,
@@ -32,7 +32,7 @@ private fun ColorScheme.toSampleColors() =
         background = background,
         surface = surface,
         onSurface = onSurface,
-        scrim = SampleColors.Neutral.Scrim
+        scrim = SamplePalette.Neutral.Scrim
     )
 
 private val LightColors = LightColorScheme.toSampleColors()

@@ -2,44 +2,44 @@ package br.com.composesample.structural.designsystem.theme
 
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
-import br.com.composesample.structural.designsystem.tokens.SampleColors
+import br.com.composesample.structural.designsystem.tokens.SamplePalette
 
 internal val LightColorScheme =
     lightColorScheme(
-        primary = SampleColors.Light.Primary,
-        onPrimary = SampleColors.Light.OnPrimary,
-        primaryContainer = SampleColors.Light.PrimaryContainer,
-        onPrimaryContainer = SampleColors.Light.OnPrimaryContainer,
-        secondary = SampleColors.Light.Secondary,
-        onSecondary = SampleColors.Light.OnSecondary,
-        secondaryContainer = SampleColors.Light.SecondaryContainer,
-        onSecondaryContainer = SampleColors.Light.OnSecondaryContainer,
-        background = SampleColors.Light.Background,
-        surface = SampleColors.Light.Surface,
-        onSurface = SampleColors.Light.OnSurface,
-        surfaceVariant = SampleColors.Light.SurfaceVariant,
-        onSurfaceVariant = SampleColors.Light.OnSurfaceVariant,
-        outline = SampleColors.Light.Outline,
-        outlineVariant = SampleColors.Light.OutlineVariant,
-        onBackground = SampleColors.Light.OnSurface
+        primary = SamplePalette.Light.Primary,
+        onPrimary = SamplePalette.Light.OnPrimary,
+        primaryContainer = SamplePalette.Light.PrimaryContainer,
+        onPrimaryContainer = SamplePalette.Light.OnPrimaryContainer,
+        secondary = SamplePalette.Light.Secondary,
+        onSecondary = SamplePalette.Light.OnSecondary,
+        secondaryContainer = SamplePalette.Light.SecondaryContainer,
+        onSecondaryContainer = SamplePalette.Light.OnSecondaryContainer,
+        background = SamplePalette.Light.Background,
+        surface = SamplePalette.Light.Surface,
+        onSurface = SamplePalette.Light.OnSurface,
+        surfaceVariant = SamplePalette.Light.SurfaceVariant,
+        onSurfaceVariant = SamplePalette.Light.OnSurfaceVariant,
+        outline = SamplePalette.Light.Outline,
+        outlineVariant = SamplePalette.Light.OutlineVariant,
+        onBackground = SamplePalette.Light.OnSurface
     )
 
 internal val DarkColorScheme =
     darkColorScheme(
-        primary = SampleColors.Dark.Primary,
-        onPrimary = SampleColors.Dark.OnPrimary,
-        primaryContainer = SampleColors.Dark.PrimaryContainer,
-        onPrimaryContainer = SampleColors.Dark.OnPrimaryContainer,
-        secondary = SampleColors.Dark.Secondary,
-        onSecondary = SampleColors.Dark.OnSecondary,
-        secondaryContainer = SampleColors.Dark.SecondaryContainer,
-        onSecondaryContainer = SampleColors.Dark.OnSecondaryContainer,
-        background = SampleColors.Dark.Background,
-        surface = SampleColors.Dark.Surface,
-        onSurface = SampleColors.Dark.OnSurface,
-        surfaceVariant = SampleColors.Dark.SurfaceVariant,
-        onSurfaceVariant = SampleColors.Dark.OnSurfaceVariant,
-        outline = SampleColors.Dark.Outline,
-        outlineVariant = SampleColors.Dark.OutlineVariant,
-        onBackground = SampleColors.Dark.OnSurface
+        primary = SamplePalette.Dark.Primary,
+        onPrimary = SamplePalette.Dark.OnPrimary,
+        primaryContainer = SamplePalette.Dark.PrimaryContainer,
+        onPrimaryContainer = SamplePalette.Dark.OnPrimaryContainer,
+        secondary = SamplePalette.Dark.Secondary,
+        onSecondary = SamplePalette.Dark.OnSecondary,
+        secondaryContainer = SamplePalette.Dark.SecondaryContainer,
+        onSecondaryContainer = SamplePalette.Dark.OnSecondaryContainer,
+        background = SamplePalette.Dark.Background,
+        surface = SamplePalette.Dark.Surface,
+        onSurface = SamplePalette.Dark.OnSurface,
+        surfaceVariant = SamplePalette.Dark.SurfaceVariant,
+        onSurfaceVariant = SamplePalette.Dark.OnSurfaceVariant,
+        outline = SamplePalette.Dark.Outline,
+        outlineVariant = SamplePalette.Dark.OutlineVariant,
+        onBackground = SamplePalette.Dark.OnSurface
     )
