@@ -28,3 +28,5 @@ services, never in `core`.
 
 HTTP Flow error handling consumes the exceptions from `network/api`. Transport SDKs
 and JSON decoding remain in `network/impl`.
+
+UiText represents resource-backed text without retaining a Context or resolving a locale in state. StringResource captures an ID and a snapshot of vararg formatting arguments; Raw is reserved for dynamic content. Resource resolution belongs to the UI.

@@ -13,3 +13,5 @@ Os módulos de apresentação consomem esses componentes por `:structural:design
 O módulo também fornece `LifecycleBiometricProvider`, que cancela uma solicitação biométrica em andamento quando o escopo de coroutine da tela é cancelado. O binding fica em `:structural:design-system:di`; telas que usam biometria solicitam um provider com a `FragmentActivity` e o escopo de ciclo de vida da tela. A Activity da plataforma serve apenas como adaptador exigido pelo AndroidX BiometricPrompt, não como implementação de tela.
 
 O app carrega `DesignSystemModule.init()` depois do módulo DI de biometria durante a inicialização. O design-system consome contratos estruturais e não inicializa providers nem SDKs por conta própria.
+
+UiText.asString() resolves UiText.StringResource with Compose stringResource and positional arguments, using the current configuration. UiText.Raw returns its dynamic value unchanged. This keeps resource lookup out of ViewModels.
