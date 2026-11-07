@@ -26,40 +26,45 @@ internal object SamplePalette {
 
     val White = Color.White
 
-    object Light {
-        val Primary = Color(0xFF6750A4)
-        val OnPrimary = Color(0xFFFFFFFF)
-        val PrimaryContainer = Color(0xFFEADDFF)
-        val OnPrimaryContainer = Color(0xFF21005D)
-        val Secondary = Color(0xFF625B71)
-        val OnSecondary = Color(0xFFFFFFFF)
-        val SecondaryContainer = Color(0xFFE8DEF8)
-        val OnSecondaryContainer = Color(0xFF1D192B)
-        val Background = Color(0xFFFFFBFE)
-        val Surface = Color(0xFFFFFBFE)
-        val OnSurface = Color(0xFF1C1B1F)
-        val SurfaceVariant = Color(0xFFE7E0EC)
-        val OnSurfaceVariant = Color(0xFF49454F)
-        val Outline = Color(0xFF79747E)
-        val OutlineVariant = Color(0xFFCAC4D0)
+    object Purple {
+        val S10 = Color(0xFFEADDFF)
+        val S20 = Color(0xFF4F378B)
+        val S40 = Color(0xFF6750A4)
+        val S80 = Color(0xFFD0BCFF)
+        val S90 = Color(0xFF381E72)
+        val S100 = Color(0xFF21005D)
     }
 
-    object Dark {
-        val Primary = Color(0xFFD0BCFF)
-        val OnPrimary = Color(0xFF381E72)
-        val PrimaryContainer = Color(0xFF4F378B)
-        val OnPrimaryContainer = Color(0xFFEADDFF)
-        val Secondary = Color(0xFFCCC2DC)
-        val OnSecondary = Color(0xFF332D41)
-        val SecondaryContainer = Color(0xFF4A4458)
-        val OnSecondaryContainer = Color(0xFFE8DEF8)
-        val Background = Color(0xFF141318)
-        val Surface = Color(0xFF141318)
-        val OnSurface = Color(0xFFECE6F0)
-        val SurfaceVariant = Color(0xFF302B36)
-        val OnSurfaceVariant = Color(0xFFCCC2D8)
-        val Outline = Color(0xFF93869F)
-        val OutlineVariant = Color(0xFF49424F)
+    object VioletGray {
+        val S10 = Color(0xFFE8DEF8)
+        val S20 = Color(0xFF4A4458)
+        val S40 = Color(0xFF625B71)
+        val S80 = Color(0xFFCCC2DC)
+        val S90 = Color(0xFF332D41)
+        val S100 = Color(0xFF1D192B)
     }
+
+    object Surfaces {
+        val WarmWhite = Color(0xFFFFFBFE)
+        val Night = Color(0xFF141318)
+        val Lavender = Color(0xFFE7E0EC)
+        val Charcoal = Color(0xFF302B36)
+    }
+
+    object Content {
+        val Ink = Color(0xFF1C1B1F)
+        val Snow = Color(0xFFECE6F0)
+        val Muted = Color(0xFF49454F)
+        val SoftLavender = Color(0xFFCCC2D8)
+    }
+
+    object Outlines {
+        val Muted = Color(0xFF79747E)
+        val Soft = Color(0xFF93869F)
+        val Lavender = Color(0xFFCAC4D0)
+        val Plum = Color(0xFF49424F)
+    }
+
+
 
 }
