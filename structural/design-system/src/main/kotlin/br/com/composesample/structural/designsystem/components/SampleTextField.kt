@@ -14,11 +14,11 @@ import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
 fun SampleTextField(
+    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
     placeholder: String,
-    modifier: Modifier = Modifier,
     maxLength: Int = Int.MAX_VALUE,
     enabled: Boolean = true
 ) {

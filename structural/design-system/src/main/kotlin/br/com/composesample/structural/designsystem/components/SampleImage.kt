@@ -29,9 +29,9 @@ import kotlinx.coroutines.withContext
 /** Displays a locally cached image; decoding and network work stay off the main dispatcher. */
 @Composable
 fun SampleImage(
+    modifier: Modifier = Modifier,
     request: AssetRequest?,
-    contentDescription: String?,
-    modifier: Modifier = Modifier
+    contentDescription: String?
 ) {
     val inspection = LocalInspectionMode.current
     val cache = if (inspection) null else remember { get<AssetsCacheProvider>() }
