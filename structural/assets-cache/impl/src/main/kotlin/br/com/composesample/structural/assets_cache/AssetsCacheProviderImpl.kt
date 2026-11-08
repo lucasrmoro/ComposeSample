@@ -23,8 +23,7 @@ internal class AssetsCacheProviderImpl(
 
     override fun observe(request: AssetRequest, previousUrl: String?): Flow<AssetState> = flow {
         mutex.withLock { load(request, previousUrl) }
-    }
-        .flowOn(coroutineDispatcher)
+    }.flowOn(coroutineDispatcher)
 
     private suspend fun FlowCollector<AssetState>.load(
         request: AssetRequest,
@@ -52,10 +51,9 @@ internal class AssetsCacheProviderImpl(
                 val file = assetCacheWriter.download(request)
                 val refreshed = assetsCacheStore.save(url = url, file = file, now = clock.millis())
                 emit(AssetState(file = refreshed, isRefreshing = false, failed = false))
+            }.catch {
+                emit(AssetState(file = fallback, isRefreshing = false, failed = true))
             }
-                .catch {
-                    emit(AssetState(file = fallback, isRefreshing = false, failed = true))
-                }
         )
     }
 

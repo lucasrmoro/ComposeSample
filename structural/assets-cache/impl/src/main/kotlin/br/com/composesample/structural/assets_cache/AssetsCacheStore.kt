@@ -40,8 +40,7 @@ internal class AssetsCacheStore(
     }
 
     suspend fun touch(url: String, now: Long): Result<Unit> =
-        fileCacheMetadataDataSource
-            .touch(namespace, hashingProvider.sha256(url), now)
+        fileCacheMetadataDataSource.touch(namespace, hashingProvider.sha256(url), now)
             .map { Result.success(it) }
             .catch { emit(Result.failure(it)) }
             .single()
@@ -61,15 +60,13 @@ internal class AssetsCacheStore(
                     )
                 )
                 .single()
-        }
-            .onFailure {
-                withContext(NonCancellable) {
-                    previous?.let { fileCacheMetadataDataSource.save(it).single() }
-                        ?: fileCacheMetadataDataSource.remove(namespace, key).single()
-                    file.delete()
-                }
+        }.onFailure {
+            withContext(NonCancellable) {
+                previous?.let { fileCacheMetadataDataSource.save(it).single() }
+                    ?: fileCacheMetadataDataSource.remove(namespace, key).single()
+                file.delete()
             }
-            .getOrThrow()
+        }.getOrThrow()
         previous?.let(::resolve)?.delete()
         return file
     }

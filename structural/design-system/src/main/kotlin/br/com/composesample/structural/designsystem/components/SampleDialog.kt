@@ -1,17 +1,15 @@
 package br.com.composesample.structural.designsystem.components
 
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
-fun DialogSample(
+fun SampleDialog(
+    modifier: Modifier = Modifier,
     title: String,
     message: String,
     confirmText: String,
@@ -20,27 +18,26 @@ fun DialogSample(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
+        modifier = modifier,
         onDismissRequest = onDismiss,
         containerColor = CurrentTheme.color.surface,
         titleContentColor = CurrentTheme.color.onSurface,
         textContentColor = CurrentTheme.color.onSurface,
-        title = { Text(title) },
-        text = { Text(message) },
+        title = { SampleText(text = title) },
+        text = { SampleText(text = message) },
         confirmButton = {
-            TextButton(
+            SampleButton(
+                text = confirmText,
                 onClick = onConfirm,
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = CurrentTheme.color.primary
-                )
-            ) { Text(confirmText) }
+                style = SampleButtonStyle.TEXT
+            )
         },
         dismissButton = {
-            TextButton(
+            SampleButton(
+                text = dismissText,
                 onClick = onDismiss,
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = CurrentTheme.color.primary
-                )
-            ) { Text(dismissText) }
+                style = SampleButtonStyle.TEXT
+            )
         }
     )
 }
@@ -49,7 +46,7 @@ fun DialogSample(
 @Composable
 private fun SampleDialogPreview() {
     ComposeSampleTheme {
-        DialogSample(
+        SampleDialog(
             title = "Discard changes?",
             message = "Your changes will be lost.",
             confirmText = "Discard",
