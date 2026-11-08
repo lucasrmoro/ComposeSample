@@ -17,7 +17,7 @@ fun SampleCircularProgressIndicator(
     CircularProgressIndicator(
         modifier = modifier,
         color = color,
-        strokeWidth = CurrentTheme.stroke.Thin
+        strokeWidth = CurrentTheme.stroke.thin
     )
 }
 
@@ -26,7 +26,7 @@ fun SampleCircularProgressIndicator(
 private fun SampleCircularProgressIndicatorPreview() {
     ComposeSampleTheme {
         SampleCircularProgressIndicator(
-            modifier = Modifier.size(CurrentTheme.size.Medium),
+            modifier = Modifier.size(CurrentTheme.size.medium),
             color = CurrentTheme.color.primary
         )
     }

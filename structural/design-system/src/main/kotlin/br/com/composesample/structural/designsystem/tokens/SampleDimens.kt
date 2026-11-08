@@ -31,6 +31,13 @@ internal object SampleDimens {
     }
 
     object Text {
+        val LabelSmall = 11.sp
+        val LabelMedium = 12.sp
+        val BodyLarge = 16.sp
+        val LabelLineHeight = 16.sp
+        val BodyLineHeight = 24.sp
+        val LabelLetterSpacing = 0.5.sp
+        val BodyLetterSpacing = 0.5.sp
         val SectionTitle = 20.sp
     }
 

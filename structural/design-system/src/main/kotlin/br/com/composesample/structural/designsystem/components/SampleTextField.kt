@@ -167,7 +167,7 @@ private fun TextFieldIcon(
         modifier = modifier,
         icon = icon,
         contentDescription = contentDescription,
-        tint = CurrentTheme.colors.OnSurfaceVariant
+        tint = CurrentTheme.colors.onSurfaceVariant
     )
 }
 
@@ -222,8 +222,8 @@ private fun SampleTextFieldStylePreview(
     style: SampleTextFieldStyle
 ) {
     Column(
-        modifier = modifier.padding(CurrentTheme.spacing.Medium),
-        verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.Small)
+        modifier = modifier.padding(CurrentTheme.spacing.medium),
+        verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small)
     ) {
         SampleTextField(
             value = stringResource(R.string.sample_text_field_preview_value),

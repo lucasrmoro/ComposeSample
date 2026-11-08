@@ -23,9 +23,9 @@ fun ProfileSampleImage(
             contentAlignment = Alignment.Center
         ) {
             SampleIcon(
-                icon = CurrentTheme.icon.Person,
+                icon = CurrentTheme.icon.person,
                 contentDescription = stringResource(R.string.sample_photo_not_provided),
-                tint = CurrentTheme.colors.OnSurfaceVariant
+                tint = CurrentTheme.colors.onSurfaceVariant
             )
         }
         return

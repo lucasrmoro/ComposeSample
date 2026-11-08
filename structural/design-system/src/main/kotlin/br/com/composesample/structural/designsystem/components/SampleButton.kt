@@ -42,10 +42,10 @@ fun SampleButton(
     val buttonContent: @Composable RowScope.() -> Unit = {
         if (isLoading) {
             SampleCircularProgressIndicator(
-                modifier = Modifier.size(CurrentTheme.size.Small),
+                modifier = Modifier.size(CurrentTheme.size.small),
                 color = contentColor
             )
-            Spacer(modifier = Modifier.width(CurrentTheme.spacing.Small))
+            Spacer(modifier = Modifier.width(CurrentTheme.spacing.small))
         }
         SampleText(text = text)
     }
@@ -105,8 +105,8 @@ private fun SampleButtonStylePreview(
     style: SampleButtonStyle
 ) {
     Column(
-        modifier = modifier.padding(CurrentTheme.spacing.Medium),
-        verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.Small)
+        modifier = modifier.padding(CurrentTheme.spacing.medium),
+        verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small)
     ) {
         SampleButton(
             text = stringResource(R.string.sample_button_preview_label),

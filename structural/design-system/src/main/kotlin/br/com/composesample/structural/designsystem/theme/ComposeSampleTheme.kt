@@ -3,7 +3,6 @@ package br.com.composesample.structural.designsystem.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
@@ -13,6 +12,8 @@ import br.com.composesample.structural.designsystem.tokens.SampleDimens
 import br.com.composesample.structural.designsystem.tokens.SampleColor
 import br.com.composesample.structural.designsystem.tokens.IconToken
 import br.com.composesample.structural.designsystem.tokens.SampleIcons
+import br.com.composesample.structural.designsystem.tokens.SampleTypography
+import br.com.composesample.structural.designsystem.tokens.TypographyToken
 import br.com.composesample.structural.designsystem.tokens.SamplePalette
 
 data class ComposeSampleColors(
@@ -40,51 +41,52 @@ private fun ColorScheme.toSampleColors() =
 
 private val LightColors = LightColorScheme.toSampleColors()
 
-private val SampleTypography =
-    Typography().let { typography ->
-        Typography(titleLarge = typography.titleLarge.copy(fontSize = SampleDimens.Text.SectionTitle))
-    }
-
 private val LocalComposeSampleColors = staticCompositionLocalOf { LightColors }
 
 object CurrentTheme {
 
     object size {
-        val Small get() = SampleDimens.Size.Small
-        val Medium get() = SampleDimens.Size.Medium
-        val FloatingActionClearance get() = SampleDimens.Size.FloatingActionClearance
-        val TouchTarget get() = SampleDimens.Size.TouchTarget
-        val PosterWidth get() = SampleDimens.Size.PosterWidth
-        val PosterHeight get() = SampleDimens.Size.PosterHeight
-        val BackdropHeight get() = SampleDimens.Size.BackdropHeight
-        val Portrait get() = SampleDimens.Size.Portrait
-        val RatingIcon get() = SampleDimens.Size.RatingIcon
+        val small get() = SampleDimens.Size.Small
+        val medium get() = SampleDimens.Size.Medium
+        val floatingActionClearance get() = SampleDimens.Size.FloatingActionClearance
+        val touchTarget get() = SampleDimens.Size.TouchTarget
+        val posterWidth get() = SampleDimens.Size.PosterWidth
+        val posterHeight get() = SampleDimens.Size.PosterHeight
+        val backdropHeight get() = SampleDimens.Size.BackdropHeight
+        val portrait get() = SampleDimens.Size.Portrait
+        val ratingIcon get() = SampleDimens.Size.RatingIcon
     }
 
     object spacing {
-        val ExtraSmall get() = SampleDimens.Spacing.ExtraSmall
-        val Small get() = SampleDimens.Spacing.Small
-        val Medium get() = SampleDimens.Spacing.Medium
-        val Large get() = SampleDimens.Spacing.Large
-        val ExtraLarge get() = SampleDimens.Spacing.ExtraLarge
+        val extraSmall get() = SampleDimens.Spacing.ExtraSmall
+        val small get() = SampleDimens.Spacing.Small
+        val medium get() = SampleDimens.Spacing.Medium
+        val large get() = SampleDimens.Spacing.Large
+        val extraLarge get() = SampleDimens.Spacing.ExtraLarge
     }
 
     object stroke {
-        val Thin get() = SampleDimens.Stroke.Thin
+        val thin get() = SampleDimens.Stroke.Thin
     }
 
     object ratio {
-        const val Video = SampleDimens.Ratio.Video
+        val video get() = SampleDimens.Ratio.Video
     }
 
     object icon {
-        val Person: IconToken get() = SampleIcons.Person
-        val Search: IconToken get() = SampleIcons.Search
-        val Close: IconToken get() = SampleIcons.Close
+        val person: IconToken get() = SampleIcons.Person
+        val search: IconToken get() = SampleIcons.Search
+        val close: IconToken get() = SampleIcons.Close
+    }
+
+    object typography {
+        val labelSmall: TypographyToken get() = SampleTypography.LabelSmall
+        val labelMedium: TypographyToken get() = SampleTypography.LabelMedium
+        val bodyLarge: TypographyToken get() = SampleTypography.BodyLarge
     }
 
     object colors {
-        val OnSurfaceVariant = SampleColor { MaterialTheme.colorScheme.onSurfaceVariant }
+        val onSurfaceVariant = SampleColor { MaterialTheme.colorScheme.onSurfaceVariant }
     }
 
     val color: ComposeSampleColors
@@ -100,6 +102,6 @@ fun ComposeSampleTheme(
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
     SystemBarsSample(darkTheme = darkTheme)
     CompositionLocalProvider(LocalComposeSampleColors provides colorScheme.toSampleColors()) {
-        MaterialTheme(colorScheme = colorScheme, typography = SampleTypography, content = content)
+        MaterialTheme(colorScheme = colorScheme, content = content)
     }
 }

@@ -29,3 +29,7 @@ conteúdo dinâmico, como texto digitado pelo usuário.
 SampleSearchBar uses search/clear icons and a keyboard search action. SampleMediaCard displays artwork and optional metadata. SampleImage observes assets-cache and decodes local media on the injected IO dispatcher. SampleVideoPlayer is the visual/lifecycle adapter for video-player embeds, uses a 16:9 player, opens fullscreen playback in landscape, and destroys the WebView when leaving the screen. SampleConnectionBanner is rendered once by the app host when offline, above navigation. All static copy is in resources, including pt-BR translations.
 
 ComposeSampleTheme now provides one shared Material 3 color scheme to MaterialTheme and CurrentTheme for both light and dark mode, including system bar contrast. SampleClearFocusOnOutsideTap is installed once in the app host and observes taps without consuming child clicks or scrolling gestures. It leaves taps inside the focused field intact.
+
+## Tipografia
+
+Consuma os estilos por `CurrentTheme.typography`, como `SampleText(text = texto, style = CurrentTheme.typography.labelMedium)`. `TypographyToken` tem construção e estilo Compose internos; os consumidores não acessam `TextStyle` nem a tipografia do Material. Fonte, peso, tamanho, altura de linha e espaçamento são definidos nos tokens internos do design system.

@@ -31,4 +31,7 @@
     <!-- Buttons -->
     <string name="sample_button_preview_label">Continuar</string>
     <string name="sample_button_preview_loading">Carregando</string>
+
+    <!-- Typography -->
+    <string name="sample_typography_preview_text">Texto de exemplo</string>
 </resources>

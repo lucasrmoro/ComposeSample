@@ -70,7 +70,7 @@ private fun VideoWebView(embed: VideoEmbed, onPause: () -> Unit) {
     }
 
     AndroidView(
-        modifier = Modifier.fillMaxWidth().aspectRatio(CurrentTheme.ratio.Video),
+        modifier = Modifier.fillMaxWidth().aspectRatio(CurrentTheme.ratio.video),
         factory = { context ->
             WebView(context).apply {
                 webView = this

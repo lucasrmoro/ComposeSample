@@ -70,8 +70,8 @@ private fun ListScreenContent(
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = CurrentTheme.spacing.Small),
-            verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.Medium)
+            contentPadding = PaddingValues(bottom = CurrentTheme.spacing.small),
+            verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.medium)
         ) {
             items(state.items, key = { it.id }) { item ->
                 Text(text = item.text)

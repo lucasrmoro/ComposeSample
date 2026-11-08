@@ -54,8 +54,8 @@ private fun FormScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = CurrentTheme.spacing.ExtraLarge),
-            verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.Large)
+                .padding(bottom = CurrentTheme.spacing.extraLarge),
+            verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.large)
         ) {
             SampleTextField(
                 value = state.message,

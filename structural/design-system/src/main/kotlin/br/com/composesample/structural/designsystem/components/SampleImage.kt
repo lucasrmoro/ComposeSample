@@ -15,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import br.com.composesample.structural.core.di.DispatcherIO
+import br.com.composesample.structural.designsystem.theme.CurrentTheme
 import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.di.get
 import br.com.composesample.structural.assets_cache.AssetsCacheProvider
@@ -74,7 +75,7 @@ fun SampleImage(
                     if (failed || request == null) R.string.sample_image_unavailable
                     else R.string.sample_image_loading
                 ),
-                style = SampleTextStyle.LabelSmall,
+                style = CurrentTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
     }

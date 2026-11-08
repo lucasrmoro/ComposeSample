@@ -33,9 +33,9 @@ fun SampleSearchBar(
             onSearch()
             focusManager.clearFocus()
         },
-        leadingIcon = CurrentTheme.icon.Search,
+        leadingIcon = CurrentTheme.icon.search,
         leadingIconDescription = stringResource(R.string.sample_search),
-        trailingIcon = CurrentTheme.icon.Close.takeIf { value.isNotEmpty() },
+        trailingIcon = CurrentTheme.icon.close.takeIf { value.isNotEmpty() },
         trailingIconDescription = if (value.isNotEmpty()) stringResource(R.string.sample_clear_search) else null,
         onTrailingIconClick = { onValueChange("") }
     )
@@ -46,8 +46,8 @@ fun SampleSearchBar(
 private fun SampleSearchBarPreview() {
     ComposeSampleTheme {
         Column(
-            modifier = Modifier.padding(CurrentTheme.spacing.Medium),
-            verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.Small)
+            modifier = Modifier.padding(CurrentTheme.spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small)
         ) {
             SampleSearchBar(
                 value = "",

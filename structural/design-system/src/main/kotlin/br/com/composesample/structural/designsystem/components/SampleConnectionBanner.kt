@@ -22,12 +22,12 @@ fun SampleConnectionBanner() {
         modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }
     ) {
         Box(
-            Modifier.fillMaxWidth().padding(CurrentTheme.spacing.Small),
+            Modifier.fillMaxWidth().padding(CurrentTheme.spacing.small),
             contentAlignment = Alignment.Center
         ) {
             SampleText(
                 text = stringResource(R.string.sample_offline_notice),
-                style = SampleTextStyle.LabelMedium
+                style = CurrentTheme.typography.labelMedium
             )
         }
     }
