@@ -67,7 +67,7 @@ fun SampleScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         SampleCircularProgressIndicator(
-                            modifier = Modifier.size(CurrentTheme.size.size40),
+                            modifier = Modifier.size(CurrentTheme.size.xxLarge),
                             color = CurrentTheme.color.primary
                         )
                     }
@@ -83,7 +83,7 @@ fun SampleScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             SampleCircularProgressIndicator(
-                                modifier = Modifier.size(CurrentTheme.size.size40),
+                                modifier = Modifier.size(CurrentTheme.size.xxLarge),
                                 color = CurrentTheme.color.primary
                             )
                         }

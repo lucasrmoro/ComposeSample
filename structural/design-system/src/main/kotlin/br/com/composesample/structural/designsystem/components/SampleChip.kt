@@ -12,7 +12,7 @@ import br.com.composesample.structural.designsystem.theme.CurrentTheme
 @Composable
 fun SampleChip(label: String, onClick: () -> Unit) {
     Box(
-        modifier = Modifier.height(CurrentTheme.size.size48),
+        modifier = Modifier.height(CurrentTheme.size.xxxLarge),
         contentAlignment = Alignment.CenterStart
     ) {
         AssistChip(onClick = onClick, label = { SampleText(text = label) })

@@ -36,4 +36,4 @@ Consuma os estilos por `CurrentTheme.typography`, como `SampleText(text = texto,
 
 ## Tamanhos
 
-`CurrentTheme.size` expõe `size4`, `size8`, `size12`, `size16`, `size20`, `size24`, `size32`, `size40`, `size48` e `size64`. Tamanhos específicos fora dessa escala devem ser definidos na feature consumidora, sem adicionar conceitos de domínio aos tokens compartilhados.
+`CurrentTheme.size` expõe `xxxSmall`, `xxSmall`, `extraSmall`, `small`, `medium`, `large`, `extraLarge`, `xxLarge`, `xxxLarge` e `xxxxLarge`. Os nomes públicos representam posições relativas na escala; os valores em dp ficam internos e podem ser remapeados sem alterar os consumidores. A escala padrão usa 4, 8, 12, 16, 20, 24, 32, 40, 48 e 64 dp, respectivamente. Tamanhos específicos fora dessa escala devem ser definidos na feature consumidora.
