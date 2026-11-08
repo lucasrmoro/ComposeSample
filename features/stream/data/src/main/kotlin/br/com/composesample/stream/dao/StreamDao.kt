@@ -12,6 +12,8 @@ internal interface StreamDao {
 
     @Query("SELECT * FROM stream_cache WHERE `key` = :key")
     fun observe(key: String): Flow<StreamCacheEntity?>
-    @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun save(entity: StreamCacheEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun save(entity: StreamCacheEntity)
 
 }
