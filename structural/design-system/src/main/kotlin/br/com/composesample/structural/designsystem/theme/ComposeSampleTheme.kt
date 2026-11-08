@@ -55,7 +55,7 @@ object CurrentTheme {
         val xLarge get() = SampleDimens.Size.Size32
         val xxLarge get() = SampleDimens.Size.Size40
         val xxxLarge get() = SampleDimens.Size.Size48
-        val xxxxLarge get() = SampleDimens.Size.Size64
+        val huge get() = SampleDimens.Size.Size64
     }
 
     object spacing {
