@@ -81,7 +81,7 @@ private fun FormScreenContent(
 private fun FormScreenPreview() {
     ComposeSampleTheme {
         FormScreenContent(
-            state = FormUiState(message = stringResource(R.string.feature_a_message_preview)),
+            state = FormUiState(message = "Preview message"),
             sendEvent = {},
             onNavigateBack = {}
         )

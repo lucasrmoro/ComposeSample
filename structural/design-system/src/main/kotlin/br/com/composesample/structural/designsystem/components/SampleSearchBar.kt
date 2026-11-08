@@ -51,13 +51,13 @@ private fun SampleSearchBarPreview() {
         ) {
             SampleSearchBar(
                 value = "",
-                placeholder = stringResource(R.string.sample_search_preview_placeholder),
+                placeholder = "Search movies",
                 onValueChange = {},
                 onSearch = {}
             )
             SampleSearchBar(
-                value = stringResource(R.string.sample_search_preview_value),
-                placeholder = stringResource(R.string.sample_search_preview_placeholder),
+                value = "Dune",
+                placeholder = "Search movies",
                 onValueChange = {},
                 onSearch = {}
             )

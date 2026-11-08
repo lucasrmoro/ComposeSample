@@ -7,9 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 import br.com.composesample.structural.designsystem.tokens.TypographyToken
@@ -38,7 +36,7 @@ private fun SampleTextPreview() {
                 CurrentTheme.typography.bodyLarge
             )
             for (style in styles) {
-                SampleText(text = stringResource(R.string.sample_typography_preview_text), style = style)
+                SampleText(text = "Sample text", style = style)
             }
         }
     }

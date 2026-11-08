@@ -6,10 +6,7 @@
     <string name="feature_a_message_label">Mensagem</string>
     <string name="feature_a_message_placeholder">Digite algo aqui</string>
     <string name="feature_a_save">Salvar</string>
-    <string name="feature_a_message_preview">Mensagem de exemplo</string>
 
     <!-- List -->
     <string name="feature_a_add_item">Adicionar item</string>
-    <string name="feature_a_first_item_preview">Primeiro item</string>
-    <string name="feature_a_second_item_preview">Segundo item</string>
 </resources>

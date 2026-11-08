@@ -5,13 +5,6 @@
     <!-- Search -->
     <string name="sample_search">Pesquisar</string>
     <string name="sample_clear_search">Limpar pesquisa</string>
-    <string name="sample_search_preview_placeholder">Pesquisar filmes</string>
-    <string name="sample_search_preview_value">Duna</string>
-
-    <!-- Text fields -->
-    <string name="sample_text_field_preview_label">Mensagem</string>
-    <string name="sample_text_field_preview_placeholder">Digite algo aqui</string>
-    <string name="sample_text_field_preview_value">Mensagem de exemplo</string>
 
     <!-- Images -->
     <string name="sample_image_unavailable">Imagem indisponível</string>
@@ -27,18 +20,4 @@
     <string name="sample_trailer">Trailer</string>
     <string name="sample_image_loading">Carregando imagem…</string>
     <string name="sample_photo_not_provided">Foto não fornecida</string>
-
-    <!-- Buttons -->
-    <string name="sample_button_preview_label">Continuar</string>
-    <string name="sample_button_preview_loading">Carregando</string>
-
-    <!-- Typography -->
-    <string name="sample_typography_preview_text">Texto de exemplo</string>
-
-    <!-- Component previews -->
-    <string name="sample_preview_title">Compose - Sample</string>
-    <string name="sample_dialog_preview_title">Descartar alterações?</string>
-    <string name="sample_dialog_preview_message">Suas alterações serão perdidas.</string>
-    <string name="sample_dialog_preview_confirm">Descartar</string>
-    <string name="sample_dialog_preview_dismiss">Cancelar</string>
 </resources>

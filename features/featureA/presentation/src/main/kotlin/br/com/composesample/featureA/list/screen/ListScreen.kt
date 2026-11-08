@@ -90,8 +90,8 @@ private fun ListScreenPreview() {
         ListScreenContent(
             state = ListUiState(
                 items = listOf(
-                    SomeModel(id = 1, text = stringResource(R.string.feature_a_first_item_preview)),
-                    SomeModel(id = 2, text = stringResource(R.string.feature_a_second_item_preview))
+                    SomeModel(id = 1, text = "First item"),
+                    SomeModel(id = 2, text = "Second item")
                 )
             ),
             sendEvent = {}

@@ -15,11 +15,9 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 import br.com.composesample.structural.designsystem.tokens.IconToken
@@ -226,17 +224,17 @@ private fun SampleTextFieldStylePreview(
         verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small)
     ) {
         SampleTextField(
-            value = stringResource(R.string.sample_text_field_preview_value),
+            value = "Preview message",
             onValueChange = {},
-            label = stringResource(R.string.sample_text_field_preview_label),
-            placeholder = stringResource(R.string.sample_text_field_preview_placeholder),
+            label = "Message",
+            placeholder = "Type something here",
             style = style
         )
         SampleTextField(
-            value = stringResource(R.string.sample_text_field_preview_value),
+            value = "Preview message",
             onValueChange = {},
-            label = stringResource(R.string.sample_text_field_preview_label),
-            placeholder = stringResource(R.string.sample_text_field_preview_placeholder),
+            label = "Message",
+            placeholder = "Type something here",
             enabled = false,
             style = style
         )

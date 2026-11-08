@@ -48,6 +48,6 @@ fun SampleHeader(
 @Composable
 private fun HeaderPreview() {
     ComposeSampleTheme {
-        SampleHeader(title = stringResource(R.string.sample_preview_title), canNavigateBack = true, onNavigateBack = {})
+        SampleHeader(title = "Compose - Sample", canNavigateBack = true, onNavigateBack = {})
     }
 }

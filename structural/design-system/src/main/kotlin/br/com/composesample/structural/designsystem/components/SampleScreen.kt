@@ -18,9 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
@@ -104,7 +102,7 @@ fun SampleScreen(
 private fun SampleScreenPreview() {
     ComposeSampleTheme {
         SampleScreen(
-            title = stringResource(R.string.sample_preview_title),
+            title = "Compose - Sample",
             canNavigateBack = true,
             onNavigateBack = {}
         ) { }

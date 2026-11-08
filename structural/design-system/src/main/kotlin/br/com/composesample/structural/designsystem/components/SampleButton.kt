@@ -13,9 +13,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
@@ -109,18 +107,18 @@ private fun SampleButtonStylePreview(
         verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small)
     ) {
         SampleButton(
-            text = stringResource(R.string.sample_button_preview_label),
+            text = "Continue",
             onClick = {},
             style = style
         )
         SampleButton(
-            text = stringResource(R.string.sample_button_preview_label),
+            text = "Continue",
             onClick = {},
             style = style,
             enabled = false
         )
         SampleButton(
-            text = stringResource(R.string.sample_button_preview_loading),
+            text = "Loading",
             onClick = {},
             style = style,
             isLoading = true
