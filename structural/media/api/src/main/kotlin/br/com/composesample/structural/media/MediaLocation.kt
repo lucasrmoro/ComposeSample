@@ -18,4 +18,5 @@ data class MediaLocation(
         fun gallery(directory: String): MediaLocation =
             MediaLocation(MediaStorageArea.GALLERY, directory)
     }
+
 }

@@ -24,7 +24,6 @@ import okhttp3.Authenticator
 import okhttp3.Interceptor
 
 object NetworkModule {
-
     private val networkModule = dependencyModule {
         singleton<BinaryDownloadProvider> {
             createBinaryDownloadProvider(
@@ -74,5 +73,4 @@ object NetworkModule {
     }
 
     fun init() = loadModules(networkModule)
-
 }

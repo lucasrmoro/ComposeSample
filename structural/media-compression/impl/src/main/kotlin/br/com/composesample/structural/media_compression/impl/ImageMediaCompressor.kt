@@ -142,4 +142,5 @@ internal class ImageMediaCompressor(
             ExifInterface.TAG_GPS_TIMESTAMP
         )
     }
+
 }

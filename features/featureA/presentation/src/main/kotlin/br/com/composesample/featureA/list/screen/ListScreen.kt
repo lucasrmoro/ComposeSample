@@ -9,21 +9,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import br.com.composesample.featureA.model.SomeModel
 import br.com.composesample.featureA.list.model.ListUiEffect
 import br.com.composesample.featureA.list.model.ListUiEvent
 import br.com.composesample.featureA.list.model.ListUiState
 import br.com.composesample.featureA.list.viewModel.ListViewModel
+import br.com.composesample.featureA.model.SomeModel
+import br.com.composesample.features.featureA.presentation.R
 import br.com.composesample.structural.designsystem.components.LoadingState
-import br.com.composesample.structural.designsystem.components.ScreenSample
+import br.com.composesample.structural.designsystem.components.SampleScreen
+import br.com.composesample.structural.designsystem.components.SampleText
+import br.com.composesample.structural.designsystem.screen.BaseScreen
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
-import br.com.composesample.structural.designsystem.screen.BaseScreen
 
 internal class ListScreen(
     private val viewModel: ListViewModel,
@@ -46,6 +48,7 @@ internal class ListScreen(
             ListUiEffect.NavigateToForm -> onOpenForm()
         }
     }
+
 }
 
 @Composable
@@ -53,8 +56,8 @@ private fun ListScreenContent(
     state: ListUiState,
     sendEvent: (ListUiEvent) -> Unit
 ) {
-    ScreenSample(
-        title = "Compose - Sample",
+    SampleScreen(
+        title = stringResource(R.string.feature_a_title),
         canNavigateBack = false,
         onNavigateBack = {},
         loadingState = if (state.isLoading) LoadingState.ONLY_LOADING else LoadingState.NONE,
@@ -64,17 +67,17 @@ private fun ListScreenContent(
                 containerColor = CurrentTheme.color.secondary,
                 contentColor = CurrentTheme.color.onSecondary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add item")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.feature_a_add_item))
             }
         }
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = CurrentTheme.spacing.Small),
-            verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.Medium)
+            contentPadding = PaddingValues(bottom = CurrentTheme.spacing.small),
+            verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.medium)
         ) {
             items(state.items, key = { it.id }) { item ->
-                Text(text = item.text)
+                SampleText(text = item.text)
             }
         }
     }

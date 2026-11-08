@@ -25,7 +25,8 @@ interface MediaFile {
     val location: MediaLocation
 
     /** Opens this item for reading. The caller must close the returned stream. */
-    @Throws(IOException::class) fun openStream(): InputStream
+    @Throws(IOException::class)
+    fun openStream(): InputStream
 
     /** Deletes this item from its storage location. */
     fun delete(): Boolean

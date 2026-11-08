@@ -7,7 +7,8 @@ import java.io.OutputStream
 interface WritableMediaFile : MediaFile {
 
     /** Opens this item for writing. The caller must close the returned stream. */
-    @Throws(IOException::class) fun openOutputStream(): OutputStream
+    @Throws(IOException::class)
+    fun openOutputStream(): OutputStream
 
     /** Makes a completed item visible in gallery storage. */
     fun publish(): Boolean

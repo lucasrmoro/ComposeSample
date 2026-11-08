@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
-import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
@@ -30,7 +29,8 @@ enum class LoadingState {
 }
 
 @Composable
-fun ScreenSample(
+fun SampleScreen(
+    modifier: Modifier = Modifier,
     title: String,
     canNavigateBack: Boolean,
     onNavigateBack: () -> Unit,
@@ -39,10 +39,11 @@ fun ScreenSample(
     content: @Composable () -> Unit
 ) {
     Scaffold(
+        modifier = modifier,
         containerColor = CurrentTheme.color.background,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(WindowInsets.ime),
         topBar = {
-            HeaderSample(
+            SampleHeader(
                 title = title,
                 canNavigateBack = canNavigateBack,
                 onNavigateBack = onNavigateBack
@@ -66,8 +67,8 @@ fun ScreenSample(
                         modifier = contentModifier,
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicatorSample(
-                            modifier = Modifier.size(CurrentTheme.size.Medium),
+                        SampleCircularProgressIndicator(
+                            modifier = Modifier.size(CurrentTheme.size.xxLarge),
                             color = CurrentTheme.color.primary
                         )
                     }
@@ -82,8 +83,8 @@ fun ScreenSample(
                                 .background(CurrentTheme.color.scrim),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicatorSample(
-                                modifier = Modifier.size(CurrentTheme.size.Medium),
+                            SampleCircularProgressIndicator(
+                                modifier = Modifier.size(CurrentTheme.size.xxLarge),
                                 color = CurrentTheme.color.primary
                             )
                         }
@@ -100,7 +101,7 @@ fun ScreenSample(
 @Composable
 private fun SampleScreenPreview() {
     ComposeSampleTheme {
-        ScreenSample(
+        SampleScreen(
             title = "Compose - Sample",
             canNavigateBack = true,
             onNavigateBack = {}
