@@ -5,5 +5,5 @@ plugins {
 }
 
 dependencies {
-    api(project(Modules.Structural.Analytics.API))
+    implementation(project(Modules.Structural.Analytics.API))
 }

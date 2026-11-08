@@ -9,6 +9,7 @@ Presentation can receive the contract through its constructor. Other feature lay
 can depend on this module to consume the same methods without knowing event names,
 building maps, or depending on Firebase. This module does not depend on those layers.
 
-Methods return `AnalyticsResult`: unavailable integration differs from a call accepted
-by the SDK. The result does not change the business flow. Payloads contain no tokens,
-passwords, or personal identifiers.
+The analytics module translates feature events into `structural/analytics` events. Its
+structural dependency is internal; the feature contract does not expose structural
+analytics types to its consumers. Payloads contain no tokens, passwords, or personal
+identifiers.
