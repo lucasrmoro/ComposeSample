@@ -17,11 +17,11 @@ import br.com.composesample.structural.design_system.R
 
 @Composable
 fun SampleSearchBar(
+    modifier: Modifier = Modifier,
     value: String,
     placeholder: String,
     onValueChange: (String) -> Unit,
-    onSearch: () -> Unit,
-    modifier: Modifier = Modifier
+    onSearch: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     TextField(

@@ -13,9 +13,9 @@ import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
 fun ProfileSampleImage(
+    modifier: Modifier = Modifier,
     request: AssetRequest?,
-    contentDescription: String,
-    modifier: Modifier = Modifier
+    contentDescription: String
 ) {
     if (request == null) {
         Box(

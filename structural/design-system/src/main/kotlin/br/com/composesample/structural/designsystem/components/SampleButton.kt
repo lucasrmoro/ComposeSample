@@ -15,9 +15,9 @@ import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
 fun SampleButton(
+    modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isLoading: Boolean = false
 ) {
