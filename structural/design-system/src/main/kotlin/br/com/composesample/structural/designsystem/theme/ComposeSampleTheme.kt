@@ -48,22 +48,22 @@ object CurrentTheme {
     object size {
         val xxxSmall get() = SampleDimens.Size.Size4
         val xxSmall get() = SampleDimens.Size.Size8
-        val extraSmall get() = SampleDimens.Size.Size12
+        val xSmall get() = SampleDimens.Size.Size12
         val small get() = SampleDimens.Size.Size16
         val medium get() = SampleDimens.Size.Size20
         val large get() = SampleDimens.Size.Size24
-        val extraLarge get() = SampleDimens.Size.Size32
+        val xLarge get() = SampleDimens.Size.Size32
         val xxLarge get() = SampleDimens.Size.Size40
         val xxxLarge get() = SampleDimens.Size.Size48
         val xxxxLarge get() = SampleDimens.Size.Size64
     }
 
     object spacing {
-        val extraSmall get() = SampleDimens.Spacing.ExtraSmall
+        val xSmall get() = SampleDimens.Spacing.XSmall
         val small get() = SampleDimens.Spacing.Small
         val medium get() = SampleDimens.Spacing.Medium
         val large get() = SampleDimens.Spacing.Large
-        val extraLarge get() = SampleDimens.Spacing.ExtraLarge
+        val xLarge get() = SampleDimens.Spacing.XLarge
     }
 
     object stroke {

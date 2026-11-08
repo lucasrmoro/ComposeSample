@@ -24,11 +24,11 @@ internal object SampleDimens {
     }
 
     object Spacing {
-        val ExtraSmall = 4.dp
+        val XSmall = 4.dp
         val Small = 8.dp
         val Medium = 12.dp
         val Large = 16.dp
-        val ExtraLarge = 24.dp
+        val XLarge = 24.dp
     }
 
     object Text {
