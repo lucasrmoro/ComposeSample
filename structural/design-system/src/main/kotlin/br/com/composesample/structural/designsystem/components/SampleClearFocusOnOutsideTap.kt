@@ -38,11 +38,9 @@ fun SampleClearFocusOnOutsideTap(
                         pass = PointerEventPass.Initial
                     )
                     val up = waitForUpOrCancellation(pass = PointerEventPass.Final)
-                    if (
-                        up != null &&
-                            (up.position - down.position).getDistance() <=
-                                viewConfiguration.touchSlop &&
-                            focusedBounds.value?.contains(up.position) == false
+                    if (up != null &&
+                        (up.position - down.position).getDistance() <= viewConfiguration.touchSlop &&
+                        focusedBounds.value?.contains(up.position) == false
                     ) {
                         focusManager.clearFocus()
                     }
