@@ -132,4 +132,5 @@ abstract class BasePlugin : Plugin<Project> {
         val appName = if (isDev) DEV else PRD
         manifestPlaceholders["appLabel"] = "@string/app_name_$appName"
     }
+
 }
