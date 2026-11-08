@@ -1,12 +1,12 @@
 package br.com.composesample.stream.dataSource
 
-import br.com.composesample.stream.dto.GenresRespDTO
-import br.com.composesample.stream.dto.MediaRespDTO
-import br.com.composesample.stream.dto.PageRespDTO
-import br.com.composesample.stream.dto.SeasonRespDTO
-import br.com.composesample.stream.model.CatalogQuery
-import br.com.composesample.stream.model.MediaId
-import br.com.composesample.stream.model.MediaType
+import br.com.composesample.stream.dto.catalog.GenresRespDTO
+import br.com.composesample.stream.dto.catalog.PageRespDTO
+import br.com.composesample.stream.dto.media.MediaRespDTO
+import br.com.composesample.stream.dto.seasons.SeasonRespDTO
+import br.com.composesample.stream.model.catalog.CatalogQuery
+import br.com.composesample.stream.model.media.MediaId
+import br.com.composesample.stream.model.media.MediaType
 import kotlinx.coroutines.flow.Flow
 
 interface StreamRemoteDataSource {

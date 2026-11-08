@@ -1,6 +1,6 @@
 package br.com.composesample.stream.useCase
 
-import br.com.composesample.stream.model.CatalogQuery
+import br.com.composesample.stream.model.catalog.CatalogQuery
 import br.com.composesample.stream.repository.StreamRepository
 
 internal class RefreshCatalogUseCaseImpl(private val streamRepository: StreamRepository) :

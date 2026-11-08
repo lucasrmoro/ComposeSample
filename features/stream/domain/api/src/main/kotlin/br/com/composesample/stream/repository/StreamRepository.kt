@@ -1,13 +1,13 @@
 package br.com.composesample.stream.repository
 
-import br.com.composesample.stream.model.CatalogPage
-import br.com.composesample.stream.model.CatalogQuery
-import br.com.composesample.stream.model.CatalogRegion
-import br.com.composesample.stream.model.Genre
-import br.com.composesample.stream.model.MediaDetails
-import br.com.composesample.stream.model.MediaId
-import br.com.composesample.stream.model.MediaType
-import br.com.composesample.stream.model.SeasonDetails
+import br.com.composesample.stream.model.catalog.CatalogPage
+import br.com.composesample.stream.model.catalog.CatalogQuery
+import br.com.composesample.stream.model.catalog.CatalogRegion
+import br.com.composesample.stream.model.catalog.Genre
+import br.com.composesample.stream.model.details.MediaDetails
+import br.com.composesample.stream.model.media.MediaId
+import br.com.composesample.stream.model.media.MediaType
+import br.com.composesample.stream.model.seasons.SeasonDetails
 import kotlinx.coroutines.flow.Flow
 
 interface StreamRepository {

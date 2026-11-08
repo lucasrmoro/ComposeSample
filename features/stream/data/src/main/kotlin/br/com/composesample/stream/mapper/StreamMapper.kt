@@ -1,14 +1,14 @@
 package br.com.composesample.stream.mapper
 
-import br.com.composesample.stream.dto.PageRespDTO
+import br.com.composesample.stream.dto.catalog.PageRespDTO
 import br.com.composesample.stream.entity.StreamCacheEntity
-import br.com.composesample.stream.model.CatalogPage
-import br.com.composesample.stream.model.CatalogQuery
-import br.com.composesample.stream.model.CatalogRegion
-import br.com.composesample.stream.model.Genre
-import br.com.composesample.stream.model.MediaDetails
-import br.com.composesample.stream.model.MediaId
-import br.com.composesample.stream.model.SeasonDetails
+import br.com.composesample.stream.model.catalog.CatalogPage
+import br.com.composesample.stream.model.catalog.CatalogQuery
+import br.com.composesample.stream.model.catalog.CatalogRegion
+import br.com.composesample.stream.model.catalog.Genre
+import br.com.composesample.stream.model.details.MediaDetails
+import br.com.composesample.stream.model.media.MediaId
+import br.com.composesample.stream.model.seasons.SeasonDetails
 
 internal interface StreamMapper {
     fun page(entity: StreamCacheEntity?, query: CatalogQuery): CatalogPage

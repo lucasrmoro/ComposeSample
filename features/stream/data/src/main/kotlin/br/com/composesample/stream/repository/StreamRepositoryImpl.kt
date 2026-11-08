@@ -3,10 +3,10 @@ package br.com.composesample.stream.repository
 import br.com.composesample.stream.dataSource.StreamLocalDataSource
 import br.com.composesample.stream.dataSource.StreamRemoteDataSource
 import br.com.composesample.stream.mapper.StreamMapper
-import br.com.composesample.stream.model.CatalogQuery
-import br.com.composesample.stream.model.CatalogRegion
-import br.com.composesample.stream.model.MediaId
-import br.com.composesample.stream.model.MediaType
+import br.com.composesample.stream.model.catalog.CatalogQuery
+import br.com.composesample.stream.model.catalog.CatalogRegion
+import br.com.composesample.stream.model.media.MediaId
+import br.com.composesample.stream.model.media.MediaType
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.catch

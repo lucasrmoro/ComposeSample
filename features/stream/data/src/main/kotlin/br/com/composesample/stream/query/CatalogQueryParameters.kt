@@ -1,8 +1,8 @@
 package br.com.composesample.stream.query
 
-import br.com.composesample.stream.model.CatalogQuery
-import br.com.composesample.stream.model.CollectionKind
-import br.com.composesample.stream.model.MediaType
+import br.com.composesample.stream.model.catalog.CatalogQuery
+import br.com.composesample.stream.model.catalog.CollectionKind
+import br.com.composesample.stream.model.media.MediaType
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneId
