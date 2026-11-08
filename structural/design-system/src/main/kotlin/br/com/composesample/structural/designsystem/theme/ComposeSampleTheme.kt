@@ -43,6 +43,7 @@ private val LightColors = LightColorScheme.toSampleColors()
 private val LocalComposeSampleColors = staticCompositionLocalOf { LightColors }
 
 object CurrentTheme {
+
     object size {
         val xxxSmall get() = SampleDimens.Size.Size4
         val xxSmall get() = SampleDimens.Size.Size8
@@ -91,6 +92,7 @@ object CurrentTheme {
 
     val color: ComposeSampleColors
         @Composable @ReadOnlyComposable get() = LocalComposeSampleColors.current
+
 }
 
 @Composable

@@ -5,6 +5,7 @@ import androidx.compose.ui.unit.sp
 
 /** Reusable dimension tokens shared across Compose Sample components. */
 internal object SampleDimens {
+
     object Size {
         val Size4 = 4.dp
         val Size8 = 8.dp
@@ -55,4 +56,5 @@ internal object SampleDimens {
     object Stroke {
         val Thin = 2.dp
     }
+
 }
