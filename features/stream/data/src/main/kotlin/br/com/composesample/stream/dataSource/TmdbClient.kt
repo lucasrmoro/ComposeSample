@@ -6,14 +6,12 @@ import br.com.composesample.structural.network.http.get
 
 internal class TmdbClient(private val httpClient: HttpClient, private val configured: Boolean) {
 
-    private val missingCredentialMessage = "TMDB credential is not configured"
-
     suspend inline fun <reified T> get(
         path: String,
         query: Map<String, String>,
         pathParameters: Map<String, String> = emptyMap()
     ): T {
-        check(configured) { missingCredentialMessage }
+        check(configured) { "TMDB credential is not configured" }
         return httpClient.get(
             HttpRequest(path = path, query = query, pathParameters = pathParameters)
         )
