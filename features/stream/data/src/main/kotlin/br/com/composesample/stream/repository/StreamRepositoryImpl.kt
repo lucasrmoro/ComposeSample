@@ -7,7 +7,6 @@ import br.com.composesample.stream.model.catalog.CatalogQuery
 import br.com.composesample.stream.model.catalog.CatalogRegion
 import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.media.MediaType
-import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -16,8 +15,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 internal class StreamRepositoryImpl(
     private val streamLocalDataSource: StreamLocalDataSource,
@@ -26,7 +23,7 @@ internal class StreamRepositoryImpl(
     private val coroutineDispatcher: CoroutineDispatcher
 ) : StreamRepository {
 
-    private val locks = ConcurrentHashMap<String, Mutex>()
+    private val catalogLocks = KeyedMutex<String>()
 
     private fun detailsKey(id: MediaId, region: CatalogRegion) =
         "details:${id.type}:${id.value}:${region.languageTag}:${region.countryCode}"
@@ -49,7 +46,7 @@ internal class StreamRepositoryImpl(
     override fun loadNextPage(query: CatalogQuery) = savePage(query, replace = false)
 
     private fun savePage(query: CatalogQuery, replace: Boolean) = flow {
-        locks.getOrPut(query.key, ::Mutex).withLock {
+        catalogLocks.withLock(query.key) {
             val previous =
                 if (replace) null
                 else streamMapper.pageDTO(streamLocalDataSource.observe(query.key).first())
