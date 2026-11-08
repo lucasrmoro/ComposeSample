@@ -30,7 +30,7 @@ fun SampleSearchBar(
         modifier.fillMaxWidth(),
         singleLine = true,
         shape = CircleShape,
-        placeholder = { Text(placeholder) },
+        placeholder = { SampleText(text = placeholder) },
         leadingIcon = {
             Icon(Icons.Default.Search, contentDescription = stringResource(R.string.sample_search))
         },

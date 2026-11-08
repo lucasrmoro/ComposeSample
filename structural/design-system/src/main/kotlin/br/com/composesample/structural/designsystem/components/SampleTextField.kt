@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,8 +28,8 @@ fun SampleTextField(
         onValueChange = { newValue ->
             if (newValue.length <= maxLength) onValueChange(newValue)
         },
-        label = { Text(label) },
-        placeholder = { Text(placeholder) },
+        label = { SampleText(text = label) },
+        placeholder = { SampleText(text = placeholder) },
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = CurrentTheme.color.primary,
             focusedLabelColor = CurrentTheme.color.primary,
