@@ -18,6 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
+private const val SHIMMER_DURATION_MILLIS = 1200
+
 @Composable
 internal fun SampleShimmer(modifier: Modifier = Modifier) {
     val transition = rememberInfiniteTransition(label = "SampleShimmer")
@@ -60,5 +62,3 @@ private fun SampleShimmerPreview() {
         SampleShimmer(modifier = Modifier.size(CurrentTheme.size.huge))
     }
 }
-
-private const val SHIMMER_DURATION_MILLIS = 1200

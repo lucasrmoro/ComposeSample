@@ -27,6 +27,9 @@ import br.com.composesample.structural.video_player.VideoPlaybackProvider
 import br.com.composesample.structural.video_player.VideoSource
 import kotlinx.coroutines.flow.catch
 
+private const val BLANK_PAGE = "about:blank"
+private const val HTML_MIME_TYPE = "text/html"
+
 @Composable
 fun SampleVideoPlayer(modifier: Modifier = Modifier, source: VideoSource, online: Boolean) {
     var playbackState by remember(source) {
@@ -114,6 +117,3 @@ private fun VideoWebView(
         }
     )
 }
-
-private const val BLANK_PAGE = "about:blank"
-private const val HTML_MIME_TYPE = "text/html"
