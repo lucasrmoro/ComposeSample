@@ -13,7 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import br.com.composesample.structural.design_system.R
-import br.com.composesample.structural.designsystem.tokens.SampleDimens
+import br.com.composesample.structural.designsystem.theme.CurrentTheme
 import br.com.composesample.structural.di.get
 import br.com.composesample.structural.video_player.*
 import kotlinx.coroutines.flow.catch
@@ -70,7 +70,7 @@ private fun VideoWebView(embed: VideoEmbed, onPause: () -> Unit) {
     }
 
     AndroidView(
-        modifier = Modifier.fillMaxWidth().aspectRatio(SampleDimens.Ratio.Video),
+        modifier = Modifier.fillMaxWidth().aspectRatio(CurrentTheme.ratio.Video),
         factory = { context ->
             WebView(context).apply {
                 webView = this
