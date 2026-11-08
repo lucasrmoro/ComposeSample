@@ -11,27 +11,27 @@ internal object SampleTypography {
         TextStyle(
             fontFamily = FontFamily.Default,
             fontWeight = FontWeight.Medium,
-            fontSize = SampleDimens.Text.LabelSmall,
-            lineHeight = SampleDimens.Text.LabelLineHeight,
-            letterSpacing = SampleDimens.Text.LabelLetterSpacing
+            fontSize = SampleDimens.FontSize.LabelSmall,
+            lineHeight = SampleDimens.LineHeight.Label,
+            letterSpacing = SampleDimens.LetterSpacing.Label
         )
     )
     val LabelMedium = TypographyToken(
         TextStyle(
             fontFamily = FontFamily.Default,
             fontWeight = FontWeight.Medium,
-            fontSize = SampleDimens.Text.LabelMedium,
-            lineHeight = SampleDimens.Text.LabelLineHeight,
-            letterSpacing = SampleDimens.Text.LabelLetterSpacing
+            fontSize = SampleDimens.FontSize.LabelMedium,
+            lineHeight = SampleDimens.LineHeight.Label,
+            letterSpacing = SampleDimens.LetterSpacing.Label
         )
     )
     val BodyLarge = TypographyToken(
         TextStyle(
             fontFamily = FontFamily.Default,
             fontWeight = FontWeight.Normal,
-            fontSize = SampleDimens.Text.BodyLarge,
-            lineHeight = SampleDimens.Text.BodyLineHeight,
-            letterSpacing = SampleDimens.Text.BodyLetterSpacing
+            fontSize = SampleDimens.FontSize.BodyLarge,
+            lineHeight = SampleDimens.LineHeight.Body,
+            letterSpacing = SampleDimens.LetterSpacing.Body
         )
     )
 }
