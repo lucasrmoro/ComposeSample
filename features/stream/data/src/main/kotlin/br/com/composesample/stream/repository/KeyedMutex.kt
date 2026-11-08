@@ -10,7 +10,7 @@ internal class KeyedMutex<K> {
     suspend fun <T> withLock(key: K, action: suspend () -> T): T {
         val entry =
             synchronized(registryLock) {
-                entries.getOrPut(key, ::Entry).also { it.users++ }
+                entries.getOrPut(key) { Entry() }.also { it.users++ }
             }
         var acquired = false
         try {
