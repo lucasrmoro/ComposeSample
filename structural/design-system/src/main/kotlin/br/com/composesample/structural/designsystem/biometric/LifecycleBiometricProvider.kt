@@ -1,8 +1,8 @@
 package br.com.composesample.structural.designsystem.biometric
 
 import br.com.composesample.structural.biometric.BiometricDecryption
-import br.com.composesample.structural.biometric.BiometricEncryption
 import br.com.composesample.structural.biometric.BiometricEncryptedData
+import br.com.composesample.structural.biometric.BiometricEncryption
 import br.com.composesample.structural.biometric.BiometricPromptConfig
 import br.com.composesample.structural.biometric.BiometricProvider
 import br.com.composesample.structural.biometric.BiometricResult
