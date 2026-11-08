@@ -1,6 +1,5 @@
 package br.com.composesample.stream.dataSource
 
-import br.com.composesample.stream.dto.EventDTO
 import br.com.composesample.stream.dto.GenresDTO
 import br.com.composesample.stream.dto.MediaDTO
 import br.com.composesample.stream.dto.PageDTO
@@ -10,7 +9,6 @@ import br.com.composesample.stream.model.CatalogRegion
 import br.com.composesample.stream.model.CollectionKind
 import br.com.composesample.stream.model.MediaId
 import br.com.composesample.stream.model.MediaType
-import br.com.composesample.stream.model.ReleaseKind
 import br.com.composesample.structural.core.base.dataSource.BaseDataSource
 import br.com.composesample.structural.network.http.HttpRequest
 import br.com.composesample.structural.network.http.get
@@ -18,23 +16,13 @@ import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.single
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 
 internal class StreamRemoteDataSourceImpl(
     private val tmdbClient: TmdbClient,
     private val coroutineDispatcher: CoroutineDispatcher,
     private val clock: Clock
 ) : BaseDataSource(), StreamRemoteDataSource {
-
-    private val enrichment = Semaphore(4)
 
     private suspend inline fun <reified T> get(
         path: String,
@@ -106,122 +94,9 @@ internal class StreamRemoteDataSourceImpl(
             if (query.type == MediaType.SERIES) params[TIMEZONE_PARAMETER] = query.region.timeZoneId
             params[SORT_PARAMETER] = POPULARITY_ORDER
         }
-        val response = get<PageDTO>(path, params)
-        val rows = coroutineScope {
-            response.results
-                .map { item ->
-                    async {
-                        enrichment.withPermit {
-                            val requiresEvent =
-                                query.type == MediaType.SERIES &&
-                                    query.kind in
-                                        listOf(CollectionKind.RECENT, CollectionKind.UPCOMING)
-                            val request =
-                                details(MediaId(type = query.type, value = item.id), query.region)
-                            val enriched =
-                                if (requiresEvent) request.single()
-                                else request.catch { emit(item) }.single()
-                            if (
-                                query.type != MediaType.SERIES ||
-                                    query.kind !in
-                                        listOf(CollectionKind.RECENT, CollectionKind.UPCOMING)
-                            )
-                                enriched
-                            else seriesEvent(enriched, query, today)
-                        }
-                    }
-                }
-                .awaitAll()
-                .filterNotNull()
-        }
-        response.copy(results = rows)
+        get<PageDTO>(path, params)
     }
         .flowOn(coroutineDispatcher)
-
-    private suspend fun seriesEvent(
-        dto: MediaDTO,
-        query: CatalogQuery,
-        today: LocalDate
-    ): MediaDTO? {
-        val recent = query.kind == CollectionKind.RECENT
-        fun included(date: String?): Boolean {
-            val value =
-                date?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return false
-            return if (recent) value >= today.minusDays(30) && value <= today
-            else value > today && value <= today.plusDays(30)
-        }
-        val events = mutableListOf<EventDTO>()
-        if (included(dto.firstAirDate))
-            events +=
-                EventDTO(
-                    kind = ReleaseKind.NEW_SERIES.name,
-                    date = dto.firstAirDate!!,
-                    season = 1,
-                    episode = 1
-                )
-        dto.seasons
-            .orEmpty()
-            .filter { it.number > 1 && included(it.airDate) }
-            .forEach {
-                events +=
-                    EventDTO(
-                        kind = ReleaseKind.NEW_SEASON.name,
-                        date = it.airDate!!,
-                        season = it.number,
-                        episode = 1
-                    )
-            }
-        val episodes = listOfNotNull(dto.lastEpisode, dto.nextEpisode).toMutableList()
-        val relevant =
-            dto.seasons
-                .orEmpty()
-                .filter {
-                    it.number > 0 &&
-                        (it.airDate == null || it.airDate <= today.plusDays(30).toString())
-                }
-                .sortedByDescending(SeasonDTO::number)
-                .take(2)
-        var seasonFailure: Throwable? = null
-        for (season in relevant) {
-            season(MediaId(type = MediaType.SERIES, value = dto.id), season.number, query.region)
-                .map<SeasonDTO, Result<SeasonDTO>> { Result.success(it) }
-                .catch { emit(Result.failure(it)) }
-                .single()
-                .fold(
-                    onSuccess = { episodes += it.episodes.orEmpty() },
-                    onFailure = { seasonFailure = it }
-                )
-        }
-        episodes
-            .filter { included(it.airDate) }
-            .forEach { episode ->
-                val kind =
-                    when {
-                        episode.season == 1 && episode.number == 1 -> ReleaseKind.NEW_SERIES
-                        episode.season > 1 && episode.number == 1 -> ReleaseKind.NEW_SEASON
-                        else -> ReleaseKind.NEW_EPISODE
-                    }
-                events +=
-                    EventDTO(
-                        kind = kind.name,
-                        date = episode.airDate!!,
-                        season = episode.season,
-                        episode = episode.number
-                    )
-            }
-        val ordered =
-            events.sortedWith(
-                compareBy<EventDTO> {
-                        if (recent) -LocalDate.parse(it.date).toEpochDay()
-                        else LocalDate.parse(it.date).toEpochDay()
-                    }
-                    .thenBy { ReleaseKind.valueOf(it.kind).ordinal }
-                    .thenBy { it.season ?: 0 }
-                    .thenBy { it.episode ?: 0 }
-            )
-        if (ordered.isEmpty()) seasonFailure?.let { throw it }
-        return ordered.firstOrNull()?.let { dto.copy(event = it) }
-    }
 
     private companion object {
         const val MOVIE_DETAILS_PATH = "movie/{id}"
