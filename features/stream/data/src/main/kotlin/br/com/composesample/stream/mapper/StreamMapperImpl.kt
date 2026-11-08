@@ -8,6 +8,7 @@ import br.com.composesample.stream.dto.media.MediaRespDTO
 import br.com.composesample.stream.dto.media.NamedRespDTO
 import br.com.composesample.stream.dto.providers.ProviderRespDTO
 import br.com.composesample.stream.dto.releases.ReleaseRespDTO
+import br.com.composesample.stream.dto.seasons.EpisodeRespDTO
 import br.com.composesample.stream.dto.seasons.SeasonRespDTO
 import br.com.composesample.stream.dto.videos.VideoRespDTO
 import br.com.composesample.stream.entity.StreamCacheEntity
@@ -60,18 +61,6 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
         StreamCacheEntity(key = key, payload = jsonCodec.encode(value))
 
     private fun summary(dto: MediaRespDTO, type: MediaType, region: CatalogRegion): MediaSummary {
-        val certification =
-            if (type == MediaType.MOVIE)
-                dto.releaseDates
-                    ?.results
-                    ?.firstOrNull { it.country == region.countryCode }
-                    ?.dates
-                    ?.firstNotNullOfOrNull { it.certification?.takeIf(String::isNotBlank) }
-            else dto.contentRatings
-                ?.results
-                ?.firstOrNull { it.country == region.countryCode }
-                ?.rating
-                ?.takeIf(String::isNotBlank)
         val date = if (type == MediaType.MOVIE) dto.releaseDate else dto.firstAirDate
         return MediaSummary(
             id = MediaId(type = type, value = dto.id),
@@ -79,21 +68,42 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
             posterPath = dto.posterPath,
             year = date?.take(4)?.takeIf { it.length == 4 },
             rating = dto.voteAverage?.takeIf { (dto.voteCount ?: 0) > 0 },
-            certification = certification,
-            releaseEvent = dto.event?.let { event ->
-                ReleaseKind.entries
-                    .firstOrNull { it.name == event.kind }
-                    ?.let {
-                        ReleaseEvent(
-                            kind = it,
-                            date = event.date,
-                            season = event.season,
-                            episode = event.episode
-                        )
-                    }
-            }
+            certification = certification(dto, type, region),
+            releaseEvent = releaseEvent(dto)
         )
     }
+
+    private fun certification(dto: MediaRespDTO, type: MediaType, region: CatalogRegion) =
+        if (type == MediaType.MOVIE) releaseCertification(dto, region)
+        else contentRating(dto, region)
+
+    private fun releaseCertification(dto: MediaRespDTO, region: CatalogRegion) =
+        dto.releaseDates
+            ?.results
+            ?.firstOrNull { it.country == region.countryCode }
+            ?.dates
+            ?.firstNotNullOfOrNull { it.certification?.takeIf(String::isNotBlank) }
+
+    private fun contentRating(dto: MediaRespDTO, region: CatalogRegion) =
+        dto.contentRatings
+            ?.results
+            ?.firstOrNull { it.country == region.countryCode }
+            ?.rating
+            ?.takeIf(String::isNotBlank)
+
+    private fun releaseEvent(dto: MediaRespDTO): ReleaseEvent? =
+        dto.event?.let { event ->
+            ReleaseKind.entries
+                .firstOrNull { it.name == event.kind }
+                ?.let {
+                    ReleaseEvent(
+                        kind = it,
+                        date = event.date,
+                        season = event.season,
+                        episode = event.episode
+                    )
+                }
+        }
 
     override fun genres(entity: StreamCacheEntity?): List<Genre> =
         entity?.let { jsonCodec.decode<GenresRespDTO>(it.payload).genres.map(::genre) }.orEmpty()
@@ -118,38 +128,18 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
         region: CatalogRegion
     ): MediaDetails? {
         val dto = entity?.let { jsonCodec.decode<MediaRespDTO>(it.payload) } ?: return null
-        val providers = dto.watchProviders?.results?.get(region.countryCode)
-        fun group(items: List<ProviderRespDTO>?, category: ProviderCategory) =
-            items.orEmpty().map {
-                WatchProvider(
-                    id = it.id,
-                    name = it.name,
-                    logoPath = it.logoPath,
-                    category = category
-                )
-            }
-        val available =
-            group(providers?.subscription, ProviderCategory.SUBSCRIPTION) +
-                group(providers?.free, ProviderCategory.FREE) +
-                group(providers?.ads, ProviderCategory.ADS) +
-                group(providers?.rent, ProviderCategory.RENT) +
-                group(providers?.buy, ProviderCategory.BUY)
-        val regionalDate =
-            dto.releaseDates
-                ?.results
-                ?.firstOrNull { it.country == region.countryCode }
-                ?.dates
-                ?.mapNotNull(ReleaseRespDTO::date)
-                ?.minOrNull()
-                ?.take(10)
-        return MediaDetails(
+        return mediaDetails(dto, id, region)
+    }
+
+    private fun mediaDetails(dto: MediaRespDTO, id: MediaId, region: CatalogRegion) =
+        MediaDetails(
             summary = summary(dto, id.type, region),
             originalTitle = dto.originalTitle ?: dto.originalName,
             overview = dto.overview?.takeIf(String::isNotBlank),
             backdropPath = dto.backdropPath,
             genres = dto.genres.orEmpty().map(::genre),
             runtimeMinutes = dto.runtime?.takeIf { it > 0 },
-            releaseDate = regionalDate ?: dto.releaseDate ?: dto.firstAirDate,
+            releaseDate = releaseDate(dto, region),
             status = dto.status,
             voteCount = dto.voteCount,
             originalLanguage = dto.originalLanguage,
@@ -161,24 +151,60 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
             homepage = dto.homepage?.takeIf(String::isNotBlank),
             cast = dto.credits?.cast.orEmpty().map(::person),
             crew = dto.credits?.crew.orEmpty().map(::person),
-            videos = dto.videos?.results.orEmpty()
-                .map(::video)
-                .sortedByDescending(VideoReference::official),
-            providers = available,
-            providerLink = providers?.link,
-            seasons = dto.seasons.orEmpty()
-                .filter { it.number > 0 }
-                .map {
-                    SeasonSummary(
-                        number = it.number,
-                        name = it.name,
-                        episodeCount = it.episodeCount,
-                        airDate = it.airDate
-                    )
-                },
+            videos = videos(dto),
+            providers = providers(dto, region),
+            providerLink = dto.watchProviders?.results?.get(region.countryCode)?.link,
+            seasons = seasons(dto),
             episodeCount = dto.numberOfEpisodes
         )
+
+    private fun releaseDate(dto: MediaRespDTO, region: CatalogRegion) =
+        regionalReleaseDate(dto, region) ?: dto.releaseDate ?: dto.firstAirDate
+
+    private fun regionalReleaseDate(dto: MediaRespDTO, region: CatalogRegion) =
+        dto.releaseDates
+            ?.results
+            ?.firstOrNull { it.country == region.countryCode }
+            ?.dates
+            ?.mapNotNull(ReleaseRespDTO::date)
+            ?.minOrNull()
+            ?.take(10)
+
+    private fun providers(dto: MediaRespDTO, region: CatalogRegion): List<WatchProvider> {
+        val providers = dto.watchProviders?.results?.get(region.countryCode) ?: return emptyList()
+        return providerGroup(providers.subscription, ProviderCategory.SUBSCRIPTION) +
+            providerGroup(providers.free, ProviderCategory.FREE) +
+            providerGroup(providers.ads, ProviderCategory.ADS) +
+            providerGroup(providers.rent, ProviderCategory.RENT) +
+            providerGroup(providers.buy, ProviderCategory.BUY)
     }
+
+    private fun providerGroup(items: List<ProviderRespDTO>?, category: ProviderCategory) =
+        items.orEmpty().map {
+            WatchProvider(
+                id = it.id,
+                name = it.name,
+                logoPath = it.logoPath,
+                category = category
+            )
+        }
+
+    private fun videos(dto: MediaRespDTO) =
+        dto.videos?.results.orEmpty()
+            .map(::video)
+            .sortedByDescending(VideoReference::official)
+
+    private fun seasons(dto: MediaRespDTO) =
+        dto.seasons.orEmpty()
+            .filter { it.number > 0 }
+            .map {
+                SeasonSummary(
+                    number = it.number,
+                    name = it.name,
+                    episodeCount = it.episodeCount,
+                    airDate = it.airDate
+                )
+            }
 
     override fun season(entity: StreamCacheEntity?): SeasonDetails? {
         val dto = entity?.let { jsonCodec.decode<SeasonRespDTO>(it.payload) } ?: return null
@@ -186,17 +212,18 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
             number = dto.number,
             name = dto.name,
             overview = dto.overview,
-            episodes = dto.episodes.orEmpty().map {
-                EpisodeDetails(
-                    number = it.number,
-                    name = it.name,
-                    overview = it.overview,
-                    airDate = it.airDate,
-                    runtime = it.runtime,
-                    imagePath = it.stillPath
-                )
-            }
+            episodes = dto.episodes.orEmpty().map(::episode)
         )
     }
+
+    private fun episode(dto: EpisodeRespDTO) =
+        EpisodeDetails(
+            number = dto.number,
+            name = dto.name,
+            overview = dto.overview,
+            airDate = dto.airDate,
+            runtime = dto.runtime,
+            imagePath = dto.stillPath
+        )
 
 }
