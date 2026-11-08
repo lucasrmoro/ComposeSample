@@ -9,20 +9,21 @@ import br.com.composesample.stream.model.CatalogRegion
 import br.com.composesample.stream.model.CollectionKind
 import br.com.composesample.stream.model.MediaId
 import br.com.composesample.stream.model.MediaType
+import br.com.composesample.stream.query.CatalogQueryParameters
 import br.com.composesample.structural.core.base.dataSource.BaseDataSource
 import br.com.composesample.structural.network.http.HttpRequest
 import br.com.composesample.structural.network.http.get
 import java.time.Clock
-import java.time.LocalDate
-import java.time.ZoneId
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
 
 internal class StreamRemoteDataSourceImpl(
     private val tmdbClient: TmdbClient,
     private val coroutineDispatcher: CoroutineDispatcher,
-    private val clock: Clock
+    clock: Clock
 ) : BaseDataSource(), StreamRemoteDataSource {
+
+    private val queryParameters = CatalogQueryParameters(clock)
 
     private suspend inline fun <reified T> get(
         path: String,
@@ -74,27 +75,7 @@ internal class StreamRemoteDataSourceImpl(
                     if (query.type == MediaType.MOVIE) DISCOVER_MOVIES_PATH
                     else DISCOVER_SERIES_PATH
             }
-        val params =
-            mutableMapOf(
-                LANGUAGE_PARAMETER to query.region.languageTag,
-                PAGE_PARAMETER to page.toString(),
-                INCLUDE_ADULT_PARAMETER to FALSE_VALUE
-            )
-        val today = LocalDate.now(clock.withZone(ZoneId.of(query.region.timeZoneId)))
-        if (query.type == MediaType.MOVIE) params[REGION_PARAMETER] = query.region.countryCode
-        if (query.kind == CollectionKind.SEARCH) params[QUERY_PARAMETER] = query.searchText.trim()
-        query.genreId?.let { params[GENRE_PARAMETER] = it.toString() }
-        if (query.kind == CollectionKind.RECENT || query.kind == CollectionKind.UPCOMING) {
-            val recent = query.kind == CollectionKind.RECENT
-            val field =
-                if (query.type == MediaType.MOVIE) RELEASE_DATE_PARAMETER else AIR_DATE_PARAMETER
-            params["$field$MINIMUM_SUFFIX"] =
-                (if (recent) today.minusDays(30) else today.plusDays(1)).toString()
-            params["$field$MAXIMUM_SUFFIX"] = (if (recent) today else today.plusDays(30)).toString()
-            if (query.type == MediaType.SERIES) params[TIMEZONE_PARAMETER] = query.region.timeZoneId
-            params[SORT_PARAMETER] = POPULARITY_ORDER
-        }
-        get<PageDTO>(path, params)
+        get<PageDTO>(path, queryParameters.create(query, page))
     }
         .flowOn(coroutineDispatcher)
 
@@ -112,23 +93,10 @@ internal class StreamRemoteDataSourceImpl(
         const val DISCOVER_SERIES_PATH = "discover/tv"
         const val ID_PARAMETER = "id"
         const val SEASON_PARAMETER = "season"
-        const val MINIMUM_SUFFIX = ".gte"
-        const val MAXIMUM_SUFFIX = ".lte"
         const val MISSING_CREDENTIAL_MESSAGE = "TMDB credential is not configured"
         const val MOVIE_DETAIL_SECTIONS = "credits,videos,release_dates,watch/providers"
         const val SERIES_DETAIL_SECTIONS = "credits,videos,content_ratings,watch/providers"
         const val LANGUAGE_PARAMETER = "language"
         const val APPEND_PARAMETER = "append_to_response"
-        const val PAGE_PARAMETER = "page"
-        const val INCLUDE_ADULT_PARAMETER = "include_adult"
-        const val FALSE_VALUE = "false"
-        const val REGION_PARAMETER = "region"
-        const val QUERY_PARAMETER = "query"
-        const val GENRE_PARAMETER = "with_genres"
-        const val RELEASE_DATE_PARAMETER = "release_date"
-        const val AIR_DATE_PARAMETER = "air_date"
-        const val TIMEZONE_PARAMETER = "timezone"
-        const val SORT_PARAMETER = "sort_by"
-        const val POPULARITY_ORDER = "popularity.desc"
     }
 }
