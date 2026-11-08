@@ -1,5 +1,6 @@
 package br.com.composesample.stream.repository
 
+import br.com.composesample.structural.core.concurrency.KeyedMutex
 import br.com.composesample.stream.dataSource.StreamLocalDataSource
 import br.com.composesample.stream.dataSource.StreamRemoteDataSource
 import br.com.composesample.stream.mapper.StreamMapper

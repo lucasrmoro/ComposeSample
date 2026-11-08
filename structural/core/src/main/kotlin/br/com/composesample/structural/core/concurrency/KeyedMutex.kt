@@ -1,8 +1,12 @@
-package br.com.composesample.stream.repository
+package br.com.composesample.structural.core.concurrency
 
 import kotlinx.coroutines.sync.Mutex
 
-internal class KeyedMutex<K> {
+/**
+ * Serializes suspending actions for each key while allowing actions for different keys to run
+ * concurrently. A key's lock is removed after its last active or waiting action completes.
+ */
+class KeyedMutex<K> {
 
     private val registryLock = Any()
     private val entries = mutableMapOf<K, Entry>()
