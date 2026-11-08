@@ -23,48 +23,48 @@ internal class StreamRemoteDataSourceImpl(
 
     private val queryParameters = CatalogQueryParameters(clock)
 
-    override fun details(id: MediaId, region: CatalogRegion) = call {
-        val append =
-            if (id.type == MediaType.MOVIE) MOVIE_DETAIL_SECTIONS else SERIES_DETAIL_SECTIONS
-        tmdbClient.get<MediaDTO>(
-            if (id.type == MediaType.MOVIE) MOVIE_DETAILS_PATH else SERIES_DETAILS_PATH,
-            mapOf(LANGUAGE_PARAMETER to region.languageTag, APPEND_PARAMETER to append),
-            mapOf(ID_PARAMETER to id.value.toString())
-        )
-    }
-        .flowOn(coroutineDispatcher)
+    override fun details(id: MediaId, region: CatalogRegion) =
+        call {
+            val append =
+                if (id.type == MediaType.MOVIE) MOVIE_DETAIL_SECTIONS else SERIES_DETAIL_SECTIONS
+            tmdbClient.get<MediaDTO>(
+                if (id.type == MediaType.MOVIE) MOVIE_DETAILS_PATH else SERIES_DETAILS_PATH,
+                mapOf(LANGUAGE_PARAMETER to region.languageTag, APPEND_PARAMETER to append),
+                mapOf(ID_PARAMETER to id.value.toString())
+            )
+        }.flowOn(coroutineDispatcher)
 
-    override fun genres(type: MediaType, region: CatalogRegion) = call {
-        tmdbClient.get<GenresDTO>(
-            if (type == MediaType.MOVIE) MOVIE_GENRES_PATH else SERIES_GENRES_PATH,
-            mapOf(LANGUAGE_PARAMETER to region.languageTag)
-        )
-    }
-        .flowOn(coroutineDispatcher)
+    override fun genres(type: MediaType, region: CatalogRegion) =
+        call {
+            tmdbClient.get<GenresDTO>(
+                if (type == MediaType.MOVIE) MOVIE_GENRES_PATH else SERIES_GENRES_PATH,
+                mapOf(LANGUAGE_PARAMETER to region.languageTag)
+            )
+        }.flowOn(coroutineDispatcher)
 
-    override fun season(id: MediaId, number: Int, region: CatalogRegion) = call {
-        tmdbClient.get<SeasonDTO>(
-            SEASON_DETAILS_PATH,
-            mapOf(LANGUAGE_PARAMETER to region.languageTag),
-            mapOf(ID_PARAMETER to id.value.toString(), SEASON_PARAMETER to number.toString())
-        )
-    }
-        .flowOn(coroutineDispatcher)
+    override fun season(id: MediaId, number: Int, region: CatalogRegion) =
+        call {
+            tmdbClient.get<SeasonDTO>(
+                SEASON_DETAILS_PATH,
+                mapOf(LANGUAGE_PARAMETER to region.languageTag),
+                mapOf(ID_PARAMETER to id.value.toString(), SEASON_PARAMETER to number.toString())
+            )
+        }.flowOn(coroutineDispatcher)
 
-    override fun page(query: CatalogQuery, page: Int) = call {
-        val path =
-            when (query.kind) {
-                CollectionKind.POPULAR ->
-                    if (query.type == MediaType.MOVIE) POPULAR_MOVIES_PATH else POPULAR_SERIES_PATH
-                CollectionKind.SEARCH ->
-                    if (query.type == MediaType.MOVIE) SEARCH_MOVIES_PATH else SEARCH_SERIES_PATH
-                else ->
-                    if (query.type == MediaType.MOVIE) DISCOVER_MOVIES_PATH
-                    else DISCOVER_SERIES_PATH
-            }
-        tmdbClient.get<PageDTO>(path, queryParameters.create(query, page))
-    }
-        .flowOn(coroutineDispatcher)
+    override fun page(query: CatalogQuery, page: Int) =
+        call {
+            val path =
+                when (query.kind) {
+                    CollectionKind.POPULAR ->
+                        if (query.type == MediaType.MOVIE) POPULAR_MOVIES_PATH else POPULAR_SERIES_PATH
+                    CollectionKind.SEARCH ->
+                        if (query.type == MediaType.MOVIE) SEARCH_MOVIES_PATH else SEARCH_SERIES_PATH
+                    else ->
+                        if (query.type == MediaType.MOVIE) DISCOVER_MOVIES_PATH
+                        else DISCOVER_SERIES_PATH
+                }
+            tmdbClient.get<PageDTO>(path, queryParameters.create(query, page))
+        }.flowOn(coroutineDispatcher)
 
     private companion object {
         const val MOVIE_DETAILS_PATH = "movie/{id}"
