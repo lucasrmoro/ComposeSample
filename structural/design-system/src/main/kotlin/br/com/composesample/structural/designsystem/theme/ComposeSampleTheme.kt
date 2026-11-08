@@ -46,15 +46,16 @@ private val LocalComposeSampleColors = staticCompositionLocalOf { LightColors }
 object CurrentTheme {
 
     object size {
-        val small get() = SampleDimens.Size.Small
-        val medium get() = SampleDimens.Size.Medium
-        val floatingActionClearance get() = SampleDimens.Size.FloatingActionClearance
-        val touchTarget get() = SampleDimens.Size.TouchTarget
-        val posterWidth get() = SampleDimens.Size.PosterWidth
-        val posterHeight get() = SampleDimens.Size.PosterHeight
-        val backdropHeight get() = SampleDimens.Size.BackdropHeight
-        val portrait get() = SampleDimens.Size.Portrait
-        val ratingIcon get() = SampleDimens.Size.RatingIcon
+        val size4 get() = SampleDimens.Size.Size4
+        val size8 get() = SampleDimens.Size.Size8
+        val size12 get() = SampleDimens.Size.Size12
+        val size16 get() = SampleDimens.Size.Size16
+        val size20 get() = SampleDimens.Size.Size20
+        val size24 get() = SampleDimens.Size.Size24
+        val size32 get() = SampleDimens.Size.Size32
+        val size40 get() = SampleDimens.Size.Size40
+        val size48 get() = SampleDimens.Size.Size48
+        val size64 get() = SampleDimens.Size.Size64
     }
 
     object spacing {

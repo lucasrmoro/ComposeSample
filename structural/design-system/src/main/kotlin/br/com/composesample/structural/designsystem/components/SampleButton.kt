@@ -42,7 +42,7 @@ fun SampleButton(
     val buttonContent: @Composable RowScope.() -> Unit = {
         if (isLoading) {
             SampleCircularProgressIndicator(
-                modifier = Modifier.size(CurrentTheme.size.small),
+                modifier = Modifier.size(CurrentTheme.size.size16),
                 color = contentColor
             )
             Spacer(modifier = Modifier.width(CurrentTheme.spacing.small))

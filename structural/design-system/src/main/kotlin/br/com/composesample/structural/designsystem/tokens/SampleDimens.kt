@@ -7,15 +7,16 @@ import androidx.compose.ui.unit.sp
 internal object SampleDimens {
 
     object Size {
-        val Small = 18.dp
-        val Medium = 40.dp
-        val FloatingActionClearance = 88.dp
-        val TouchTarget = 48.dp
-        val PosterWidth = 140.dp
-        val PosterHeight = 200.dp
-        val BackdropHeight = 200.dp
-        val Portrait = 88.dp
-        val RatingIcon = 14.dp
+        val Size4 = 4.dp
+        val Size8 = 8.dp
+        val Size12 = 12.dp
+        val Size16 = 16.dp
+        val Size20 = 20.dp
+        val Size24 = 24.dp
+        val Size32 = 32.dp
+        val Size40 = 40.dp
+        val Size48 = 48.dp
+        val Size64 = 64.dp
     }
 
     object Ratio {

@@ -33,3 +33,7 @@ ComposeSampleTheme now provides one shared Material 3 color scheme to MaterialTh
 ## Tipografia
 
 Consuma os estilos por `CurrentTheme.typography`, como `SampleText(text = texto, style = CurrentTheme.typography.labelMedium)`. `TypographyToken` tem construção e estilo Compose internos; os consumidores não acessam `TextStyle` nem a tipografia do Material. Fonte, peso, tamanho, altura de linha e espaçamento são definidos nos tokens internos do design system.
+
+## Tamanhos
+
+`CurrentTheme.size` expõe `size4`, `size8`, `size12`, `size16`, `size20`, `size24`, `size32`, `size40`, `size48` e `size64`. Tamanhos específicos fora dessa escala devem ser definidos na feature consumidora, sem adicionar conceitos de domínio aos tokens compartilhados.
