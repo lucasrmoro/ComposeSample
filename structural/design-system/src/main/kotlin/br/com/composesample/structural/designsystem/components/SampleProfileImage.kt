@@ -17,10 +17,8 @@ fun ProfileSampleImage(
     contentDescription: String,
     modifier: Modifier = Modifier
 ) {
-    request?.let {
-        SampleImage(request = it, contentDescription = contentDescription, modifier = modifier)
-    }
-        ?: Box(
+    if (request == null) {
+        Box(
             modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
@@ -30,4 +28,7 @@ fun ProfileSampleImage(
                 tint = CurrentTheme.colors.OnSurfaceVariant
             )
         }
+        return
+    }
+    SampleImage(request = request, contentDescription = contentDescription, modifier = modifier)
 }
