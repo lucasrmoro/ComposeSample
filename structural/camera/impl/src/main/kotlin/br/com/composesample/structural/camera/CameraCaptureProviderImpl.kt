@@ -82,11 +82,8 @@ internal class CameraCaptureProviderImpl(
     ) {
 
         private var launcher: ActivityResultLauncher<CameraCaptureRequest>? = null
-
         private var finished = false
-
         private var resultReceived = false
-
         private val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_DESTROY && !resultReceived) finish(null, discard = true)
         }
