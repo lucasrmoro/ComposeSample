@@ -57,19 +57,11 @@ internal class StreamRepositoryImpl(
                 emit(Unit)
                 return@withLock
             }
-            var next = (previous?.page ?: 0) + 1
-            var accumulated = previous
-            repeat(3) {
-                val page = streamRemoteDataSource.page(query, next).single()
-                val entity = streamMapper.pageEntity(query, page, accumulated)
-                accumulated = streamMapper.pageDTO(entity)
-                if (page.results.isNotEmpty() || page.page >= page.totalPages || it == 2) {
-                    streamLocalDataSource.save(entity).single()
-                    emit(Unit)
-                    return@withLock
-                }
-                next++
-            }
+            val next = (previous?.page ?: 0) + 1
+            val page = streamRemoteDataSource.page(query, next).single()
+            val entity = streamMapper.pageEntity(query, page, previous)
+            streamLocalDataSource.save(entity).single()
+            emit(Unit)
         }
     }.flowOn(coroutineDispatcher)
 
