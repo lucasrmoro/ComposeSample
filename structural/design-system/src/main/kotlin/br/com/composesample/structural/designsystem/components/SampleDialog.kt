@@ -2,7 +2,6 @@ package br.com.composesample.structural.designsystem.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,15 +23,15 @@ fun SampleDialog(
         containerColor = CurrentTheme.color.surface,
         titleContentColor = CurrentTheme.color.onSurface,
         textContentColor = CurrentTheme.color.onSurface,
-        title = { Text(title) },
-        text = { Text(message) },
+        title = { SampleText(text = title) },
+        text = { SampleText(text = message) },
         confirmButton = {
             TextButton(
                 onClick = onConfirm,
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = CurrentTheme.color.primary
                 )
-            ) { Text(confirmText) }
+            ) { SampleText(text = confirmText) }
         },
         dismissButton = {
             TextButton(
@@ -40,7 +39,7 @@ fun SampleDialog(
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = CurrentTheme.color.primary
                 )
-            ) { Text(dismissText) }
+            ) { SampleText(text = dismissText) }
         }
     )
 }

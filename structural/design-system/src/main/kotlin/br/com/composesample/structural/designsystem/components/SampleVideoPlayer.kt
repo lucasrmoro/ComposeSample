@@ -35,16 +35,16 @@ fun SampleVideoPlayer(modifier: Modifier = Modifier, source: VideoSource, online
 
     Column(modifier) {
         when {
-            !online -> Text(stringResource(R.string.sample_video_offline))
+            !online -> SampleText(text = stringResource(R.string.sample_video_offline))
             playbackState == VideoPlaybackState.Failed ->
-                Text(stringResource(R.string.sample_video_error))
+                SampleText(text = stringResource(R.string.sample_video_error))
             playbackState is VideoPlaybackState.Playing ->
                 VideoWebView(
                     embed = (playbackState as VideoPlaybackState.Playing).embed,
                     onPause = { playbackState = VideoPlaybackState.Ready }
                 )
             else -> Button(onClick = { playbackState = VideoPlaybackState.Loading }) {
-                Text(stringResource(R.string.sample_play_trailer))
+                SampleText(text = stringResource(R.string.sample_play_trailer))
             }
         }
     }

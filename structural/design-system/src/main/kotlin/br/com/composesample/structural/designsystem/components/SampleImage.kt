@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,12 +69,12 @@ fun SampleImage(
         image?.let {
             Image(it, contentDescription, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
         }
-            ?: Text(
-                stringResource(
+            ?: SampleText(
+                text = stringResource(
                     if (failed || request == null) R.string.sample_image_unavailable
                     else R.string.sample_image_loading
                 ),
-                style = MaterialTheme.typography.labelSmall,
+                style = SampleTextStyle.LabelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
     }
