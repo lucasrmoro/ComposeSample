@@ -11,8 +11,6 @@ import br.com.composesample.stream.model.MediaId
 import br.com.composesample.stream.model.MediaType
 import br.com.composesample.stream.query.CatalogQueryParameters
 import br.com.composesample.structural.core.base.dataSource.BaseDataSource
-import br.com.composesample.structural.network.http.HttpRequest
-import br.com.composesample.structural.network.http.get
 import java.time.Clock
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
@@ -25,21 +23,10 @@ internal class StreamRemoteDataSourceImpl(
 
     private val queryParameters = CatalogQueryParameters(clock)
 
-    private suspend inline fun <reified T> get(
-        path: String,
-        query: Map<String, String>,
-        pathParameters: Map<String, String> = emptyMap()
-    ): T {
-        check(tmdbClient.configured) { MISSING_CREDENTIAL_MESSAGE }
-        return tmdbClient.httpClient.get(
-            HttpRequest(path = path, query = query, pathParameters = pathParameters)
-        )
-    }
-
     override fun details(id: MediaId, region: CatalogRegion) = call {
         val append =
             if (id.type == MediaType.MOVIE) MOVIE_DETAIL_SECTIONS else SERIES_DETAIL_SECTIONS
-        get<MediaDTO>(
+        tmdbClient.get<MediaDTO>(
             if (id.type == MediaType.MOVIE) MOVIE_DETAILS_PATH else SERIES_DETAILS_PATH,
             mapOf(LANGUAGE_PARAMETER to region.languageTag, APPEND_PARAMETER to append),
             mapOf(ID_PARAMETER to id.value.toString())
@@ -48,7 +35,7 @@ internal class StreamRemoteDataSourceImpl(
         .flowOn(coroutineDispatcher)
 
     override fun genres(type: MediaType, region: CatalogRegion) = call {
-        get<GenresDTO>(
+        tmdbClient.get<GenresDTO>(
             if (type == MediaType.MOVIE) MOVIE_GENRES_PATH else SERIES_GENRES_PATH,
             mapOf(LANGUAGE_PARAMETER to region.languageTag)
         )
@@ -56,7 +43,7 @@ internal class StreamRemoteDataSourceImpl(
         .flowOn(coroutineDispatcher)
 
     override fun season(id: MediaId, number: Int, region: CatalogRegion) = call {
-        get<SeasonDTO>(
+        tmdbClient.get<SeasonDTO>(
             SEASON_DETAILS_PATH,
             mapOf(LANGUAGE_PARAMETER to region.languageTag),
             mapOf(ID_PARAMETER to id.value.toString(), SEASON_PARAMETER to number.toString())
@@ -75,7 +62,7 @@ internal class StreamRemoteDataSourceImpl(
                     if (query.type == MediaType.MOVIE) DISCOVER_MOVIES_PATH
                     else DISCOVER_SERIES_PATH
             }
-        get<PageDTO>(path, queryParameters.create(query, page))
+        tmdbClient.get<PageDTO>(path, queryParameters.create(query, page))
     }
         .flowOn(coroutineDispatcher)
 
@@ -93,7 +80,6 @@ internal class StreamRemoteDataSourceImpl(
         const val DISCOVER_SERIES_PATH = "discover/tv"
         const val ID_PARAMETER = "id"
         const val SEASON_PARAMETER = "season"
-        const val MISSING_CREDENTIAL_MESSAGE = "TMDB credential is not configured"
         const val MOVIE_DETAIL_SECTIONS = "credits,videos,release_dates,watch/providers"
         const val SERIES_DETAIL_SECTIONS = "credits,videos,content_ratings,watch/providers"
         const val LANGUAGE_PARAMETER = "language"
