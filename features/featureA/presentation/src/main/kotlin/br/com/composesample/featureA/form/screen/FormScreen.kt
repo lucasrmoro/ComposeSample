@@ -7,17 +7,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.composesample.featureA.form.model.FormUiEffect
 import br.com.composesample.featureA.form.model.FormUiEvent
 import br.com.composesample.featureA.form.model.FormUiState
 import br.com.composesample.featureA.form.viewModel.FormViewModel
+import br.com.composesample.features.featureA.presentation.R
 import br.com.composesample.structural.designsystem.components.SampleButton
 import br.com.composesample.structural.designsystem.components.SampleScreen
 import br.com.composesample.structural.designsystem.components.SampleTextField
+import br.com.composesample.structural.designsystem.screen.BaseScreen
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
-import br.com.composesample.structural.designsystem.screen.BaseScreen
 
 internal class FormScreen(
     private val viewModel: FormViewModel,
@@ -38,6 +40,7 @@ internal class FormScreen(
             FormUiEffect.NavigateBack -> onNavigateBack()
         }
     }
+
 }
 
 @Composable
@@ -47,7 +50,7 @@ private fun FormScreenContent(
     onNavigateBack: () -> Unit
 ) {
     SampleScreen(
-        title = "Compose - Sample",
+        title = stringResource(R.string.feature_a_title),
         canNavigateBack = true,
         onNavigateBack = onNavigateBack
     ) {
@@ -60,12 +63,12 @@ private fun FormScreenContent(
             SampleTextField(
                 value = state.message,
                 onValueChange = { sendEvent(FormUiEvent.MessageChanged(it)) },
-                label = "Message",
-                placeholder = "Type something here"
+                label = stringResource(R.string.feature_a_message_label),
+                placeholder = stringResource(R.string.feature_a_message_placeholder)
             )
             SampleButton(
                 modifier = Modifier.fillMaxWidth(),
-                text = "Save",
+                text = stringResource(R.string.feature_a_save),
                 onClick = { sendEvent(FormUiEvent.SaveClicked) },
                 isLoading = state.isSaving
             )
@@ -78,7 +81,7 @@ private fun FormScreenContent(
 private fun FormScreenPreview() {
     ComposeSampleTheme {
         FormScreenContent(
-            state = FormUiState(message = "Preview message"),
+            state = FormUiState(message = stringResource(R.string.feature_a_message_preview)),
             sendEvent = {},
             onNavigateBack = {}
         )

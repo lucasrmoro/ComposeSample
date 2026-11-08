@@ -3,7 +3,6 @@ package br.com.composesample.structural.designsystem.tokens
 import androidx.compose.ui.graphics.Color
 
 internal object SamplePalette {
-
     object Green {
         val S300 = Color(0xFF81C784)
         val S700 = Color(0xFF2E7D32)

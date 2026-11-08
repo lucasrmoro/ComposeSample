@@ -8,13 +8,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import br.com.composesample.structural.designsystem.tokens.SampleDimens
-import br.com.composesample.structural.designsystem.tokens.SampleColor
+import br.com.composesample.structural.designsystem.tokens.ColorToken
 import br.com.composesample.structural.designsystem.tokens.IconToken
+import br.com.composesample.structural.designsystem.tokens.SampleDimens
 import br.com.composesample.structural.designsystem.tokens.SampleIcons
+import br.com.composesample.structural.designsystem.tokens.SamplePalette
 import br.com.composesample.structural.designsystem.tokens.SampleTypography
 import br.com.composesample.structural.designsystem.tokens.TypographyToken
-import br.com.composesample.structural.designsystem.tokens.SamplePalette
 
 data class ComposeSampleColors(
     val primary: Color,
@@ -27,24 +27,22 @@ data class ComposeSampleColors(
     val scrim: Color
 )
 
-private fun ColorScheme.toSampleColors() =
-    ComposeSampleColors(
-        primary = primary,
-        onPrimary = onPrimary,
-        secondary = secondary,
-        onSecondary = onSecondary,
-        background = background,
-        surface = surface,
-        onSurface = onSurface,
-        scrim = SamplePalette.Neutral.Scrim
-    )
+private fun ColorScheme.toSampleColors() = ComposeSampleColors(
+    primary = primary,
+    onPrimary = onPrimary,
+    secondary = secondary,
+    onSecondary = onSecondary,
+    background = background,
+    surface = surface,
+    onSurface = onSurface,
+    scrim = SamplePalette.Neutral.Scrim
+)
 
 private val LightColors = LightColorScheme.toSampleColors()
 
 private val LocalComposeSampleColors = staticCompositionLocalOf { LightColors }
 
 object CurrentTheme {
-
     object size {
         val xxxSmall get() = SampleDimens.Size.Size4
         val xxSmall get() = SampleDimens.Size.Size8
@@ -71,7 +69,7 @@ object CurrentTheme {
     }
 
     object ratio {
-        val video get() = SampleDimens.Ratio.Video
+        val video get() = SampleDimens.Ratio.VIDEO
     }
 
     object icon {
@@ -87,13 +85,12 @@ object CurrentTheme {
     }
 
     object colors {
-        val shimmer = SampleColor { MaterialTheme.colorScheme.outlineVariant }
-        val onSurfaceVariant = SampleColor { MaterialTheme.colorScheme.onSurfaceVariant }
+        val shimmer = ColorToken { MaterialTheme.colorScheme.outlineVariant }
+        val onSurfaceVariant = ColorToken { MaterialTheme.colorScheme.onSurfaceVariant }
     }
 
     val color: ComposeSampleColors
         @Composable @ReadOnlyComposable get() = LocalComposeSampleColors.current
-
 }
 
 @Composable
@@ -102,7 +99,7 @@ fun ComposeSampleTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-    SystemBarsSample(darkTheme = darkTheme)
+    SampleSystemBars(darkTheme = darkTheme)
     CompositionLocalProvider(LocalComposeSampleColors provides colorScheme.toSampleColors()) {
         MaterialTheme(colorScheme = colorScheme, content = content)
     }

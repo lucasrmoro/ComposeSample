@@ -10,9 +10,9 @@ import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 /** Reusable chip for an action with a short label. */
 @Composable
-fun SampleChip(label: String, onClick: () -> Unit) {
+fun SampleChip(modifier: Modifier = Modifier, label: String, onClick: () -> Unit) {
     Box(
-        modifier = Modifier.height(CurrentTheme.size.xxxLarge),
+        modifier = modifier.height(CurrentTheme.size.xxxLarge),
         contentAlignment = Alignment.CenterStart
     ) {
         AssistChip(onClick = onClick, label = { SampleText(text = label) })

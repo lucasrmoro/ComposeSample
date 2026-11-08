@@ -8,6 +8,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.composesample.structural.design_system.R
@@ -17,11 +18,13 @@ import br.com.composesample.structural.designsystem.theme.CurrentTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SampleHeader(
+    modifier: Modifier = Modifier,
     title: String,
     canNavigateBack: Boolean,
     onNavigateBack: () -> Unit
 ) {
     TopAppBar(
+        modifier = modifier,
         title = { SampleText(text = title) },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = CurrentTheme.color.surface,
@@ -45,6 +48,6 @@ fun SampleHeader(
 @Composable
 private fun HeaderPreview() {
     ComposeSampleTheme {
-        SampleHeader(title = "Compose - Sample", canNavigateBack = true, onNavigateBack = {})
+        SampleHeader(title = stringResource(R.string.sample_preview_title), canNavigateBack = true, onNavigateBack = {})
     }
 }

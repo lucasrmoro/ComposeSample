@@ -12,7 +12,7 @@ import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
-fun ProfileSampleImage(
+fun SampleProfileImage(
     modifier: Modifier = Modifier,
     request: AssetRequest?,
     contentDescription: String

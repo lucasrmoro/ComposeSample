@@ -34,4 +34,11 @@
 
     <!-- Typography -->
     <string name="sample_typography_preview_text">Texto de exemplo</string>
+
+    <!-- Component previews -->
+    <string name="sample_preview_title">Compose - Sample</string>
+    <string name="sample_dialog_preview_title">Descartar alterações?</string>
+    <string name="sample_dialog_preview_message">Suas alterações serão perdidas.</string>
+    <string name="sample_dialog_preview_confirm">Descartar</string>
+    <string name="sample_dialog_preview_dismiss">Cancelar</string>
 </resources>

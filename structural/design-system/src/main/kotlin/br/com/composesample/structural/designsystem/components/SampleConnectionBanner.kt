@@ -16,13 +16,13 @@ import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
-fun SampleConnectionBanner() {
+fun SampleConnectionBanner(modifier: Modifier = Modifier) {
     Surface(
         color = MaterialTheme.colorScheme.secondaryContainer,
-        modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }
+        modifier = modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }
     ) {
         Box(
-            Modifier.fillMaxWidth().padding(CurrentTheme.spacing.small),
+            modifier = Modifier.fillMaxWidth().padding(CurrentTheme.spacing.small),
             contentAlignment = Alignment.Center
         ) {
             SampleText(

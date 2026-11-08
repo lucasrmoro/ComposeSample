@@ -32,11 +32,12 @@ private fun SampleTextPreview() {
             modifier = Modifier.padding(CurrentTheme.spacing.medium),
             verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small)
         ) {
-            listOf(
+            val styles = listOf(
                 CurrentTheme.typography.labelSmall,
                 CurrentTheme.typography.labelMedium,
                 CurrentTheme.typography.bodyLarge
-            ).forEach { style ->
+            )
+            for (style in styles) {
                 SampleText(text = stringResource(R.string.sample_typography_preview_text), style = style)
             }
         }

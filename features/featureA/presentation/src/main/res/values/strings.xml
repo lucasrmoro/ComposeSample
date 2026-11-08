@@ -1,0 +1,15 @@
+<resources>
+    <!-- Common -->
+    <string name="feature_a_title">Compose - Sample</string>
+
+    <!-- Form -->
+    <string name="feature_a_message_label">Message</string>
+    <string name="feature_a_message_placeholder">Type something here</string>
+    <string name="feature_a_save">Save</string>
+    <string name="feature_a_message_preview">Preview message</string>
+
+    <!-- List -->
+    <string name="feature_a_add_item">Add item</string>
+    <string name="feature_a_first_item_preview">First item</string>
+    <string name="feature_a_second_item_preview">Second item</string>
+</resources>

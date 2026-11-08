@@ -1,10 +1,10 @@
 package br.com.composesample.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.material3.Surface
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.com.composesample.structural.designsystem.components.SampleClearFocusOnOutsideTap
@@ -30,7 +30,7 @@ fun ComposeSampleApp(navigationRegistry: NavigationRegistry) {
                     navController = navController,
                     startDestination = navigationRegistry.startDestination
                 ) {
-                    navigationRegistry.entryPoints.forEach { entryPoint ->
+                    for (entryPoint in navigationRegistry.entryPoints) {
                         composable(route = entryPoint.route) {
                             entryPoint.Content(navigator)
                         }

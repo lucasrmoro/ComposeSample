@@ -137,21 +137,21 @@ private fun TextFieldContent(
     }
 }
 
-private fun textFieldText(text: String?): (@Composable () -> Unit)? = text?.let {
-    { SampleText(text = it) }
+private fun textFieldText(text: String?): (@Composable () -> Unit)? = text?.let { value ->
+    { SampleText(text = value) }
 }
 
 private fun textFieldIcon(
     icon: IconToken?,
     contentDescription: String?,
     onClick: (() -> Unit)? = null
-): (@Composable () -> Unit)? = icon?.let {
+): (@Composable () -> Unit)? = icon?.let { iconToken ->
     {
         if (onClick == null) {
-            TextFieldIcon(icon = it, contentDescription = contentDescription)
+            TextFieldIcon(icon = iconToken, contentDescription = contentDescription)
         } else {
             IconButton(onClick = onClick) {
-                TextFieldIcon(icon = it, contentDescription = contentDescription)
+                TextFieldIcon(icon = iconToken, contentDescription = contentDescription)
             }
         }
     }

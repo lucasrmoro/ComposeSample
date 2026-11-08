@@ -11,8 +11,8 @@ import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 @Composable
 fun SampleCircularProgressIndicator(
-    color: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color
 ) {
     CircularProgressIndicator(
         modifier = modifier,

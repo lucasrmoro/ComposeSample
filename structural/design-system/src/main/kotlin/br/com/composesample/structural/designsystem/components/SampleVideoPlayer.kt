@@ -3,9 +3,16 @@ package br.com.composesample.structural.designsystem.components
 import android.annotation.SuppressLint
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
@@ -15,7 +22,9 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 import br.com.composesample.structural.di.get
-import br.com.composesample.structural.video_player.*
+import br.com.composesample.structural.video_player.VideoEmbed
+import br.com.composesample.structural.video_player.VideoPlaybackProvider
+import br.com.composesample.structural.video_player.VideoSource
 import kotlinx.coroutines.flow.catch
 
 @Composable
@@ -33,7 +42,7 @@ fun SampleVideoPlayer(modifier: Modifier = Modifier, source: VideoSource, online
         }
     }
 
-    Column(modifier) {
+    Column(modifier = modifier) {
         when {
             !online -> SampleText(text = stringResource(R.string.sample_video_offline))
             playbackState == VideoPlaybackState.Failed ->
@@ -43,16 +52,21 @@ fun SampleVideoPlayer(modifier: Modifier = Modifier, source: VideoSource, online
                     embed = (playbackState as VideoPlaybackState.Playing).embed,
                     onPause = { playbackState = VideoPlaybackState.Ready }
                 )
-            else -> Button(onClick = { playbackState = VideoPlaybackState.Loading }) {
-                SampleText(text = stringResource(R.string.sample_play_trailer))
-            }
+            else -> SampleButton(
+                text = stringResource(R.string.sample_play_trailer),
+                onClick = { playbackState = VideoPlaybackState.Loading }
+            )
         }
     }
 }
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-private fun VideoWebView(embed: VideoEmbed, onPause: () -> Unit) {
+private fun VideoWebView(
+    modifier: Modifier = Modifier,
+    embed: VideoEmbed,
+    onPause: () -> Unit
+) {
     var webView by remember { mutableStateOf<WebView?>(null) }
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
@@ -70,7 +84,7 @@ private fun VideoWebView(embed: VideoEmbed, onPause: () -> Unit) {
     }
 
     AndroidView(
-        modifier = Modifier.fillMaxWidth().aspectRatio(CurrentTheme.ratio.video),
+        modifier = modifier.fillMaxWidth().aspectRatio(CurrentTheme.ratio.video),
         factory = { context ->
             WebView(context).apply {
                 webView = this

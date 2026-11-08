@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
@@ -31,6 +32,7 @@ enum class LoadingState {
 
 @Composable
 fun SampleScreen(
+    modifier: Modifier = Modifier,
     title: String,
     canNavigateBack: Boolean,
     onNavigateBack: () -> Unit,
@@ -39,6 +41,7 @@ fun SampleScreen(
     content: @Composable () -> Unit
 ) {
     Scaffold(
+        modifier = modifier,
         containerColor = CurrentTheme.color.background,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets.union(WindowInsets.ime),
         topBar = {
@@ -101,7 +104,7 @@ fun SampleScreen(
 private fun SampleScreenPreview() {
     ComposeSampleTheme {
         SampleScreen(
-            title = "Compose - Sample",
+            title = stringResource(R.string.sample_preview_title),
             canNavigateBack = true,
             onNavigateBack = {}
         ) { }
