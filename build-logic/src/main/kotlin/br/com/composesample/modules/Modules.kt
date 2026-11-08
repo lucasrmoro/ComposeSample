@@ -1,6 +1,7 @@
 package br.com.composesample.modules
 
 object Modules {
+
     object Structural {
         val Analytics = StructuralModules.Analytics
         val AssetsCache = StructuralModules.AssetsCache
@@ -30,4 +31,5 @@ object Modules {
         val Login = FeatureModules.Login
         val Stream = FeatureModules.Stream
     }
+
 }

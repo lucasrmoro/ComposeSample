@@ -25,8 +25,9 @@ Each qualifier has one shared client:
 
 - `AuthenticatedHttpClient`: adds the stored access token and installs the token-refresh
   authenticator, which consumes `LoginRepository` from `login/domain/api`.
-- `UnauthenticatedHttpClient`: has neither the authorization interceptor nor the authenticator.
-  The login token-refresh service must use this client to avoid recursive authentication.
+- `UnauthenticatedHttpClient`: has no authorization interceptor or authenticator, and adds the
+  current app language through the language interceptor. The login token-refresh service uses
+  this client to avoid recursive authentication.
 
 Feature DI can use `DependencyResolver.httpClient` and `httpClientNoAuth`, or resolve
 `HttpClient` directly with a qualifier. It registers its own typed service implementations:

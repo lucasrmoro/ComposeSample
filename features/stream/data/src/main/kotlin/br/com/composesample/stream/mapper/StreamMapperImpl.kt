@@ -1,15 +1,15 @@
 package br.com.composesample.stream.mapper
 
-import br.com.composesample.stream.dto.GenreDTO
-import br.com.composesample.stream.dto.GenresDTO
-import br.com.composesample.stream.dto.MediaDTO
-import br.com.composesample.stream.dto.NamedDTO
-import br.com.composesample.stream.dto.PageDTO
-import br.com.composesample.stream.dto.PersonDTO
-import br.com.composesample.stream.dto.ProviderDTO
-import br.com.composesample.stream.dto.ReleaseDTO
-import br.com.composesample.stream.dto.SeasonDTO
-import br.com.composesample.stream.dto.VideoDTO
+import br.com.composesample.stream.dto.GenreRespDTO
+import br.com.composesample.stream.dto.GenresRespDTO
+import br.com.composesample.stream.dto.MediaRespDTO
+import br.com.composesample.stream.dto.NamedRespDTO
+import br.com.composesample.stream.dto.PageRespDTO
+import br.com.composesample.stream.dto.PersonRespDTO
+import br.com.composesample.stream.dto.ProviderRespDTO
+import br.com.composesample.stream.dto.ReleaseRespDTO
+import br.com.composesample.stream.dto.SeasonRespDTO
+import br.com.composesample.stream.dto.VideoRespDTO
 import br.com.composesample.stream.entity.StreamCacheEntity
 import br.com.composesample.stream.model.CatalogPage
 import br.com.composesample.stream.model.CatalogQuery
@@ -41,25 +41,25 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
         )
     }
 
-    override fun pageDTO(entity: StreamCacheEntity?): PageDTO? = entity?.let {
-        jsonCodec.decode<PageDTO>(it.payload)
+    override fun pageDTO(entity: StreamCacheEntity?): PageRespDTO? = entity?.let {
+        jsonCodec.decode<PageRespDTO>(it.payload)
     }
 
     override fun pageEntity(
         query: CatalogQuery,
-        page: PageDTO,
-        previous: PageDTO?
+        page: PageRespDTO,
+        previous: PageRespDTO?
     ): StreamCacheEntity {
         val merged =
             if (previous == null) page
-            else page.copy(results = (previous.results + page.results).distinctBy(MediaDTO::id))
+            else page.copy(results = (previous.results + page.results).distinctBy(MediaRespDTO::id))
         return entity(query.key, merged)
     }
 
     override fun entity(key: String, value: Any) =
         StreamCacheEntity(key = key, payload = jsonCodec.encode(value))
 
-    private fun summary(dto: MediaDTO, type: MediaType, region: CatalogRegion): MediaSummary {
+    private fun summary(dto: MediaRespDTO, type: MediaType, region: CatalogRegion): MediaSummary {
         val certification =
             if (type == MediaType.MOVIE)
                 dto.releaseDates
@@ -67,12 +67,11 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
                     ?.firstOrNull { it.country == region.countryCode }
                     ?.dates
                     ?.firstNotNullOfOrNull { it.certification?.takeIf(String::isNotBlank) }
-            else
-                dto.contentRatings
-                    ?.results
-                    ?.firstOrNull { it.country == region.countryCode }
-                    ?.rating
-                    ?.takeIf(String::isNotBlank)
+            else dto.contentRatings
+                ?.results
+                ?.firstOrNull { it.country == region.countryCode }
+                ?.rating
+                ?.takeIf(String::isNotBlank)
         val date = if (type == MediaType.MOVIE) dto.releaseDate else dto.firstAirDate
         return MediaSummary(
             id = MediaId(type = type, value = dto.id),
@@ -81,31 +80,30 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
             year = date?.take(4)?.takeIf { it.length == 4 },
             rating = dto.voteAverage?.takeIf { (dto.voteCount ?: 0) > 0 },
             certification = certification,
-            releaseEvent =
-                dto.event?.let { event ->
-                    ReleaseKind.entries
-                        .firstOrNull { it.name == event.kind }
-                        ?.let {
-                            ReleaseEvent(
-                                kind = it,
-                                date = event.date,
-                                season = event.season,
-                                episode = event.episode
-                            )
-                        }
-                }
+            releaseEvent = dto.event?.let { event ->
+                ReleaseKind.entries
+                    .firstOrNull { it.name == event.kind }
+                    ?.let {
+                        ReleaseEvent(
+                            kind = it,
+                            date = event.date,
+                            season = event.season,
+                            episode = event.episode
+                        )
+                    }
+            }
         )
     }
 
     override fun genres(entity: StreamCacheEntity?): List<Genre> =
-        entity?.let { jsonCodec.decode<GenresDTO>(it.payload).genres.map(::genre) }.orEmpty()
+        entity?.let { jsonCodec.decode<GenresRespDTO>(it.payload).genres.map(::genre) }.orEmpty()
 
-    private fun genre(dto: GenreDTO) = Genre(id = dto.id, name = dto.name)
+    private fun genre(dto: GenreRespDTO) = Genre(id = dto.id, name = dto.name)
 
-    private fun person(dto: PersonDTO) =
+    private fun person(dto: PersonRespDTO) =
         PersonCredit(name = dto.name, role = dto.character ?: dto.job, imagePath = dto.profilePath)
 
-    private fun video(dto: VideoDTO) =
+    private fun video(dto: VideoRespDTO) =
         VideoReference(
             key = dto.key,
             site = dto.site,
@@ -119,9 +117,9 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
         id: MediaId,
         region: CatalogRegion
     ): MediaDetails? {
-        val dto = entity?.let { jsonCodec.decode<MediaDTO>(it.payload) } ?: return null
+        val dto = entity?.let { jsonCodec.decode<MediaRespDTO>(it.payload) } ?: return null
         val providers = dto.watchProviders?.results?.get(region.countryCode)
-        fun group(items: List<ProviderDTO>?, category: ProviderCategory) =
+        fun group(items: List<ProviderRespDTO>?, category: ProviderCategory) =
             items.orEmpty().map {
                 WatchProvider(
                     id = it.id,
@@ -141,7 +139,7 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
                 ?.results
                 ?.firstOrNull { it.country == region.countryCode }
                 ?.dates
-                ?.mapNotNull(ReleaseDTO::date)
+                ?.mapNotNull(ReleaseRespDTO::date)
                 ?.minOrNull()
                 ?.take(10)
         return MediaDetails(
@@ -155,55 +153,49 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
             status = dto.status,
             voteCount = dto.voteCount,
             originalLanguage = dto.originalLanguage,
-            countries = dto.productionCountries.orEmpty().mapNotNull(NamedDTO::name),
+            countries = dto.productionCountries.orEmpty().mapNotNull(NamedRespDTO::name),
             languages = dto.spokenLanguages.orEmpty().mapNotNull { it.name ?: it.englishName },
-            companies = dto.productionCompanies.orEmpty().mapNotNull(NamedDTO::name),
+            companies = dto.productionCompanies.orEmpty().mapNotNull(NamedRespDTO::name),
             budget = dto.budget?.takeIf { it > 0 },
             revenue = dto.revenue?.takeIf { it > 0 },
             homepage = dto.homepage?.takeIf(String::isNotBlank),
             cast = dto.credits?.cast.orEmpty().map(::person),
             crew = dto.credits?.crew.orEmpty().map(::person),
-            videos =
-                dto.videos
-                    ?.results
-                    .orEmpty()
-                    .map(::video)
-                    .sortedByDescending(VideoReference::official),
+            videos = dto.videos?.results.orEmpty()
+                .map(::video)
+                .sortedByDescending(VideoReference::official),
             providers = available,
             providerLink = providers?.link,
-            seasons =
-                dto.seasons
-                    .orEmpty()
-                    .filter { it.number > 0 }
-                    .map {
-                        SeasonSummary(
-                            number = it.number,
-                            name = it.name,
-                            episodeCount = it.episodeCount,
-                            airDate = it.airDate
-                        )
-                    },
+            seasons = dto.seasons.orEmpty()
+                .filter { it.number > 0 }
+                .map {
+                    SeasonSummary(
+                        number = it.number,
+                        name = it.name,
+                        episodeCount = it.episodeCount,
+                        airDate = it.airDate
+                    )
+                },
             episodeCount = dto.numberOfEpisodes
         )
     }
 
     override fun season(entity: StreamCacheEntity?): SeasonDetails? {
-        val dto = entity?.let { jsonCodec.decode<SeasonDTO>(it.payload) } ?: return null
+        val dto = entity?.let { jsonCodec.decode<SeasonRespDTO>(it.payload) } ?: return null
         return SeasonDetails(
             number = dto.number,
             name = dto.name,
             overview = dto.overview,
-            episodes =
-                dto.episodes.orEmpty().map {
-                    EpisodeDetails(
-                        number = it.number,
-                        name = it.name,
-                        overview = it.overview,
-                        airDate = it.airDate,
-                        runtime = it.runtime,
-                        imagePath = it.stillPath
-                    )
-                }
+            episodes = dto.episodes.orEmpty().map {
+                EpisodeDetails(
+                    number = it.number,
+                    name = it.name,
+                    overview = it.overview,
+                    airDate = it.airDate,
+                    runtime = it.runtime,
+                    imagePath = it.stillPath
+                )
+            }
         )
     }
 

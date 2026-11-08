@@ -114,6 +114,7 @@ include(
     ":features:stream",
     ":features:stream:analytics",
     ":features:stream:data",
+    ":features:stream:di",
     ":features:stream:domain:api",
     ":features:stream:domain:impl"
 )

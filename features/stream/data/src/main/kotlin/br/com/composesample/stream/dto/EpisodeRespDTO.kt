@@ -2,7 +2,7 @@ package br.com.composesample.stream.dto
 
 import br.com.composesample.structural.network.http.JsonName
 
-internal data class EpisodeDTO(
+data class EpisodeRespDTO(
     @JsonName("episode_number") val number: Int = 0,
     @JsonName("season_number") val season: Int = 0,
     @JsonName("name") val name: String = "",

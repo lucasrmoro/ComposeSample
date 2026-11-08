@@ -71,8 +71,7 @@ internal class StreamRepositoryImpl(
                 next++
             }
         }
-    }
-        .flowOn(coroutineDispatcher)
+    }.flowOn(coroutineDispatcher)
 
     override fun observeGenres(type: MediaType, region: CatalogRegion) =
         streamLocalDataSource

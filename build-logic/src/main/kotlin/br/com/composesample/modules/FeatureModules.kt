@@ -1,6 +1,7 @@
 package br.com.composesample.modules
 
 object FeatureModules {
+
     private const val ROOT = ":features"
 
     object FeatureA {
@@ -32,4 +33,5 @@ object FeatureModules {
         const val DI = "$LOGIN:di"
         const val DOMAIN_API = "$LOGIN:domain:api"
     }
+
 }

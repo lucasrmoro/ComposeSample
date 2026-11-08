@@ -1,6 +1,6 @@
 package br.com.composesample.stream.mapper
 
-import br.com.composesample.stream.dto.PageDTO
+import br.com.composesample.stream.dto.PageRespDTO
 import br.com.composesample.stream.entity.StreamCacheEntity
 import br.com.composesample.stream.model.CatalogPage
 import br.com.composesample.stream.model.CatalogQuery
@@ -12,8 +12,13 @@ import br.com.composesample.stream.model.SeasonDetails
 
 internal interface StreamMapper {
     fun page(entity: StreamCacheEntity?, query: CatalogQuery): CatalogPage
-    fun pageDTO(entity: StreamCacheEntity?): PageDTO?
-    fun pageEntity(query: CatalogQuery, page: PageDTO, previous: PageDTO?): StreamCacheEntity
+    fun pageDTO(entity: StreamCacheEntity?): PageRespDTO?
+    fun pageEntity(
+        query: CatalogQuery,
+        page: PageRespDTO,
+        previous: PageRespDTO?
+    ): StreamCacheEntity
+
     fun details(entity: StreamCacheEntity?, id: MediaId, region: CatalogRegion): MediaDetails?
     fun genres(entity: StreamCacheEntity?): List<Genre>
     fun season(entity: StreamCacheEntity?): SeasonDetails?

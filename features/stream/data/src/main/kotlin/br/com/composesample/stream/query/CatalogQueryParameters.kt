@@ -47,4 +47,5 @@ internal class CatalogQueryParameters(private val clock: Clock) {
         const val SORT_PARAMETER = "sort_by"
         const val POPULARITY_ORDER = "popularity.desc"
     }
+
 }

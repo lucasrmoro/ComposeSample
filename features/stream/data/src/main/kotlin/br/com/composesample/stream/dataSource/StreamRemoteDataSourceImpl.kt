@@ -1,21 +1,24 @@
 package br.com.composesample.stream.dataSource
 
-import br.com.composesample.stream.dto.GenresDTO
-import br.com.composesample.stream.dto.MediaDTO
-import br.com.composesample.stream.dto.PageDTO
-import br.com.composesample.stream.dto.SeasonDTO
+import br.com.composesample.stream.dto.GenresRespDTO
+import br.com.composesample.stream.dto.MediaRespDTO
+import br.com.composesample.stream.dto.PageRespDTO
+import br.com.composesample.stream.dto.SeasonRespDTO
 import br.com.composesample.stream.model.CatalogQuery
 import br.com.composesample.stream.model.CollectionKind
 import br.com.composesample.stream.model.MediaId
 import br.com.composesample.stream.model.MediaType
 import br.com.composesample.stream.query.CatalogQueryParameters
 import br.com.composesample.structural.core.base.dataSource.BaseDataSource
+import br.com.composesample.structural.network.http.HttpClient
+import br.com.composesample.structural.network.http.HttpRequest
+import br.com.composesample.structural.network.http.get
 import java.time.Clock
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
 
 internal class StreamRemoteDataSourceImpl(
-    private val tmdbClient: TmdbClient,
+    private val httpClient: HttpClient,
     private val coroutineDispatcher: CoroutineDispatcher,
     private val clock: Clock
 ) : BaseDataSource(), StreamRemoteDataSource {
@@ -24,25 +27,34 @@ internal class StreamRemoteDataSourceImpl(
         call {
             val append =
                 if (id.type == MediaType.MOVIE) MOVIE_DETAIL_SECTIONS else SERIES_DETAIL_SECTIONS
-            tmdbClient.get<MediaDTO>(
-                if (id.type == MediaType.MOVIE) MOVIE_DETAILS_PATH else SERIES_DETAILS_PATH,
-            mapOf(APPEND_PARAMETER to append),
-                mapOf(ID_PARAMETER to id.value.toString())
+            val path = if (id.type == MediaType.MOVIE) MOVIE_DETAILS_PATH else SERIES_DETAILS_PATH
+            httpClient.get<MediaRespDTO>(
+                HttpRequest(
+                    path = path,
+                    query = mapOf(APPEND_PARAMETER to append),
+                    pathParameters = mapOf(ID_PARAMETER to id.value.toString())
+                )
             )
         }.flowOn(coroutineDispatcher)
 
     override fun genres(type: MediaType) =
         call {
-            tmdbClient.get<GenresDTO>(
-                if (type == MediaType.MOVIE) MOVIE_GENRES_PATH else SERIES_GENRES_PATH
+            val path = if (type == MediaType.MOVIE) MOVIE_GENRES_PATH else SERIES_GENRES_PATH
+            httpClient.get<GenresRespDTO>(
+                HttpRequest(path = path)
             )
         }.flowOn(coroutineDispatcher)
 
     override fun season(id: MediaId, number: Int) =
         call {
-            tmdbClient.get<SeasonDTO>(
-                SEASON_DETAILS_PATH,
-                mapOf(ID_PARAMETER to id.value.toString(), SEASON_PARAMETER to number.toString())
+            httpClient.get<SeasonRespDTO>(
+                HttpRequest(
+                    path = SEASON_DETAILS_PATH,
+                    pathParameters = mapOf(
+                        ID_PARAMETER to id.value.toString(),
+                        SEASON_PARAMETER to number.toString()
+                    )
+                )
             )
         }.flowOn(coroutineDispatcher)
 
@@ -51,15 +63,17 @@ internal class StreamRemoteDataSourceImpl(
             val path =
                 when (query.kind) {
                     CollectionKind.POPULAR ->
-                        if (query.type == MediaType.MOVIE) POPULAR_MOVIES_PATH else POPULAR_SERIES_PATH
+                        if (query.type == MediaType.MOVIE) POPULAR_MOVIES_PATH
+                        else POPULAR_SERIES_PATH
                     CollectionKind.SEARCH ->
-                        if (query.type == MediaType.MOVIE) SEARCH_MOVIES_PATH else SEARCH_SERIES_PATH
+                        if (query.type == MediaType.MOVIE) SEARCH_MOVIES_PATH
+                        else SEARCH_SERIES_PATH
                     else ->
                         if (query.type == MediaType.MOVIE) DISCOVER_MOVIES_PATH
                         else DISCOVER_SERIES_PATH
                 }
             val params = CatalogQueryParameters(clock).create(query, page)
-            tmdbClient.get<PageDTO>(path, params)
+            httpClient.get<PageRespDTO>(HttpRequest(path = path, query = params))
         }.flowOn(coroutineDispatcher)
 
     private companion object {
@@ -80,4 +94,5 @@ internal class StreamRemoteDataSourceImpl(
         const val SERIES_DETAIL_SECTIONS = "credits,videos,content_ratings,watch/providers"
         const val APPEND_PARAMETER = "append_to_response"
     }
+
 }
