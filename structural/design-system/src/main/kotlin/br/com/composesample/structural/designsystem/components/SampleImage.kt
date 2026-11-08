@@ -14,12 +14,13 @@ import br.com.composesample.structural.assets_cache.AssetRequest
 import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
-/** Displays a cached image or its loading and unavailable placeholders. */
+/** Displays a cached image, with caller-owned unavailable content that is empty by default. */
 @Composable
 fun SampleImage(
     modifier: Modifier = Modifier,
     request: AssetRequest?,
-    contentDescription: String?
+    contentDescription: String?,
+    unavailableContent: @Composable () -> Unit = {}
 ) {
     val state = rememberSampleImageState(request)
     Box(
@@ -34,9 +35,7 @@ fun SampleImage(
                 contentScale = ContentScale.Crop
             )
             SampleImageState.Loading -> SampleImageLoading()
-            SampleImageState.Unavailable -> SampleImagePlaceholder(
-                text = stringResource(R.string.sample_image_unavailable)
-            )
+            SampleImageState.Unavailable -> unavailableContent()
         }
     }
 }
