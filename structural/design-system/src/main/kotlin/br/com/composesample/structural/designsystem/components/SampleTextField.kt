@@ -59,51 +59,51 @@ fun SampleTextField(
     trailingIconDescription: String? = null,
     onTrailingIconClick: () -> Unit = {}
 ) {
-    val keyboardOptions = KeyboardOptions(
-        keyboardType = KeyboardType.Text,
-        imeAction = keyboardAction.toImeAction()
+    TextFieldContent(
+        modifier = modifier,
+        value = value,
+        onValueChange = { newValue ->
+            if (newValue.length <= maxLength) onValueChange(newValue)
+        },
+        enabled = enabled,
+        singleLine = singleLine,
+        style = style,
+        keyboardOptions = keyboardAction.toKeyboardOptions(),
+        keyboardActions = keyboardAction.toKeyboardActions(onKeyboardAction),
+        label = textFieldText(label),
+        placeholder = textFieldText(placeholder),
+        leadingIcon = textFieldIcon(leadingIcon, leadingIconDescription),
+        trailingIcon = textFieldIcon(trailingIcon, trailingIconDescription, onTrailingIconClick)
     )
-    val keyboardActions = keyboardAction.toKeyboardActions(onKeyboardAction)
-    val onValueChangeWithinLimit: (String) -> Unit = { newValue ->
-        if (newValue.length <= maxLength) onValueChange(newValue)
-    }
-    val labelContent: (@Composable () -> Unit)? = label?.let { text ->
-        { SampleText(text = text) }
-    }
-    val leadingIconContent: (@Composable () -> Unit)? = leadingIcon?.let { icon ->
-        {
-            SampleIcon(
-                icon = icon,
-                contentDescription = leadingIconDescription,
-                tint = CurrentTheme.colors.OnSurfaceVariant
-            )
-        }
-    }
-    val trailingIconContent: (@Composable () -> Unit)? = trailingIcon?.let { icon ->
-        {
-            IconButton(onClick = onTrailingIconClick) {
-                SampleIcon(
-                    icon = icon,
-                    contentDescription = trailingIconDescription,
-                    tint = CurrentTheme.colors.OnSurfaceVariant
-                )
-            }
-        }
-    }
-    val placeholderContent: @Composable () -> Unit = { SampleText(text = placeholder) }
+}
 
+@Composable
+private fun TextFieldContent(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    enabled: Boolean,
+    singleLine: Boolean,
+    style: SampleTextFieldStyle,
+    keyboardOptions: KeyboardOptions,
+    keyboardActions: KeyboardActions,
+    label: (@Composable () -> Unit)?,
+    placeholder: (@Composable () -> Unit)?,
+    leadingIcon: (@Composable () -> Unit)?,
+    trailingIcon: (@Composable () -> Unit)?
+) {
     when (style) {
         SampleTextFieldStyle.FILLED -> TextField(
             modifier = modifier.fillMaxWidth(),
             value = value,
             enabled = enabled,
-            onValueChange = onValueChangeWithinLimit,
+            onValueChange = onValueChange,
             singleLine = singleLine,
             shape = if (singleLine) CircleShape else TextFieldDefaults.shape,
-            label = labelContent,
-            placeholder = placeholderContent,
-            leadingIcon = leadingIconContent,
-            trailingIcon = trailingIconContent,
+            label = label,
+            placeholder = placeholder,
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             colors = TextFieldDefaults.colors(
@@ -118,12 +118,12 @@ fun SampleTextField(
             modifier = modifier.fillMaxWidth(),
             value = value,
             enabled = enabled,
-            onValueChange = onValueChangeWithinLimit,
+            onValueChange = onValueChange,
             singleLine = singleLine,
-            label = labelContent,
-            placeholder = placeholderContent,
-            leadingIcon = leadingIconContent,
-            trailingIcon = trailingIconContent,
+            label = label,
+            placeholder = placeholder,
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             colors = OutlinedTextFieldDefaults.colors(
@@ -136,6 +136,45 @@ fun SampleTextField(
         )
     }
 }
+
+private fun textFieldText(text: String?): (@Composable () -> Unit)? = text?.let {
+    { SampleText(text = it) }
+}
+
+private fun textFieldIcon(
+    icon: IconToken?,
+    contentDescription: String?,
+    onClick: (() -> Unit)? = null
+): (@Composable () -> Unit)? = icon?.let {
+    {
+        if (onClick == null) {
+            TextFieldIcon(icon = it, contentDescription = contentDescription)
+        } else {
+            IconButton(onClick = onClick) {
+                TextFieldIcon(icon = it, contentDescription = contentDescription)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TextFieldIcon(
+    modifier: Modifier = Modifier,
+    icon: IconToken,
+    contentDescription: String?
+) {
+    SampleIcon(
+        modifier = modifier,
+        icon = icon,
+        contentDescription = contentDescription,
+        tint = CurrentTheme.colors.OnSurfaceVariant
+    )
+}
+
+private fun SampleKeyboardAction.toKeyboardOptions(): KeyboardOptions = KeyboardOptions(
+    keyboardType = KeyboardType.Text,
+    imeAction = toImeAction()
+)
 
 private fun SampleKeyboardAction.toImeAction(): ImeAction = when (this) {
     SampleKeyboardAction.DEFAULT -> ImeAction.Default
