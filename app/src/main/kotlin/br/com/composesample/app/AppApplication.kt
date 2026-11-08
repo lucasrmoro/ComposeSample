@@ -4,6 +4,7 @@ import android.app.Application
 import br.com.composesample.configuration.AppConfigurationModule
 import br.com.composesample.featureA.FeatureAModule
 import br.com.composesample.login.LoginModule
+import br.com.composesample.stream.di.StreamModule
 import br.com.composesample.structural.analytics.di.AnalyticsModule
 import br.com.composesample.structural.analytics.initializeAnalytics
 import br.com.composesample.structural.analytics.initializeFirebase
@@ -91,6 +92,7 @@ class AppApplication : Application(), PushMessagingServiceHost {
 
     private fun setupFeatureModules() {
         LoginModule.init()
+        StreamModule.init()
         FeatureAModule.init(navigationRegistry = get())
     }
 

@@ -110,5 +110,11 @@ include(
     ":features:login:analytics",
     ":features:login:data",
     ":features:login:di",
-    ":features:login:domain:api"
+    ":features:login:domain:api",
+    ":features:stream",
+    ":features:stream:analytics",
+    ":features:stream:data",
+    ":features:stream:di",
+    ":features:stream:domain:api",
+    ":features:stream:domain:impl"
 )

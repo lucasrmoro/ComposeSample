@@ -30,4 +30,5 @@ dependencies {
     implementation(project(Modules.Structural.MediaCompression.DI))
     implementation(project(Modules.Feature.Login.DI))
     implementation(project(Modules.Feature.FeatureA.DI))
+    implementation(project(Modules.Feature.Stream.DI))
 }
