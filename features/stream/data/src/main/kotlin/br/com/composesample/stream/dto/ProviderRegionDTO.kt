@@ -2,7 +2,7 @@ package br.com.composesample.stream.dto
 
 import br.com.composesample.structural.network.http.JsonName
 
-data class ProviderRegionDTO(
+internal data class ProviderRegionDTO(
     @JsonName("link") val link: String? = null,
     @JsonName("flatrate") val subscription: List<ProviderDTO>? = null,
     @JsonName("free") val free: List<ProviderDTO>? = null,

@@ -2,8 +2,8 @@
 
 Exposes `StreamAnalytics` to the feature's layers through `listLoadStarted()` and `listLoadFinished(itemCount)`.
 The internal implementation depends only on `structural/analytics/api`.
-`StreamModule.init()` registers the contract as a singleton through
-`createStreamAnalytics()`. This module declares no DI bindings.
+The module exposes a factory for its implementation and declares no DI bindings;
+the feature DI module owns registration of the contract.
 
 Presentation can receive the contract through its constructor. Other feature layers
 can depend on this module to consume the same methods without knowing event names,

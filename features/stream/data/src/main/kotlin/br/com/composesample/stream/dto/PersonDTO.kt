@@ -2,7 +2,7 @@ package br.com.composesample.stream.dto
 
 import br.com.composesample.structural.network.http.JsonName
 
-data class PersonDTO(
+internal data class PersonDTO(
     @JsonName("name") val name: String = "",
     @JsonName("character") val character: String? = null,
     @JsonName("job") val job: String? = null,

@@ -6,7 +6,7 @@ import br.com.composesample.structural.core.base.dataSource.BaseDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
 
-class StreamLocalDataSourceImpl(
+internal class StreamLocalDataSourceImpl(
     private val streamDao: StreamDao,
     private val coroutineDispatcher: CoroutineDispatcher
 ) : BaseDataSource(), StreamLocalDataSource {

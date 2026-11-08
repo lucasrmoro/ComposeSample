@@ -2,7 +2,7 @@ package br.com.composesample.stream.dto
 
 import br.com.composesample.structural.network.http.JsonName
 
-data class EventDTO(
+internal data class EventDTO(
     @JsonName("kind") val kind: String = "",
     @JsonName("date") val date: String = "",
     @JsonName("season") val season: Int? = null,

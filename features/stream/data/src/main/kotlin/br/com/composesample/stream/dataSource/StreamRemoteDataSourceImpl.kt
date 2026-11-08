@@ -1,7 +1,16 @@
 package br.com.composesample.stream.dataSource
 
-import br.com.composesample.stream.dto.*
-import br.com.composesample.stream.model.*
+import br.com.composesample.stream.dto.EventDTO
+import br.com.composesample.stream.dto.GenresDTO
+import br.com.composesample.stream.dto.MediaDTO
+import br.com.composesample.stream.dto.PageDTO
+import br.com.composesample.stream.dto.SeasonDTO
+import br.com.composesample.stream.model.CatalogQuery
+import br.com.composesample.stream.model.CatalogRegion
+import br.com.composesample.stream.model.CollectionKind
+import br.com.composesample.stream.model.MediaId
+import br.com.composesample.stream.model.MediaType
+import br.com.composesample.stream.model.ReleaseKind
 import br.com.composesample.structural.core.base.dataSource.BaseDataSource
 import br.com.composesample.structural.network.http.HttpRequest
 import br.com.composesample.structural.network.http.get
@@ -19,7 +28,7 @@ import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 
-class StreamRemoteDataSourceImpl(
+internal class StreamRemoteDataSourceImpl(
     private val tmdbClient: TmdbClient,
     private val coroutineDispatcher: CoroutineDispatcher,
     private val clock: Clock

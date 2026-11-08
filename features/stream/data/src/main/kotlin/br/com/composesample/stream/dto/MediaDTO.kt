@@ -2,7 +2,7 @@ package br.com.composesample.stream.dto
 
 import br.com.composesample.structural.network.http.JsonName
 
-data class MediaDTO(
+internal data class MediaDTO(
     @JsonName("id") val id: Long = 0,
     @JsonName("title") val title: String? = null,
     @JsonName("name") val name: String? = null,

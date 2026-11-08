@@ -1,12 +1,37 @@
 package br.com.composesample.stream.mapper
 
-import br.com.composesample.stream.dto.*
+import br.com.composesample.stream.dto.GenreDTO
+import br.com.composesample.stream.dto.GenresDTO
+import br.com.composesample.stream.dto.MediaDTO
+import br.com.composesample.stream.dto.NamedDTO
+import br.com.composesample.stream.dto.PageDTO
+import br.com.composesample.stream.dto.PersonDTO
+import br.com.composesample.stream.dto.ProviderDTO
+import br.com.composesample.stream.dto.ReleaseDTO
+import br.com.composesample.stream.dto.SeasonDTO
+import br.com.composesample.stream.dto.VideoDTO
 import br.com.composesample.stream.entity.StreamCacheEntity
-import br.com.composesample.stream.model.*
+import br.com.composesample.stream.model.CatalogPage
+import br.com.composesample.stream.model.CatalogQuery
+import br.com.composesample.stream.model.CatalogRegion
+import br.com.composesample.stream.model.EpisodeDetails
+import br.com.composesample.stream.model.Genre
+import br.com.composesample.stream.model.MediaDetails
+import br.com.composesample.stream.model.MediaId
+import br.com.composesample.stream.model.MediaSummary
+import br.com.composesample.stream.model.MediaType
+import br.com.composesample.stream.model.PersonCredit
+import br.com.composesample.stream.model.ProviderCategory
+import br.com.composesample.stream.model.ReleaseEvent
+import br.com.composesample.stream.model.ReleaseKind
+import br.com.composesample.stream.model.SeasonDetails
+import br.com.composesample.stream.model.SeasonSummary
+import br.com.composesample.stream.model.VideoReference
+import br.com.composesample.stream.model.WatchProvider
 import br.com.composesample.structural.network.http.JsonCodec
 import br.com.composesample.structural.network.http.decode
 
-class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper {
+internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper {
 
     override fun page(entity: StreamCacheEntity?, query: CatalogQuery): CatalogPage {
         val page = pageDTO(entity) ?: return CatalogPage()

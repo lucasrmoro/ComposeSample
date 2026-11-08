@@ -3,14 +3,23 @@ package br.com.composesample.stream.repository
 import br.com.composesample.stream.dataSource.StreamLocalDataSource
 import br.com.composesample.stream.dataSource.StreamRemoteDataSource
 import br.com.composesample.stream.mapper.StreamMapper
-import br.com.composesample.stream.model.*
+import br.com.composesample.stream.model.CatalogQuery
+import br.com.composesample.stream.model.CatalogRegion
+import br.com.composesample.stream.model.MediaId
+import br.com.composesample.stream.model.MediaType
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class StreamRepositoryImpl(
+internal class StreamRepositoryImpl(
     private val streamLocalDataSource: StreamLocalDataSource,
     private val streamRemoteDataSource: StreamRemoteDataSource,
     private val streamMapper: StreamMapper,

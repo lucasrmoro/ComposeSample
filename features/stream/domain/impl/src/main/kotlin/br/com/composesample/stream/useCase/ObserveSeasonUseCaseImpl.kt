@@ -1,9 +1,10 @@
 package br.com.composesample.stream.useCase
 
-import br.com.composesample.stream.model.*
+import br.com.composesample.stream.model.CatalogRegion
+import br.com.composesample.stream.model.MediaId
 import br.com.composesample.stream.repository.StreamRepository
 
-class ObserveSeasonUseCaseImpl(private val streamRepository: StreamRepository) :
+internal class ObserveSeasonUseCaseImpl(private val streamRepository: StreamRepository) :
     ObserveSeasonUseCase {
 
     override fun invoke(id: MediaId, season: Int, region: CatalogRegion) =

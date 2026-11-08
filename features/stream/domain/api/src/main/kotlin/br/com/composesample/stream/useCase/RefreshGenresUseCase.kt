@@ -1,6 +1,7 @@
 package br.com.composesample.stream.useCase
 
-import br.com.composesample.stream.model.*
+import br.com.composesample.stream.model.CatalogRegion
+import br.com.composesample.stream.model.MediaType
 import kotlinx.coroutines.flow.Flow
 
 interface RefreshGenresUseCase {
