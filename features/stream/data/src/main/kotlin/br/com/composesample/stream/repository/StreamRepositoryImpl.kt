@@ -86,7 +86,7 @@ internal class StreamRepositoryImpl(
             .save(
                 streamMapper.entity(
                     genreKey(type, region),
-                    streamRemoteDataSource.genres(type, region).single()
+                    streamRemoteDataSource.genres(type).single()
                 )
             )
             .single()
@@ -105,7 +105,7 @@ internal class StreamRepositoryImpl(
             .save(
                 streamMapper.entity(
                     detailsKey(id, region),
-                    streamRemoteDataSource.details(id, region).single()
+                    streamRemoteDataSource.details(id).single()
                 )
             )
             .single()
@@ -124,7 +124,7 @@ internal class StreamRepositoryImpl(
             .save(
                 streamMapper.entity(
                     seasonKey(id, season, region),
-                    streamRemoteDataSource.season(id, season, region).single()
+                    streamRemoteDataSource.season(id, season).single()
                 )
             )
             .single()

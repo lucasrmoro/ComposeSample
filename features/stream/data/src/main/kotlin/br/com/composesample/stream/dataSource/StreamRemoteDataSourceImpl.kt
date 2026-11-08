@@ -5,7 +5,6 @@ import br.com.composesample.stream.dto.MediaDTO
 import br.com.composesample.stream.dto.PageDTO
 import br.com.composesample.stream.dto.SeasonDTO
 import br.com.composesample.stream.model.CatalogQuery
-import br.com.composesample.stream.model.CatalogRegion
 import br.com.composesample.stream.model.CollectionKind
 import br.com.composesample.stream.model.MediaId
 import br.com.composesample.stream.model.MediaType
@@ -23,7 +22,7 @@ internal class StreamRemoteDataSourceImpl(
 
     private val queryParameters = CatalogQueryParameters(clock)
 
-    override fun details(id: MediaId, _region: CatalogRegion) =
+    override fun details(id: MediaId) =
         call {
             val append =
                 if (id.type == MediaType.MOVIE) MOVIE_DETAIL_SECTIONS else SERIES_DETAIL_SECTIONS
@@ -34,14 +33,14 @@ internal class StreamRemoteDataSourceImpl(
             )
         }.flowOn(coroutineDispatcher)
 
-    override fun genres(type: MediaType, _region: CatalogRegion) =
+    override fun genres(type: MediaType) =
         call {
             tmdbClient.get<GenresDTO>(
                 if (type == MediaType.MOVIE) MOVIE_GENRES_PATH else SERIES_GENRES_PATH
             )
         }.flowOn(coroutineDispatcher)
 
-    override fun season(id: MediaId, number: Int, _region: CatalogRegion) =
+    override fun season(id: MediaId, number: Int) =
         call {
             tmdbClient.get<SeasonDTO>(
                 SEASON_DETAILS_PATH,
