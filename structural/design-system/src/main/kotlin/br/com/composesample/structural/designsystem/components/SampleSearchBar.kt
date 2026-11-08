@@ -36,11 +36,7 @@ fun SampleSearchBar(
         leadingIcon = CurrentTheme.icon.Search,
         leadingIconDescription = stringResource(R.string.sample_search),
         trailingIcon = CurrentTheme.icon.Close.takeIf { value.isNotEmpty() },
-        trailingIconDescription = if (value.isNotEmpty()) {
-            stringResource(R.string.sample_clear_search)
-        } else {
-            null
-        },
+        trailingIconDescription = if (value.isNotEmpty()) stringResource(R.string.sample_clear_search) else null,
         onTrailingIconClick = { onValueChange("") }
     )
 }
