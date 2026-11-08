@@ -5,6 +5,13 @@
     <!-- Search -->
     <string name="sample_search">Pesquisar</string>
     <string name="sample_clear_search">Limpar pesquisa</string>
+    <string name="sample_search_preview_placeholder">Pesquisar filmes</string>
+    <string name="sample_search_preview_value">Duna</string>
+
+    <!-- Text fields -->
+    <string name="sample_text_field_preview_label">Mensagem</string>
+    <string name="sample_text_field_preview_placeholder">Digite algo aqui</string>
+    <string name="sample_text_field_preview_value">Mensagem de exemplo</string>
 
     <!-- Images -->
     <string name="sample_image_unavailable">Imagem indisponível</string>

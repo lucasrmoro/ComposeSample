@@ -19,33 +19,35 @@ import androidx.compose.ui.platform.LocalViewConfiguration
 
 /** Clears focus when a tap lands outside the focused element. */
 @Composable
-fun SampleClearFocusOnOutsideTap(content: @Composable () -> Unit) {
+fun SampleClearFocusOnOutsideTap(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
     val focusManager = LocalFocusManager.current
     val viewConfiguration = LocalViewConfiguration.current
     val focusedBounds = remember { mutableStateOf<Rect?>(null) }
 
     Box(
-        modifier =
-            Modifier.fillMaxSize()
-                .onFocusedBoundsChanged { focusedBounds.value = it?.boundsInRoot() }
-                .pointerInput(focusManager, viewConfiguration) {
-                    awaitEachGesture {
-                        val down =
-                            awaitFirstDown(
-                                requireUnconsumed = false,
-                                pass = PointerEventPass.Initial
-                            )
-                        val up = waitForUpOrCancellation(pass = PointerEventPass.Final)
-                        if (
-                            up != null &&
-                                (up.position - down.position).getDistance() <=
-                                    viewConfiguration.touchSlop &&
-                                focusedBounds.value?.contains(up.position) == false
-                        ) {
-                            focusManager.clearFocus()
-                        }
+        modifier = modifier
+            .fillMaxSize()
+            .onFocusedBoundsChanged { focusedBounds.value = it?.boundsInRoot() }
+            .pointerInput(focusManager, viewConfiguration) {
+                awaitEachGesture {
+                    val down = awaitFirstDown(
+                        requireUnconsumed = false,
+                        pass = PointerEventPass.Initial
+                    )
+                    val up = waitForUpOrCancellation(pass = PointerEventPass.Final)
+                    if (
+                        up != null &&
+                            (up.position - down.position).getDistance() <=
+                                viewConfiguration.touchSlop &&
+                            focusedBounds.value?.contains(up.position) == false
+                    ) {
+                        focusManager.clearFocus()
                     }
                 }
+            }
     ) {
         content()
     }

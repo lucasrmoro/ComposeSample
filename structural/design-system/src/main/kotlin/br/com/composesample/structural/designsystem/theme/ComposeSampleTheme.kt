@@ -79,6 +79,8 @@ object CurrentTheme {
 
     object icon {
         val Person: IconToken get() = SampleIcons.Person
+        val Search: IconToken get() = SampleIcons.Search
+        val Close: IconToken get() = SampleIcons.Close
     }
 
     object colors {

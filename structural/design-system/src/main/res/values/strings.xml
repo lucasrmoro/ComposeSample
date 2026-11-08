@@ -5,6 +5,13 @@
     <!-- Search -->
     <string name="sample_search">Search</string>
     <string name="sample_clear_search">Clear search</string>
+    <string name="sample_search_preview_placeholder">Search movies</string>
+    <string name="sample_search_preview_value">Dune</string>
+
+    <!-- Text fields -->
+    <string name="sample_text_field_preview_label">Message</string>
+    <string name="sample_text_field_preview_placeholder">Type something here</string>
+    <string name="sample_text_field_preview_value">Preview message</string>
 
     <!-- Images -->
     <string name="sample_image_unavailable">Image unavailable</string>
