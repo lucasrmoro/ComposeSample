@@ -87,6 +87,7 @@ object CurrentTheme {
     }
 
     object colors {
+        val shimmer = SampleColor { MaterialTheme.colorScheme.outlineVariant }
         val onSurfaceVariant = SampleColor { MaterialTheme.colorScheme.onSurfaceVariant }
     }
 
