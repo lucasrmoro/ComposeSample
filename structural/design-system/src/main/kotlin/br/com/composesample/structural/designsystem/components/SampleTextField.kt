@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.IconButton
@@ -30,7 +31,13 @@ enum class SampleTextFieldStyle {
 
 enum class SampleKeyboardAction {
     DEFAULT,
-    SEARCH
+    NONE,
+    DONE,
+    GO,
+    NEXT,
+    PREVIOUS,
+    SEARCH,
+    SEND
 }
 
 @Composable
@@ -52,21 +59,11 @@ fun SampleTextField(
     trailingIconDescription: String? = null,
     onTrailingIconClick: () -> Unit = {}
 ) {
-    val imeAction = when (keyboardAction) {
-        SampleKeyboardAction.DEFAULT -> ImeAction.Default
-        SampleKeyboardAction.SEARCH -> ImeAction.Search
-    }
     val keyboardOptions = KeyboardOptions(
         keyboardType = KeyboardType.Text,
-        imeAction = imeAction
+        imeAction = keyboardAction.toImeAction()
     )
-    val keyboardActions = KeyboardActions(
-        onSearch = if (keyboardAction == SampleKeyboardAction.SEARCH) {
-            { onKeyboardAction() }
-        } else {
-            null
-        }
-    )
+    val keyboardActions = keyboardAction.toKeyboardActions(onKeyboardAction)
     val onValueChangeWithinLimit: (String) -> Unit = { newValue ->
         if (newValue.length <= maxLength) onValueChange(newValue)
     }
@@ -137,6 +134,30 @@ fun SampleTextField(
                 unfocusedTextColor = CurrentTheme.color.onSurface
             )
         )
+    }
+}
+
+private fun SampleKeyboardAction.toImeAction(): ImeAction = when (this) {
+    SampleKeyboardAction.DEFAULT -> ImeAction.Default
+    SampleKeyboardAction.NONE -> ImeAction.None
+    SampleKeyboardAction.DONE -> ImeAction.Done
+    SampleKeyboardAction.GO -> ImeAction.Go
+    SampleKeyboardAction.NEXT -> ImeAction.Next
+    SampleKeyboardAction.PREVIOUS -> ImeAction.Previous
+    SampleKeyboardAction.SEARCH -> ImeAction.Search
+    SampleKeyboardAction.SEND -> ImeAction.Send
+}
+
+private fun SampleKeyboardAction.toKeyboardActions(onAction: () -> Unit): KeyboardActions {
+    val action: KeyboardActionScope.() -> Unit = { onAction() }
+    return when (this) {
+        SampleKeyboardAction.DEFAULT, SampleKeyboardAction.NONE -> KeyboardActions.Default
+        SampleKeyboardAction.DONE -> KeyboardActions(onDone = action)
+        SampleKeyboardAction.GO -> KeyboardActions(onGo = action)
+        SampleKeyboardAction.NEXT -> KeyboardActions(onNext = action)
+        SampleKeyboardAction.PREVIOUS -> KeyboardActions(onPrevious = action)
+        SampleKeyboardAction.SEARCH -> KeyboardActions(onSearch = action)
+        SampleKeyboardAction.SEND -> KeyboardActions(onSend = action)
     }
 }
 
