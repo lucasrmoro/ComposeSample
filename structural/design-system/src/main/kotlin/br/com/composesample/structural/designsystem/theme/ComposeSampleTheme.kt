@@ -73,6 +73,10 @@ object CurrentTheme {
         val Thin get() = SampleDimens.Stroke.Thin
     }
 
+    object ratio {
+        const val Video = SampleDimens.Ratio.Video
+    }
+
     object icon {
         val Person: IconToken get() = SampleIcons.Person
     }
