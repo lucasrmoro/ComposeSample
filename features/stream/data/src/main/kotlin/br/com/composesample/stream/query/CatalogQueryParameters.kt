@@ -12,7 +12,6 @@ internal class CatalogQueryParameters(private val clock: Clock) {
     fun create(query: CatalogQuery, page: Int): Map<String, String> {
         val params =
             mutableMapOf(
-                LANGUAGE_PARAMETER to query.region.languageTag,
                 PAGE_PARAMETER to page.toString(),
                 INCLUDE_ADULT_PARAMETER to FALSE_VALUE
             )
@@ -36,7 +35,6 @@ internal class CatalogQueryParameters(private val clock: Clock) {
     private companion object {
         const val MINIMUM_SUFFIX = ".gte"
         const val MAXIMUM_SUFFIX = ".lte"
-        const val LANGUAGE_PARAMETER = "language"
         const val PAGE_PARAMETER = "page"
         const val INCLUDE_ADULT_PARAMETER = "include_adult"
         const val FALSE_VALUE = "false"

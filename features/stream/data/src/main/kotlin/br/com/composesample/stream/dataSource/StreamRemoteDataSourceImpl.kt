@@ -23,30 +23,28 @@ internal class StreamRemoteDataSourceImpl(
 
     private val queryParameters = CatalogQueryParameters(clock)
 
-    override fun details(id: MediaId, region: CatalogRegion) =
+    override fun details(id: MediaId, _region: CatalogRegion) =
         call {
             val append =
                 if (id.type == MediaType.MOVIE) MOVIE_DETAIL_SECTIONS else SERIES_DETAIL_SECTIONS
             tmdbClient.get<MediaDTO>(
                 if (id.type == MediaType.MOVIE) MOVIE_DETAILS_PATH else SERIES_DETAILS_PATH,
-                mapOf(LANGUAGE_PARAMETER to region.languageTag, APPEND_PARAMETER to append),
+            mapOf(APPEND_PARAMETER to append),
                 mapOf(ID_PARAMETER to id.value.toString())
             )
         }.flowOn(coroutineDispatcher)
 
-    override fun genres(type: MediaType, region: CatalogRegion) =
+    override fun genres(type: MediaType, _region: CatalogRegion) =
         call {
             tmdbClient.get<GenresDTO>(
-                if (type == MediaType.MOVIE) MOVIE_GENRES_PATH else SERIES_GENRES_PATH,
-                mapOf(LANGUAGE_PARAMETER to region.languageTag)
+                if (type == MediaType.MOVIE) MOVIE_GENRES_PATH else SERIES_GENRES_PATH
             )
         }.flowOn(coroutineDispatcher)
 
-    override fun season(id: MediaId, number: Int, region: CatalogRegion) =
+    override fun season(id: MediaId, number: Int, _region: CatalogRegion) =
         call {
             tmdbClient.get<SeasonDTO>(
                 SEASON_DETAILS_PATH,
-                mapOf(LANGUAGE_PARAMETER to region.languageTag),
                 mapOf(ID_PARAMETER to id.value.toString(), SEASON_PARAMETER to number.toString())
             )
         }.flowOn(coroutineDispatcher)
@@ -82,7 +80,6 @@ internal class StreamRemoteDataSourceImpl(
         const val SEASON_PARAMETER = "season"
         const val MOVIE_DETAIL_SECTIONS = "credits,videos,release_dates,watch/providers"
         const val SERIES_DETAIL_SECTIONS = "credits,videos,content_ratings,watch/providers"
-        const val LANGUAGE_PARAMETER = "language"
         const val APPEND_PARAMETER = "append_to_response"
     }
 }

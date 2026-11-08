@@ -8,7 +8,7 @@ internal class TmdbClient(private val httpClient: HttpClient, private val config
 
     suspend inline fun <reified T> get(
         path: String,
-        query: Map<String, String>,
+        query: Map<String, String> = emptyMap(),
         pathParameters: Map<String, String> = emptyMap()
     ): T {
         check(configured) { "TMDB credential is not configured" }
