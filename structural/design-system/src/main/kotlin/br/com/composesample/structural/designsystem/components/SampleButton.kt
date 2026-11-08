@@ -1,7 +1,10 @@
 package br.com.composesample.structural.designsystem.components
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -10,6 +13,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.composesample.structural.design_system.R
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
@@ -71,10 +75,55 @@ fun SampleButton(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(name = "Filled", showBackground = true)
 @Composable
-private fun SampleButtonPreview() {
+private fun SampleFilledButtonPreview() {
     ComposeSampleTheme {
-        SampleButton(text = "Continue", onClick = {})
+        SampleButtonStylePreview(style = SampleButtonStyle.FILLED)
+    }
+}
+
+@Preview(name = "Outlined", showBackground = true)
+@Composable
+private fun SampleOutlinedButtonPreview() {
+    ComposeSampleTheme {
+        SampleButtonStylePreview(style = SampleButtonStyle.OUTLINED)
+    }
+}
+
+@Preview(name = "Text", showBackground = true)
+@Composable
+private fun SampleTextButtonPreview() {
+    ComposeSampleTheme {
+        SampleButtonStylePreview(style = SampleButtonStyle.TEXT)
+    }
+}
+
+@Composable
+private fun SampleButtonStylePreview(
+    modifier: Modifier = Modifier,
+    style: SampleButtonStyle
+) {
+    Column(
+        modifier = modifier.padding(CurrentTheme.spacing.Medium),
+        verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.Small)
+    ) {
+        SampleButton(
+            text = stringResource(R.string.sample_button_preview_label),
+            onClick = {},
+            style = style
+        )
+        SampleButton(
+            text = stringResource(R.string.sample_button_preview_label),
+            onClick = {},
+            style = style,
+            enabled = false
+        )
+        SampleButton(
+            text = stringResource(R.string.sample_button_preview_loading),
+            onClick = {},
+            style = style,
+            isLoading = true
+        )
     }
 }

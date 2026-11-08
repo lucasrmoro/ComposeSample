@@ -20,4 +20,8 @@
     <string name="sample_trailer">Trailer</string>
     <string name="sample_image_loading">Loading image…</string>
     <string name="sample_photo_not_provided">Photo not provided</string>
+
+    <!-- Buttons -->
+    <string name="sample_button_preview_label">Continue</string>
+    <string name="sample_button_preview_loading">Loading</string>
 </resources>
