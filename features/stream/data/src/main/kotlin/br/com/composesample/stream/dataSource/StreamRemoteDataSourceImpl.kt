@@ -17,10 +17,8 @@ import kotlinx.coroutines.flow.flowOn
 internal class StreamRemoteDataSourceImpl(
     private val tmdbClient: TmdbClient,
     private val coroutineDispatcher: CoroutineDispatcher,
-    clock: Clock
+    private val clock: Clock
 ) : BaseDataSource(), StreamRemoteDataSource {
-
-    private val queryParameters = CatalogQueryParameters(clock)
 
     override fun details(id: MediaId) =
         call {
@@ -60,7 +58,8 @@ internal class StreamRemoteDataSourceImpl(
                         if (query.type == MediaType.MOVIE) DISCOVER_MOVIES_PATH
                         else DISCOVER_SERIES_PATH
                 }
-            tmdbClient.get<PageDTO>(path, queryParameters.create(query, page))
+            val params = CatalogQueryParameters(clock).create(query, page)
+            tmdbClient.get<PageDTO>(path, params)
         }.flowOn(coroutineDispatcher)
 
     private companion object {
