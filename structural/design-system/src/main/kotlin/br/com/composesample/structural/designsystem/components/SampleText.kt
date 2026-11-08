@@ -5,12 +5,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 
 enum class SampleTextStyle {
-    BodyLarge,
+    LabelSmall,
     LabelMedium,
-    LabelSmall
+    BodyLarge
 }
 
 @Composable
@@ -20,11 +19,10 @@ fun SampleText(
     style: SampleTextStyle = SampleTextStyle.BodyLarge,
     color: Color = Color.Unspecified
 ) {
-    val textStyle =
-        when (style) {
-            SampleTextStyle.BodyLarge -> MaterialTheme.typography.bodyLarge
-            SampleTextStyle.LabelMedium -> MaterialTheme.typography.labelMedium
-            SampleTextStyle.LabelSmall -> MaterialTheme.typography.labelSmall
-        }
+    val textStyle = when (style) {
+        SampleTextStyle.LabelSmall -> MaterialTheme.typography.labelSmall
+        SampleTextStyle.LabelMedium -> MaterialTheme.typography.labelMedium
+        SampleTextStyle.BodyLarge -> MaterialTheme.typography.bodyLarge
+    }
     Text(text = text, modifier = modifier, style = textStyle, color = color)
 }
