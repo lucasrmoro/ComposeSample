@@ -26,22 +26,35 @@ fun SampleImage(
         modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant),
         contentAlignment = Alignment.Center
     ) {
-        val bitmap = state.bitmap
-        if (bitmap != null) {
-            Image(
+        when (state) {
+            is SampleImageState.Loaded -> Image(
                 modifier = Modifier.fillMaxSize(),
-                bitmap = bitmap,
+                bitmap = state.bitmap,
                 contentDescription = contentDescription,
                 contentScale = ContentScale.Crop
             )
-        } else {
-            SampleText(
-                text = stringResource(
-                    if (state.isUnavailable) R.string.sample_image_unavailable else R.string.sample_image_loading
-                ),
-                style = CurrentTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            SampleImageState.Loading -> SampleImageLoading()
+            SampleImageState.Unavailable -> SampleImagePlaceholder(
+                text = stringResource(R.string.sample_image_unavailable)
             )
         }
     }
+}
+
+@Composable
+private fun SampleImageLoading(modifier: Modifier = Modifier) {
+    SampleImagePlaceholder(
+        modifier = modifier,
+        text = stringResource(R.string.sample_image_loading)
+    )
+}
+
+@Composable
+private fun SampleImagePlaceholder(modifier: Modifier = Modifier, text: String) {
+    SampleText(
+        modifier = modifier,
+        text = text,
+        style = CurrentTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
 }

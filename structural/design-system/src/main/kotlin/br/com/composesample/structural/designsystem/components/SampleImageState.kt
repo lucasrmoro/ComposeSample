@@ -20,7 +20,13 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 
-internal data class SampleImageState(val bitmap: ImageBitmap?, val isUnavailable: Boolean)
+internal sealed interface SampleImageState {
+
+    data object Loading : SampleImageState
+    data class Loaded(val bitmap: ImageBitmap) : SampleImageState
+    data object Unavailable : SampleImageState
+
+}
 
 @Composable
 internal fun rememberSampleImageState(request: AssetRequest?): SampleImageState {
@@ -51,5 +57,10 @@ internal fun rememberSampleImageState(request: AssetRequest?): SampleImageState 
             }
         }.catch { failed = true }.collect()
     }
-    return SampleImageState(bitmap = bitmap, isUnavailable = failed || request == null)
+    val loadedBitmap = bitmap
+    return when {
+        loadedBitmap != null -> SampleImageState.Loaded(loadedBitmap)
+        failed || request == null -> SampleImageState.Unavailable
+        else -> SampleImageState.Loading
+    }
 }
