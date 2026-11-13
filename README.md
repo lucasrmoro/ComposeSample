@@ -246,14 +246,15 @@ settings.
 
 CodeRabbit reviews new PRs and later pushes, including draft and task PRs. The
 `CodeRabbit` check is required by the `main` ruleset alongside the existing checks;
-review errors fail it. Actionable findings request changes, and GitHub requires
-review threads to be resolved. Fix findings, push a new commit, and wait for a
-fresh review. For a false positive, explain the decision in the review thread
-before resolving it. If a review fails or its check is missing, request
-`@coderabbitai full review` and inspect the app installation and permissions.
-Skipped or rate-limited reviews may pass the check, so inspect its result before
-merging. Automatic approvals require an eligible CodeRabbit plan; the current
-one-approval rule does not independently require a human review.
+review errors fail it. The **Verify review approvals** check requires approvals
+from `coderabbitai[bot]` and a person other than the PR author on the current
+commit. GitHub also requires two approvals and resolved review threads. Fix
+findings, push a new commit, and wait for a fresh review. For a false positive,
+explain the decision in the review thread before resolving it. If a review fails
+or its check is missing, request `@coderabbitai full review` and inspect the app
+installation and permissions. Skipped or rate-limited reviews may pass the
+`CodeRabbit` check but cannot satisfy the approval check. Automatic approvals
+require an eligible CodeRabbit plan.
 
 Merge PRs using squash, then delete the source branch locally and remotely,
 except `main` and `develop`.
