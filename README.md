@@ -244,8 +244,16 @@ task's original parent or creation point, and does not prevent branch creation.
 Fork runs may require maintainer approval according to the repository's Actions
 settings.
 
-The [CodeRabbit review gate](docs/coderabbit-review-gate.md) describes automatic
-reviews, required checks and approvals, and the recovery path for review failures.
+CodeRabbit reviews new PRs and later pushes, including draft and task PRs. The
+`CodeRabbit` check is required by the `main` ruleset alongside the existing checks;
+review errors fail it. Actionable findings request changes, and GitHub requires
+review threads to be resolved. Fix findings, push a new commit, and wait for a
+fresh review. For a false positive, explain the decision in the review thread
+before resolving it. If a review fails or its check is missing, request
+`@coderabbitai full review` and inspect the app installation and permissions.
+Skipped or rate-limited reviews may pass the check, so inspect its result before
+merging. Automatic approvals require an eligible CodeRabbit plan; the current
+one-approval rule does not independently require a human review.
 
 Merge PRs using squash, then delete the source branch locally and remotely,
 except `main` and `develop`.

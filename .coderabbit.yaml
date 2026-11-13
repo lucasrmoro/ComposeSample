@@ -4,6 +4,7 @@ reviews:
   fail_commit_status: true
   auto_review:
     enabled: true
+    auto_pause_after_reviewed_commits: 0
     drafts: true
     base_branches:
       - ".*"
