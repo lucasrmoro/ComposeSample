@@ -7,7 +7,10 @@ object ProjectConfig {
     const val APP_ID = "br.com.composesample"
     const val NAMESPACE = "br.com.composesample"
     const val MIN_SDK = 26
+    const val TARGET_SDK = 36
     const val COMPILE_SDK = 36
+    const val VERSION_CODE = 1
+    const val VERSION_NAME = "1.0"
     const val ANDROID_JUNIT_RUNNER = "androidx.test.runner.AndroidJUnitRunner"
     val JVM_TARGET = JvmTarget.JVM_17
     val JAVA_VERSION = JavaVersion.VERSION_17

@@ -1,3 +1,4 @@
+import br.com.composesample.ProjectConfig
 import br.com.composesample.ext.stringBuildConfigField
 import br.com.composesample.modules.Modules
 
@@ -10,10 +11,10 @@ val tmdbReadAccessToken = gradle.extra["tmdbReadAccessToken"] as String
 
 android {
     defaultConfig {
-        applicationId = namespace
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        applicationId = ProjectConfig.APP_ID
+        targetSdk = ProjectConfig.TARGET_SDK
+        versionCode = ProjectConfig.VERSION_CODE
+        versionName = ProjectConfig.VERSION_NAME
         stringBuildConfigField(name = "TMDB_READ_ACCESS_TOKEN", value = tmdbReadAccessToken)
     }
 }
