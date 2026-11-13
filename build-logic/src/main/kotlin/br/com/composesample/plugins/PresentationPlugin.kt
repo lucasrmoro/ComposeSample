@@ -7,11 +7,9 @@ import br.com.composesample.modules.Modules
 import br.com.composesample.plugins.base.BasePlugin
 import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.getByType
 
 class PresentationPlugin : BasePlugin() {
 
@@ -31,23 +29,20 @@ class PresentationPlugin : BasePlugin() {
         setupProjectConfig(this)
     }
 
-    private fun Project.setupDependencies() {
-        val libraries = extensions.getByType<VersionCatalogsExtension>().named("libs")
-        dependencies {
-            implementation(project(Modules.Structural.Core.MAIN))
-            implementation(project(Modules.Structural.DesignSystem.MAIN))
-            implementation(project(Modules.Structural.Logger.API))
-            implementation(project(Modules.Structural.DI.API))
-            implementation(platform(libs.androidx.compose.bom))
-            implementation(libs.androidx.compose.runtime)
-            implementation(libs.androidx.compose.foundation)
-            implementation(libraries.findLibrary("androidx-compose-ui").get())
-            implementation(libs.androidx.compose.ui.tooling.preview)
-            debugImplementation(libraries.findLibrary("androidx-compose-ui-tooling").get())
-            implementation(libs.androidx.lifecycle.runtime.compose)
-            implementation(libs.androidx.navigation.compose)
-            implementation(libs.bundles.android)
-        }
+    private fun Project.setupDependencies() = dependencies {
+        implementation(project(Modules.Structural.Core.MAIN))
+        implementation(project(Modules.Structural.DesignSystem.MAIN))
+        implementation(project(Modules.Structural.Logger.API))
+        implementation(project(Modules.Structural.DI.API))
+        implementation(platform(libs.androidx.compose.bom))
+        implementation(libs.androidx.compose.runtime)
+        implementation(libs.androidx.compose.foundation)
+        implementation(libs.androidx.compose.ui.core)
+        implementation(libs.androidx.compose.ui.tooling.preview)
+        debugImplementation(libs.androidx.compose.ui.tooling.runtime)
+        implementation(libs.androidx.lifecycle.runtime.compose)
+        implementation(libs.androidx.navigation.compose)
+        implementation(libs.bundles.android)
     }
 
 }
