@@ -1,7 +1,12 @@
 package br.com.composesample.stream.components
 
 import br.com.composesample.structural.assets_cache.AssetRequest
+import br.com.composesample.structural.assets_cache.AssetsCacheConfiguration
+import java.time.Duration
 
+private const val ASSETS_CACHE_DIRECTORY = "stream-images"
+private const val ASSETS_CACHE_MAXIMUM_BYTES = 200L * 1024 * 1024 // 200 MiB
+private const val ASSETS_CACHE_MAXIMUM_AGE_DAYS = 30L
 private const val IMAGE_BASE_URL = "https://image.tmdb.org/t/p"
 private const val BACKDROP_SIZE = "w780"
 private const val POSTER_SIZE = "w342"
@@ -28,5 +33,16 @@ internal fun imageRequest(path: String?, role: ImageRole = ImageRole.POSTER): As
                     ImageRole.PROFILE -> PROFILE_SIZE
                     ImageRole.LOGO -> LOGO_SIZE
                 }
-            AssetRequest(url = "$IMAGE_BASE_URL/$size$it", group = role.group)
+            AssetRequest(
+                url = "$IMAGE_BASE_URL/$size$it",
+                group = role.group,
+                configuration = createAssetsCacheConfiguration()
+            )
         }
+
+private fun createAssetsCacheConfiguration() =
+    AssetsCacheConfiguration(
+        directory = ASSETS_CACHE_DIRECTORY,
+        maximumBytes = ASSETS_CACHE_MAXIMUM_BYTES,
+        maximumAgeMillis = Duration.ofDays(ASSETS_CACHE_MAXIMUM_AGE_DAYS).toMillis()
+    )

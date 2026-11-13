@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalInspectionMode
 import br.com.composesample.structural.assets_cache.AssetRequest
 import br.com.composesample.structural.assets_cache.AssetState
-import br.com.composesample.structural.assets_cache.AssetsCacheProvider
+import br.com.composesample.structural.assets_cache.AssetsCacheProviderFactory
 import br.com.composesample.structural.core.di.DispatcherIO
 import br.com.composesample.structural.di.get
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,11 +32,14 @@ internal fun rememberSampleImageState(request: AssetRequest?): SampleImageState 
     if (LocalInspectionMode.current) {
         return if (request == null) SampleImageState.Unavailable else SampleImageState.Loading
     }
-    val cache = remember { get<AssetsCacheProvider>() }
+    val cacheProviderFactory = remember { get<AssetsCacheProviderFactory>() }
+    val cache = remember(request?.configuration) {
+        request?.configuration?.let(cacheProviderFactory::create)
+    }
     val dispatcher = remember { get<CoroutineDispatcher>(DispatcherIO) }
     var previousUrl by remember { mutableStateOf<String?>(null) }
     val state by produceState<SampleImageState>(SampleImageState.Loading, request, cache, dispatcher) {
-        if (request == null) {
+        if (request == null || cache == null) {
             value = SampleImageState.Unavailable
             return@produceState
         }

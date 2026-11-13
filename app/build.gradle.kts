@@ -16,7 +16,6 @@ android {
 
 dependencies {
     implementation(project(Modules.Structural.Analytics.IMPL))
-    implementation(project(Modules.Structural.AssetsCache.API))
     implementation(project(Modules.Structural.AssetsCache.DI))
     implementation(project(Modules.Structural.Camera.DI))
     implementation(project(Modules.Structural.DI.IMPL))

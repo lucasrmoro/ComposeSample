@@ -8,7 +8,7 @@ import br.com.composesample.structural.security.hashing.HashingProvider
 import java.time.Clock
 import kotlinx.coroutines.CoroutineDispatcher
 
-fun createAssetsCacheProvider(
+internal fun createAssetsCacheProvider(
     mediaStorageProvider: MediaStorageProvider,
     binaryDownloadProvider: BinaryDownloadProvider,
     coroutineDispatcher: CoroutineDispatcher,

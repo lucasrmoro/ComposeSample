@@ -110,8 +110,8 @@ Screen event
 
 Catalog queries and details observe Room through Flow. Refreshes persist successful
 responses before updating the screen; failures preserve previously loaded content.
-Search supports an 800 ms debounce and immediate keyboard submission. Image files
-use a shared private 200 MiB least recently accessed file removal cache with a 30-day refresh age. Room stores only cache metadata; image bytes stay in private files. Posters, backdrops, cast photos and provider logos have separate directories under `cacheDir/media/stream-images`. Trailers require internet.
+Search supports an 800 ms debounce and immediate keyboard submission. Stream images
+use a private 200 MiB least recently accessed file removal cache with a 30-day refresh age. Room stores only cache metadata; image bytes stay in private files. Posters, backdrops, cast photos and provider logos have separate directories under `cacheDir/media/stream-images`. Trailers require internet.
 
 ### TMDB configuration
 

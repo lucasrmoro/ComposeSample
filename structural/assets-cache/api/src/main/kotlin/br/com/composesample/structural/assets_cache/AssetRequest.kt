@@ -1,7 +1,11 @@
 package br.com.composesample.structural.assets_cache
 
-/** Groups an asset in a caller-selected cache subdirectory, without assigning feature meaning. */
-data class AssetRequest(val url: String, val group: String) {
+/** Selects an asset URL, its cache subdirectory, and the consumer's cache policy. */
+data class AssetRequest(
+    val url: String,
+    val group: String,
+    val configuration: AssetsCacheConfiguration
+) {
 
     init {
         require(group.matches(GROUP_PATTERN))
