@@ -65,7 +65,7 @@ import br.com.composesample.structural.video_player.VideoSource
 
 internal class DetailsScreen(
     private val detailsViewModel: DetailsViewModel,
-    private val back: () -> Unit,
+    private val back: () -> Unit
 ) : BaseScreen<DetailsUiState, DetailsUiEffect>(detailsViewModel) {
 
     @Composable
@@ -83,7 +83,7 @@ private fun Info(label: Int, value: String?) {
             SampleText(
                 text = stringResource(label),
                 style = CurrentTheme.typography.labelMedium,
-                color = CurrentTheme.color.onSurface,
+                color = CurrentTheme.color.onSurface
             )
             SampleText(text = value, style = CurrentTheme.typography.bodyMedium)
         }
@@ -93,17 +93,17 @@ private fun Info(label: Int, value: String?) {
 private fun DetailsContent(
     state: DetailsUiState,
     back: () -> Unit,
-    event: (DetailsUiEvent) -> Unit,
+    event: (DetailsUiEvent) -> Unit
 ) {
     SampleScreen(
         title = stringResource(R.string.stream_details),
         canNavigateBack = true,
-        onNavigateBack = back,
+        onNavigateBack = back
     ) {
         val mediaDetails = state.details
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small),
+            verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small)
         ) {
             item {
                 Column(modifier = Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
@@ -111,7 +111,7 @@ private fun DetailsContent(
                         loading = state.loading,
                         empty = mediaDetails == null,
                         error = state.error,
-                        retry = { event(DetailsUiEvent.Retry) },
+                        retry = { event(DetailsUiEvent.Retry) }
                     )
                 }
             }
@@ -132,7 +132,7 @@ private fun DetailsContent(
                     DetailsInformationSection(
                         details = details,
                         trailer = trailer,
-                        online = state.online,
+                        online = state.online
                     )
                 }
             }
@@ -146,18 +146,18 @@ private fun DetailsSummary(details: MediaDetails) {
         SampleImage(
             request = imageRequest(details.backdropPath, ImageRole.BACKDROP),
             contentDescription = details.summary.title,
-            modifier = Modifier.fillMaxWidth().height(StreamDimens.backdropHeight),
+            modifier = Modifier.fillMaxWidth().height(StreamDimens.backdropHeight)
         )
         Column(modifier = Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
             SampleText(text = details.summary.title, style = CurrentTheme.typography.headlineSmall)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small),
+                horizontalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small)
             ) {
                 details.summary.rating?.let {
                     SampleText(
                         text = String.format(java.util.Locale.getDefault(), RATING_FORMAT, it),
-                        style = CurrentTheme.typography.labelMedium,
+                        style = CurrentTheme.typography.labelMedium
                     )
                 }
                 details.summary.year?.let {
@@ -169,11 +169,11 @@ private fun DetailsSummary(details: MediaDetails) {
             }
             SampleText(
                 text = details.genres.joinToString(" · ", transform = Genre::name),
-                style = CurrentTheme.typography.bodySmall,
+                style = CurrentTheme.typography.bodySmall
             )
             Info(
                 label = R.string.stream_runtime,
-                value = details.runtimeMinutes?.let { stringResource(R.string.stream_minutes, it) },
+                value = details.runtimeMinutes?.let { stringResource(R.string.stream_minutes, it) }
             )
             Info(label = R.string.stream_release_date, value = details.releaseDate)
             Info(label = R.string.stream_original_title, value = details.originalTitle)
@@ -186,7 +186,7 @@ private fun SynopsisSection(overview: String) {
     Column(modifier = Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
         SampleText(
             text = stringResource(R.string.stream_synopsis),
-            style = CurrentTheme.typography.titleLarge,
+            style = CurrentTheme.typography.titleLarge
         )
         SampleText(text = overview)
     }
@@ -197,11 +197,11 @@ private fun TrailerSection(trailer: VideoReference, online: Boolean) {
     Column(modifier = Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
         SampleText(
             text = stringResource(R.string.stream_trailer),
-            style = CurrentTheme.typography.titleLarge,
+            style = CurrentTheme.typography.titleLarge
         )
         SampleVideoPlayer(
             source = VideoSource(provider = trailer.site, key = trailer.key),
-            online = online,
+            online = online
         )
         SampleText(text = trailer.name, style = CurrentTheme.typography.bodySmall)
     }
@@ -212,22 +212,22 @@ private fun WatchProvidersSection(details: MediaDetails) {
     Column(modifier = Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
         SampleText(
             text = stringResource(R.string.stream_watch),
-            style = CurrentTheme.typography.titleLarge,
+            style = CurrentTheme.typography.titleLarge
         )
         details.providers.groupBy(WatchProvider::category).forEach { (category, providers) ->
             SampleText(
                 text = stringResource(category.titleResource()),
-                style = CurrentTheme.typography.titleSmall,
+                style = CurrentTheme.typography.titleSmall
             )
             providers.forEach { provider ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small),
+                    horizontalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small)
                 ) {
                     SampleImage(
                         request = imageRequest(path = provider.logoPath, role = ImageRole.LOGO),
                         contentDescription = provider.name,
-                        modifier = Modifier.size(CurrentTheme.size.xxxLarge),
+                        modifier = Modifier.size(CurrentTheme.size.xxxLarge)
                     )
                     SampleText(text = provider.name)
                 }
@@ -235,7 +235,7 @@ private fun WatchProvidersSection(details: MediaDetails) {
         }
         SampleText(
             text = stringResource(R.string.stream_justwatch),
-            style = CurrentTheme.typography.labelSmall,
+            style = CurrentTheme.typography.labelSmall
         )
         details.providerLink?.let {
             SampleLink(url = it, label = stringResource(R.string.stream_watch))
@@ -247,12 +247,12 @@ private fun WatchProvidersSection(details: MediaDetails) {
 private fun SeasonsSection(
     details: MediaDetails,
     state: DetailsUiState,
-    onEvent: (DetailsUiEvent) -> Unit,
+    onEvent: (DetailsUiEvent) -> Unit
 ) {
     Column(modifier = Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
         SampleText(
             text = stringResource(R.string.stream_seasons),
-            style = CurrentTheme.typography.titleLarge,
+            style = CurrentTheme.typography.titleLarge
         )
         var expanded by remember { mutableStateOf(false) }
         Box {
@@ -260,10 +260,10 @@ private fun SeasonsSection(
                 text =
                     stringResource(
                         R.string.stream_season,
-                        state.selectedSeason ?: details.seasons.first().number,
+                        state.selectedSeason ?: details.seasons.first().number
                     ),
                 onClick = { expanded = true },
-                style = SampleButtonStyle.OUTLINED,
+                style = SampleButtonStyle.OUTLINED
             )
             SampleDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                 details.seasons.forEach { season ->
@@ -272,7 +272,7 @@ private fun SeasonsSection(
                         onClick = {
                             expanded = false
                             onEvent(DetailsUiEvent.SelectSeason(number = season.number))
-                        },
+                        }
                     )
                 }
             }
@@ -281,7 +281,7 @@ private fun SeasonsSection(
         state.season?.episodes?.forEach { episode ->
             SampleText(
                 text = stringResource(R.string.stream_episode, episode.number, episode.name),
-                style = CurrentTheme.typography.titleSmall,
+                style = CurrentTheme.typography.titleSmall
             )
             episode.airDate?.let {
                 SampleText(text = it, style = CurrentTheme.typography.labelSmall)
@@ -289,7 +289,7 @@ private fun SeasonsSection(
             episode.runtime?.let {
                 SampleText(
                     text = stringResource(R.string.stream_minutes, it),
-                    style = CurrentTheme.typography.labelSmall,
+                    style = CurrentTheme.typography.labelSmall
                 )
             }
             episode.overview?.takeIf(String::isNotBlank)?.let {
@@ -306,18 +306,18 @@ private fun CastSection(cast: List<PersonCredit>) {
         SampleText(
             text = stringResource(R.string.stream_cast),
             modifier = Modifier.padding(horizontal = CurrentTheme.spacing.large),
-            style = CurrentTheme.typography.titleLarge,
+            style = CurrentTheme.typography.titleLarge
         )
         LazyRow(
             contentPadding = PaddingValues(CurrentTheme.spacing.large),
-            horizontalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.medium),
+            horizontalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.medium)
         ) {
             items(cast) { person ->
                 Column(modifier = Modifier.width(StreamDimens.portrait)) {
                     SampleProfileImage(
                         request = imageRequest(person.imagePath, ImageRole.PROFILE),
                         contentDescription = person.name,
-                        modifier = Modifier.size(StreamDimens.portrait),
+                        modifier = Modifier.size(StreamDimens.portrait)
                     )
                     SampleText(text = person.name, style = CurrentTheme.typography.labelMedium)
                     person.role?.let {
@@ -333,7 +333,7 @@ private fun CastSection(cast: List<PersonCredit>) {
 private fun DetailsInformationSection(
     details: MediaDetails,
     trailer: VideoReference?,
-    online: Boolean,
+    online: Boolean
 ) {
     Column(modifier = Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
         ExpandableInformation(title = stringResource(R.string.stream_information)) {
@@ -366,7 +366,7 @@ private fun DetailsInformationSection(
                         if (video.site.equals("YouTube", true)) {
                             SampleVideoPlayer(
                                 source = VideoSource(provider = video.site, key = video.key),
-                                online = online,
+                                online = online
                             )
                         }
                     }
@@ -381,7 +381,7 @@ private fun DetailsInformationSection(
         SampleText(
             text = stringResource(R.string.stream_tmdb_attribution),
             style = CurrentTheme.typography.labelSmall,
-            modifier = Modifier.padding(vertical = CurrentTheme.spacing.large),
+            modifier = Modifier.padding(vertical = CurrentTheme.spacing.large)
         )
     }
 }
@@ -417,10 +417,10 @@ private fun DetailsPreview() {
                     details = previewMediaDetails(),
                     season = previewSeasonDetails(),
                     selectedSeason = 1,
-                    loading = false,
+                    loading = false
                 ),
             back = {},
-            event = {},
+            event = {}
         )
     }
 }
@@ -469,9 +469,9 @@ private fun SeasonsSectionPreview() {
                 DetailsUiState(
                     season = previewSeasonDetails(),
                     selectedSeason = 1,
-                    loading = false,
+                    loading = false
                 ),
-            onEvent = {},
+            onEvent = {}
         )
     }
 }
@@ -511,7 +511,7 @@ private fun previewMediaDetails() =
                 year = "2024",
                 rating = 8.2,
                 certification = "TV-14",
-                releaseEvent = null,
+                releaseEvent = null
             ),
         originalTitle = "Example series",
         overview = "A story about an unexpected journey.",
@@ -537,15 +537,15 @@ private fun previewMediaDetails() =
                     site = "YouTube",
                     name = "Official trailer",
                     type = "Trailer",
-                    official = true,
+                    official = true
                 ),
                 VideoReference(
                     key = "preview-behind-scenes",
                     site = "YouTube",
                     name = "Behind the scenes",
                     type = "Behind the Scenes",
-                    official = true,
-                ),
+                    official = true
+                )
             ),
         providers =
             listOf(
@@ -553,13 +553,13 @@ private fun previewMediaDetails() =
                     id = 1,
                     name = "Example Video",
                     logoPath = null,
-                    category = ProviderCategory.SUBSCRIPTION,
+                    category = ProviderCategory.SUBSCRIPTION
                 )
             ),
         providerLink = "https://example.com/watch",
         seasons =
             listOf(SeasonSummary(number = 1, name = "Season 1", episodeCount = 1, airDate = null)),
-        episodeCount = 1,
+        episodeCount = 1
     )
 
 private fun previewSeasonDetails() =
@@ -575,7 +575,7 @@ private fun previewSeasonDetails() =
                     overview = "An opening episode.",
                     airDate = "2024-01-01",
                     runtime = 45,
-                    imagePath = null,
+                    imagePath = null
                 )
-            ),
+            )
     )

@@ -15,7 +15,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 @Composable
 inline fun <reified T : ViewModel> dependencyViewModel(
     owner: ViewModelStoreOwner? = LocalViewModelStoreOwner.current,
-    parameters: DependencyParameters = DependencyParameters(),
+    parameters: DependencyParameters = DependencyParameters()
 ): T {
     val viewModelStoreOwner = checkNotNull(owner) {
         "A ViewModelStoreOwner must be provided by the Compose host"
@@ -24,7 +24,7 @@ inline fun <reified T : ViewModel> dependencyViewModel(
         get<DependencyViewModelProvider>().get(
             owner = viewModelStoreOwner,
             type = T::class,
-            parameters = parameters,
+            parameters = parameters
         )
     }
 }

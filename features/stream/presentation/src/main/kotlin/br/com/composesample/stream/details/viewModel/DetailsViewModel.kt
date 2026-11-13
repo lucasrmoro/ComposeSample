@@ -56,7 +56,7 @@ class DetailsViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
-            initialValue = DetailsUiState(),
+            initialValue = DetailsUiState()
         )
     private var job: Job? = null
     private var seasonJob: Job? = null

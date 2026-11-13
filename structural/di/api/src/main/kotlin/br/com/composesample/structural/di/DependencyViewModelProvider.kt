@@ -14,7 +14,7 @@ interface DependencyViewModelProvider {
     fun <T : ViewModel> get(
         owner: ViewModelStoreOwner,
         type: KClass<T>,
-        parameters: DependencyParameters = DependencyParameters(),
+        parameters: DependencyParameters = DependencyParameters()
     ): T
 
 }

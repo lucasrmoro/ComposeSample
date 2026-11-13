@@ -33,7 +33,7 @@ internal fun StreamNavHost() {
             val viewModel: CatalogViewModel = dependencyViewModel()
             CatalogScreen(
                 catalogViewModel = viewModel,
-                onNavigate = { destination -> controller.navigateTo(destination) },
+                onNavigate = { destination -> controller.navigateTo(destination) }
             ).Init()
         }
         composable(StreamRoutes.GENRES) { entry ->
@@ -51,17 +51,17 @@ internal fun StreamNavHost() {
                             type = effect.type,
                             kind = CollectionKind.GENRE,
                             genreId = effect.genre.id,
-                            title = effect.genre.name,
+                            title = effect.genre.name
                         )
                     }
-                },
+                }
             ).Init()
         }
         composable(
             StreamRoutes.COLLECTION,
             arguments = listOf(
                 intArgument(key = StreamRoutes.Arguments.GENRE),
-                stringArgument(key = StreamRoutes.Arguments.TITLE, nullable = true),
+                stringArgument(key = StreamRoutes.Arguments.TITLE, nullable = true)
             )
         ) { entry ->
             val viewModel: CollectionViewModel = dependencyViewModel()
@@ -83,13 +83,13 @@ internal fun StreamNavHost() {
                     when (effect) {
                         is CollectionUiEffect.Details -> controller.navigateToDetails(effect.id)
                     }
-                },
+                }
             ).Init()
         }
         composable(
             route = StreamRoutes.DETAILS,
             arguments = listOf(
-                longArgument(key = StreamRoutes.Arguments.ID),
+                longArgument(key = StreamRoutes.Arguments.ID)
             )
         ) { entry ->
             val args = requireNotNull(entry.arguments)
@@ -99,13 +99,13 @@ internal fun StreamNavHost() {
                         MediaType.valueOf(
                             requireNotNull(args.getString(StreamRoutes.Arguments.TYPE))
                         ),
-                    value = args.getLong(StreamRoutes.Arguments.ID),
+                    value = args.getLong(StreamRoutes.Arguments.ID)
                 )
             val viewModel: DetailsViewModel =
                 dependencyViewModel(parameters = parametersOf(mediaId))
             DetailsScreen(
                 detailsViewModel = viewModel,
-                back = back,
+                back = back
             ).Init()
         }
     }

@@ -12,14 +12,14 @@ internal class AndroidDependencyViewModelProvider : DependencyViewModelProvider 
     override fun <T : ViewModel> get(
         owner: ViewModelStoreOwner,
         type: KClass<T>,
-        parameters: DependencyParameters,
+        parameters: DependencyParameters
     ): T {
         val factory = viewModelFactory {
             addInitializer(type) {
                 Dependencies.get(
                     type,
                     parameters =
-                        parametersOf(createSavedStateHandle(), *parameters.values.toTypedArray()),
+                        parametersOf(createSavedStateHandle(), *parameters.values.toTypedArray())
                 )
             }
         }
