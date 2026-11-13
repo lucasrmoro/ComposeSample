@@ -3,7 +3,7 @@
 Register `AssetsCacheConfiguration` in the application composition root, then load
 `AssetsCacheModule` after media, network, security and local-storage. The application
 selects the private directory, byte limit, refresh age.
-The sample uses 200 MB and 30 days in `app/configuration/AppConfigurationModule.kt`.
+The sample uses 200 MiB (209,715,200 bytes) and 30 days in `app/configuration/AppConfigurationModule.kt`.
 
 The provider coordinates cached delivery, refresh and fallback. `AssetCacheWriter`
 streams HTTP responses through network/api into private files managed by media/api.
