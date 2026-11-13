@@ -38,6 +38,7 @@ import br.com.composesample.stream.model.catalog.CollectionKind
 import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.media.MediaSummary
 import br.com.composesample.stream.model.media.MediaType
+import br.com.composesample.stream.navigation.StreamDestination
 import br.com.composesample.stream.tokens.StreamDimens
 import br.com.composesample.structural.designsystem.components.SampleButton
 import br.com.composesample.structural.designsystem.components.SampleButtonStyle
@@ -52,7 +53,7 @@ import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 internal class CatalogScreen(
     private val catalogViewModel: CatalogViewModel,
-    private val onNavigate: (CatalogUiEffect) -> Unit
+    private val onNavigate: (StreamDestination) -> Unit
 ) : BaseScreen<CatalogUiState, CatalogUiEffect>(catalogViewModel) {
 
     @Composable
@@ -60,7 +61,11 @@ internal class CatalogScreen(
         CatalogContent(uiState, catalogViewModel::sendEvent)
     }
 
-    override fun consumeEffect(effect: CatalogUiEffect) = onNavigate(effect)
+    override fun consumeEffect(effect: CatalogUiEffect) {
+        when (effect) {
+            is CatalogUiEffect.Navigate -> onNavigate(effect.destination)
+        }
+    }
 
 }
 

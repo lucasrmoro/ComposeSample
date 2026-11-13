@@ -10,6 +10,7 @@ import br.com.composesample.stream.catalog.model.CatalogUiState
 import br.com.composesample.stream.model.catalog.CatalogQuery
 import br.com.composesample.stream.model.catalog.CollectionKind
 import br.com.composesample.stream.model.toCatalogRegion
+import br.com.composesample.stream.navigation.StreamDestination
 import br.com.composesample.stream.useCase.LoadNextPageUseCase
 import br.com.composesample.stream.useCase.ObserveCatalogUseCase
 import br.com.composesample.stream.useCase.RefreshCatalogUseCase
@@ -82,10 +83,25 @@ class CatalogViewModel(
                 search(false)
             }
             CatalogUiEvent.SubmitSearch -> search(true)
-            CatalogUiEvent.OpenGenres -> sendEffect(CatalogUiEffect.Genres(state.value.type))
+            CatalogUiEvent.OpenGenres ->
+                sendEffect(
+                    CatalogUiEffect.Navigate(
+                        destination = StreamDestination.Genres(type = state.value.type)
+                    )
+                )
             is CatalogUiEvent.OpenCollection ->
-                sendEffect(CatalogUiEffect.Collection(type = state.value.type, kind = event.kind))
-            is CatalogUiEvent.OpenDetails -> sendEffect(CatalogUiEffect.Details(id = event.id))
+                sendEffect(
+                    CatalogUiEffect.Navigate(
+                        destination =
+                            StreamDestination.Collection(type = state.value.type, kind = event.kind)
+                    )
+                )
+            is CatalogUiEvent.OpenDetails ->
+                sendEffect(
+                    CatalogUiEffect.Navigate(
+                        destination = StreamDestination.Details(id = event.id)
+                    )
+                )
             CatalogUiEvent.Refresh ->
                 if (state.value.searchText.isBlank()) bindFeed() else search(true)
             CatalogUiEvent.LoadMoreSearch ->

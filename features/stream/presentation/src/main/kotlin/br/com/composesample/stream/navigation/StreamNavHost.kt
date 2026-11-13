@@ -3,7 +3,6 @@ package br.com.composesample.stream.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import br.com.composesample.stream.catalog.model.CatalogUiEffect
 import br.com.composesample.stream.catalog.screen.CatalogScreen
 import br.com.composesample.stream.catalog.viewModel.CatalogViewModel
 import br.com.composesample.stream.collection.model.CollectionUiEffect
@@ -31,16 +30,10 @@ internal fun StreamNavHost() {
     AnimatedNavHost(controller, startDestination = StreamRoutes.CATALOG) {
         composable(StreamRoutes.CATALOG) {
             val viewModel: CatalogViewModel = dependencyViewModel()
-            CatalogScreen(viewModel) { effect ->
-                when (effect) {
-                    is CatalogUiEffect.Details -> controller.navigateToDetails(effect.id)
-                    is CatalogUiEffect.Genres -> controller.navigateToGenres(effect.type)
-                    is CatalogUiEffect.Collection -> controller.navigateToCollection(
-                        type = effect.type,
-                        kind = effect.kind
-                    )
-                }
-            }.Init()
+            CatalogScreen(
+                catalogViewModel = viewModel,
+                onNavigate = { destination -> controller.navigateTo(destination) },
+            ).Init()
         }
         composable(StreamRoutes.GENRES) { entry ->
             val viewModel: GenresViewModel = dependencyViewModel()

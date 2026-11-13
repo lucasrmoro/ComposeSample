@@ -27,25 +27,51 @@ internal object StreamRoutes {
         type: MediaType,
         kind: CollectionKind,
         genreId: Int = 0,
-        title: String? = null
+        title: String? = null,
     ): String {
         val route = "collection/${type.name}/${kind.name}/$genreId"
         return title?.let { "$route?title=${encodeRouteValue(it)}" } ?: route
     }
 
     fun details(id: MediaId) = "details/${id.type.name}/${id.value}"
+}
 
+sealed interface StreamDestination {
+    data class Genres(val type: MediaType) : StreamDestination
+
+    data class Collection(
+        val type: MediaType,
+        val kind: CollectionKind,
+        val genreId: Int = 0,
+        val title: String? = null,
+    ) : StreamDestination
+
+    data class Details(val id: MediaId) : StreamDestination
 }
 
 internal fun NavController.navigateToGenres(type: MediaType) {
     navigate(StreamRoutes.genres(type))
 }
 
+internal fun NavController.navigateTo(destination: StreamDestination) {
+    when (destination) {
+        is StreamDestination.Genres -> navigateToGenres(type = destination.type)
+        is StreamDestination.Collection ->
+            navigateToCollection(
+                type = destination.type,
+                kind = destination.kind,
+                genreId = destination.genreId,
+                title = destination.title,
+            )
+        is StreamDestination.Details -> navigateToDetails(id = destination.id)
+    }
+}
+
 internal fun NavController.navigateToCollection(
     type: MediaType,
     kind: CollectionKind,
     genreId: Int = 0,
-    title: String? = null
+    title: String? = null,
 ) {
     navigate(StreamRoutes.collection(type, kind, genreId, title))
 }
