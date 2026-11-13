@@ -54,8 +54,7 @@ private const val BEARER_SCHEME = "Bearer"
 
 object StreamModule {
     fun init(context: Context, navigationRegistry: NavigationRegistry, readAccessToken: String) {
-        val streamModule = dependencyModule {
-            singleton<StreamAnalytics> { createStreamAnalytics(provider = get()) }
+        val dataModule = dependencyModule {
             singleton<StreamLocalDataSource> {
                 createStreamLocalDataSource(
                     context = context,
@@ -86,6 +85,8 @@ object StreamModule {
                     coroutineDispatcher = dispatcherIO
                 )
             }
+        }
+        val domainModule = dependencyModule {
             factory<ObserveCatalogUseCase> {
                 ObserveCatalogUseCaseImpl(streamRepository = get())
             }
@@ -113,6 +114,9 @@ object StreamModule {
             factory<RefreshSeasonUseCase> {
                 RefreshSeasonUseCaseImpl(streamRepository = get())
             }
+        }
+        val presentationModule = dependencyModule {
+            singleton<StreamAnalytics> { createStreamAnalytics(provider = get()) }
             factory {
                 CatalogViewModel(
                     observeCatalogUseCase = get(),
@@ -152,7 +156,7 @@ object StreamModule {
                 )
             }
         }
-        loadModules(streamModule)
+        loadModules(dataModule, domainModule, presentationModule)
         navigationRegistry.register(
             entryPoint = createStreamEntryPoint(),
             isStartDestination = true
