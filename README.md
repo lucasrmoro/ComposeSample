@@ -244,6 +244,9 @@ task's original parent or creation point, and does not prevent branch creation.
 Fork runs may require maintainer approval according to the repository's Actions
 settings.
 
+The [CodeRabbit review gate](docs/coderabbit-review-gate.md) describes automatic
+reviews, required checks and approvals, and the recovery path for review failures.
+
 Merge PRs using squash, then delete the source branch locally and remotely,
 except `main` and `develop`.
 
