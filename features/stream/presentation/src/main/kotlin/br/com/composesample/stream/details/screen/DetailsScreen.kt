@@ -103,10 +103,10 @@ private fun DetailsContent(
             item {
                 Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
                     LoadNotice(
-                        state.loading,
-                        mediaDetails == null,
-                        state.error,
-                        { event(DetailsUiEvent.Retry) }
+                        loading = state.loading,
+                        empty = mediaDetails == null,
+                        error = state.error,
+                        retry = { event(DetailsUiEvent.Retry) }
                     )
                 }
             }

@@ -59,10 +59,10 @@ private fun GenresContent(state: GenresUiState, back: () -> Unit, event: (Genres
         ) {
             item {
                 LoadNotice(
-                    state.loading,
-                    state.genres.isEmpty(),
-                    state.error,
-                    { event(GenresUiEvent.Retry) }
+                    loading = state.loading,
+                    empty = state.genres.isEmpty(),
+                    error = state.error,
+                    retry = { event(GenresUiEvent.Retry) }
                 )
             }
             items(state.genres, key = Genre::id) { genre ->

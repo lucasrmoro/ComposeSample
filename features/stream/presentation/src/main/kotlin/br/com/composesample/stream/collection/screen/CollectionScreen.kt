@@ -60,10 +60,10 @@ private fun CollectionContent(
         Column(Modifier.fillMaxSize()) {
             Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
                 LoadNotice(
-                    state.loading,
-                    state.page.items.isEmpty(),
-                    state.error,
-                    { event(CollectionUiEvent.Retry) }
+                    loading = state.loading,
+                    empty = state.page.items.isEmpty(),
+                    error = state.error,
+                    retry = { event(CollectionUiEvent.Retry) }
                 )
             }
             MediaGrid(

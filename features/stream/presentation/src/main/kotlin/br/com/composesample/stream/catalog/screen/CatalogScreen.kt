@@ -127,10 +127,10 @@ private fun ColumnScope.CatalogSearchContent(
             style = CurrentTheme.typography.bodyLarge
         )
         LoadNotice(
-            state.search.refreshing,
-            state.search.page.items.isEmpty(),
-            state.search.error,
-            { event(CatalogUiEvent.SubmitSearch) }
+            loading = state.search.refreshing,
+            empty = state.search.page.items.isEmpty(),
+            error = state.search.error,
+            retry = { event(CatalogUiEvent.SubmitSearch) }
         )
         if (state.search.error != null) SampleText(
             text = stringResource(R.string.stream_offline_search),
@@ -197,10 +197,10 @@ private fun CatalogCollectionSection(
         }
         Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
             LoadNotice(
-                section.refreshing,
-                section.page.items.isEmpty(),
-                section.error,
-                { event(CatalogUiEvent.Refresh) }
+                loading = section.refreshing,
+                empty = section.page.items.isEmpty(),
+                error = section.error,
+                retry = { event(CatalogUiEvent.Refresh) }
             )
         }
         LazyRow(
