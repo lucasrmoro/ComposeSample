@@ -21,48 +21,47 @@ import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.media.MediaType
 import br.com.composesample.structural.di.dependencyViewModel
 import br.com.composesample.structural.navigation.core.AnimatedNavHost
-import br.com.composesample.structural.navigation.core.encodeRouteValue
 
 @Composable
 internal fun StreamNavHost() {
     val controller = rememberNavController()
     val back: () -> Unit = { controller.popBackStack() }
 
-    fun details(id: MediaId) {
-        controller.navigate("details/${id.type.name}/${id.value}")
-    }
-
-    AnimatedNavHost(controller, startDestination = "catalog") {
-        composable("catalog") {
+    AnimatedNavHost(controller, startDestination = StreamRoutes.CATALOG) {
+        composable(StreamRoutes.CATALOG) {
             val viewModel: CatalogViewModel = dependencyViewModel()
             CatalogScreen(viewModel) { effect ->
                 when (effect) {
-                    is CatalogUiEffect.Details -> details(effect.id)
-                    is CatalogUiEffect.Genres ->
-                        controller.navigate("genres/${effect.type.name}")
-                    is CatalogUiEffect.Collection ->
-                        controller.navigate("collection/${effect.type.name}/${effect.kind.name}/0")
+                    is CatalogUiEffect.Details -> controller.navigateToDetails(effect.id)
+                    is CatalogUiEffect.Genres -> controller.navigateToGenres(effect.type)
+                    is CatalogUiEffect.Collection -> controller.navigateToCollection(
+                        type = effect.type,
+                        kind = effect.kind
+                    )
                 }
             }.Init()
         }
-        composable("genres/{type}") { entry ->
+        composable(StreamRoutes.GENRES) { entry ->
             val viewModel: GenresViewModel = dependencyViewModel()
-            val type = MediaType.valueOf(requireNotNull(entry.arguments?.getString("type")))
+            val type = MediaType.valueOf(
+                requireNotNull(entry.arguments?.getString(StreamRoutes.Arguments.TYPE))
+            )
             GenresScreen(viewModel, type, back) { effect ->
                 when (effect) {
-                    is GenresUiEffect.Collection -> {
-                        val route = "collection/${effect.type.name}/${CollectionKind.GENRE.name}/" +
-                            "${effect.genre.id}?title=${encodeRouteValue(effect.genre.name)}"
-                        controller.navigate(route)
-                    }
+                    is GenresUiEffect.Collection -> controller.navigateToCollection(
+                        type = effect.type,
+                        kind = CollectionKind.GENRE,
+                        genreId = effect.genre.id,
+                        title = effect.genre.name
+                    )
                 }
             }.Init()
         }
         composable(
-            "collection/{type}/{kind}/{genre}?title={title}",
+            StreamRoutes.COLLECTION,
             arguments = listOf(
-                navArgument("genre") { type = NavType.IntType },
-                navArgument("title") {
+                navArgument(StreamRoutes.Arguments.GENRE) { type = NavType.IntType },
+                navArgument(StreamRoutes.Arguments.TITLE) {
                     type = NavType.StringType
                     nullable = true
                     defaultValue = null
@@ -73,28 +72,34 @@ internal fun StreamNavHost() {
             val args = requireNotNull(entry.arguments)
             CollectionScreen(
                 viewModel,
-                MediaType.valueOf(requireNotNull(args.getString("type"))),
-                CollectionKind.valueOf(requireNotNull(args.getString("kind"))),
-                args.getInt("genre").takeIf { it > 0 },
-                args.getString("title"),
+                MediaType.valueOf(requireNotNull(args.getString(StreamRoutes.Arguments.TYPE))),
+                CollectionKind.valueOf(
+                    requireNotNull(args.getString(StreamRoutes.Arguments.KIND))
+                ),
+                args.getInt(StreamRoutes.Arguments.GENRE).takeIf { it > 0 },
+                args.getString(StreamRoutes.Arguments.TITLE),
                 back
             ) { effect ->
                 when (effect) {
-                    is CollectionUiEffect.Details -> details(effect.id)
+                    is CollectionUiEffect.Details -> controller.navigateToDetails(effect.id)
                 }
             }.Init()
         }
         composable(
-            "details/{type}/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.LongType })
+            StreamRoutes.DETAILS,
+            arguments = listOf(
+                navArgument(StreamRoutes.Arguments.ID) { type = NavType.LongType }
+            )
         ) { entry ->
             val viewModel: DetailsViewModel = dependencyViewModel()
             val args = requireNotNull(entry.arguments)
             DetailsScreen(
                 viewModel,
                 MediaId(
-                    type = MediaType.valueOf(requireNotNull(args.getString("type"))),
-                    value = args.getLong("id")
+                    type = MediaType.valueOf(
+                        requireNotNull(args.getString(StreamRoutes.Arguments.TYPE))
+                    ),
+                    value = args.getLong(StreamRoutes.Arguments.ID)
                 ),
                 back
             ).Init()
