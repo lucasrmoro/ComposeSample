@@ -20,23 +20,23 @@ import br.com.composesample.stream.navigation.createStreamEntryPoint
 import br.com.composesample.stream.repository.StreamRepository
 import br.com.composesample.stream.repository.createStreamRepository
 import br.com.composesample.stream.useCase.LoadNextPageUseCase
-import br.com.composesample.stream.useCase.LoadNextPageUseCaseImpl
+import br.com.composesample.stream.useCase.createLoadNextPageUseCase
 import br.com.composesample.stream.useCase.ObserveCatalogUseCase
-import br.com.composesample.stream.useCase.ObserveCatalogUseCaseImpl
+import br.com.composesample.stream.useCase.createObserveCatalogUseCase
 import br.com.composesample.stream.useCase.ObserveGenresUseCase
-import br.com.composesample.stream.useCase.ObserveGenresUseCaseImpl
+import br.com.composesample.stream.useCase.createObserveGenresUseCase
 import br.com.composesample.stream.useCase.ObserveMediaDetailsUseCase
-import br.com.composesample.stream.useCase.ObserveMediaDetailsUseCaseImpl
+import br.com.composesample.stream.useCase.createObserveMediaDetailsUseCase
 import br.com.composesample.stream.useCase.ObserveSeasonUseCase
-import br.com.composesample.stream.useCase.ObserveSeasonUseCaseImpl
+import br.com.composesample.stream.useCase.createObserveSeasonUseCase
 import br.com.composesample.stream.useCase.RefreshCatalogUseCase
-import br.com.composesample.stream.useCase.RefreshCatalogUseCaseImpl
+import br.com.composesample.stream.useCase.createRefreshCatalogUseCase
 import br.com.composesample.stream.useCase.RefreshGenresUseCase
-import br.com.composesample.stream.useCase.RefreshGenresUseCaseImpl
+import br.com.composesample.stream.useCase.createRefreshGenresUseCase
 import br.com.composesample.stream.useCase.RefreshMediaDetailsUseCase
-import br.com.composesample.stream.useCase.RefreshMediaDetailsUseCaseImpl
+import br.com.composesample.stream.useCase.createRefreshMediaDetailsUseCase
 import br.com.composesample.stream.useCase.RefreshSeasonUseCase
-import br.com.composesample.stream.useCase.RefreshSeasonUseCaseImpl
+import br.com.composesample.stream.useCase.createRefreshSeasonUseCase
 import br.com.composesample.structural.core.ext.dispatcherIO
 import br.com.composesample.structural.di.dependencyModule
 import br.com.composesample.structural.di.factory
@@ -88,31 +88,31 @@ object StreamModule {
         }
         val domainModule = dependencyModule {
             factory<ObserveCatalogUseCase> {
-                ObserveCatalogUseCaseImpl(streamRepository = get())
+                createObserveCatalogUseCase(streamRepository = get())
             }
             factory<RefreshCatalogUseCase> {
-                RefreshCatalogUseCaseImpl(streamRepository = get())
+                createRefreshCatalogUseCase(streamRepository = get())
             }
             factory<LoadNextPageUseCase> {
-                LoadNextPageUseCaseImpl(streamRepository = get())
+                createLoadNextPageUseCase(streamRepository = get())
             }
             factory<ObserveGenresUseCase> {
-                ObserveGenresUseCaseImpl(streamRepository = get())
+                createObserveGenresUseCase(streamRepository = get())
             }
             factory<RefreshGenresUseCase> {
-                RefreshGenresUseCaseImpl(streamRepository = get())
+                createRefreshGenresUseCase(streamRepository = get())
             }
             factory<ObserveMediaDetailsUseCase> {
-                ObserveMediaDetailsUseCaseImpl(streamRepository = get())
+                createObserveMediaDetailsUseCase(streamRepository = get())
             }
             factory<RefreshMediaDetailsUseCase> {
-                RefreshMediaDetailsUseCaseImpl(streamRepository = get())
+                createRefreshMediaDetailsUseCase(streamRepository = get())
             }
             factory<ObserveSeasonUseCase> {
-                ObserveSeasonUseCaseImpl(streamRepository = get())
+                createObserveSeasonUseCase(streamRepository = get())
             }
             factory<RefreshSeasonUseCase> {
-                RefreshSeasonUseCaseImpl(streamRepository = get())
+                createRefreshSeasonUseCase(streamRepository = get())
             }
         }
         val presentationModule = dependencyModule {

@@ -3,7 +3,7 @@ package br.com.composesample.stream.useCase
 import br.com.composesample.stream.model.catalog.CatalogQuery
 import br.com.composesample.stream.repository.StreamRepository
 
-class LoadNextPageUseCaseImpl(private val streamRepository: StreamRepository) :
+internal class LoadNextPageUseCaseImpl(private val streamRepository: StreamRepository) :
     LoadNextPageUseCase {
 
     override fun invoke(query: CatalogQuery) = streamRepository.loadNextPage(query)
