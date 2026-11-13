@@ -145,6 +145,7 @@ object CurrentTheme {
 
     object colors {
         val primary = ColorToken { CurrentTheme.color.primary }
+        val onSecondary = ColorToken { CurrentTheme.color.onSecondary }
         val shimmer = ColorToken { MaterialTheme.colorScheme.outlineVariant }
         val onSurfaceVariant = ColorToken { MaterialTheme.colorScheme.onSurfaceVariant }
     }

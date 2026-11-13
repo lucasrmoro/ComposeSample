@@ -1,7 +1,6 @@
 package br.com.composesample.structural.designsystem.components
 
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,10 +21,10 @@ fun SampleFloatingActionButton(
         containerColor = CurrentTheme.color.secondary,
         contentColor = CurrentTheme.color.onSecondary
     ) {
-        Icon(
-            imageVector = icon.imageVector,
+        SampleIcon(
+            icon = icon,
             contentDescription = contentDescription,
-            tint = CurrentTheme.color.onSecondary
+            tint = CurrentTheme.colors.onSecondary
         )
     }
 }
