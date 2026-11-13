@@ -29,3 +29,5 @@ O app cria um destino do `NavHost` para cada entry point registrado e chama seu 
 O `NavHost` do app salva sua backstack e o estado dos destinos, permitindo restaurar o `NavHost` interno e o estado salvável da tela quando uma feature filha é fechada. Não retenha Activity nem `NavController` no registro global do processo.
 
 Declare destinos como implementações de `FeatureDestination` nesta API. Cada feature é dona das rotas internas e dos Composables. Não crie um módulo Gradle de navegação por feature.
+
+Use a extensão `String.navArgument { ... }` de `api/core` para declarar argumentos nas rotas internas das features. Ela mantém o DSL oficial do Navigation Compose e permite manter o nome do argumento junto ao seu identificador compartilhado, por exemplo `Routes.Arguments.ID.navArgument { type = NavType.LongType }`.
