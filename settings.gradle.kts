@@ -1,11 +1,11 @@
 import java.util.Properties
 
-val tmdbLocalProperties = Properties().apply {
+val localProperties = Properties().apply {
     settingsDir.resolve("local.properties").takeIf { it.isFile }?.inputStream()?.use(::load)
 }
 val tmdbReadAccessToken =
     providers.environmentVariable("TMDB_READ_ACCESS_TOKEN").orNull?.takeIf(String::isNotBlank)
-        ?: tmdbLocalProperties.getProperty("TMDB_READ_ACCESS_TOKEN").orEmpty()
+        ?: localProperties.getProperty("TMDB_READ_ACCESS_TOKEN").orEmpty()
 gradle.extra["tmdbReadAccessToken"] = tmdbReadAccessToken
 
 pluginManagement {
