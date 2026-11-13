@@ -9,3 +9,6 @@ internal class LoadNextPageUseCaseImpl(private val streamRepository: StreamRepos
     override fun invoke(query: CatalogQuery) = streamRepository.loadNextPage(query)
 
 }
+
+fun createLoadNextPageUseCase(streamRepository: StreamRepository): LoadNextPageUseCase =
+    LoadNextPageUseCaseImpl(streamRepository = streamRepository)

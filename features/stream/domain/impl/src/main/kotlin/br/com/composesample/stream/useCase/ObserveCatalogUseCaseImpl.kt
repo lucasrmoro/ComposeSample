@@ -9,3 +9,6 @@ internal class ObserveCatalogUseCaseImpl(private val streamRepository: StreamRep
     override fun invoke(query: CatalogQuery) = streamRepository.observeCatalog(query)
 
 }
+
+fun createObserveCatalogUseCase(streamRepository: StreamRepository): ObserveCatalogUseCase =
+    ObserveCatalogUseCaseImpl(streamRepository = streamRepository)

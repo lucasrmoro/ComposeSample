@@ -11,3 +11,6 @@ internal class ObserveGenresUseCaseImpl(private val streamRepository: StreamRepo
         streamRepository.observeGenres(type, region)
 
 }
+
+fun createObserveGenresUseCase(streamRepository: StreamRepository): ObserveGenresUseCase =
+    ObserveGenresUseCaseImpl(streamRepository = streamRepository)

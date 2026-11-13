@@ -11,3 +11,6 @@ internal class RefreshSeasonUseCaseImpl(private val streamRepository: StreamRepo
         streamRepository.refreshSeason(id, season, region)
 
 }
+
+fun createRefreshSeasonUseCase(streamRepository: StreamRepository): RefreshSeasonUseCase =
+    RefreshSeasonUseCaseImpl(streamRepository = streamRepository)

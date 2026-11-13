@@ -11,3 +11,6 @@ internal class RefreshGenresUseCaseImpl(private val streamRepository: StreamRepo
         streamRepository.refreshGenres(type, region)
 
 }
+
+fun createRefreshGenresUseCase(streamRepository: StreamRepository): RefreshGenresUseCase =
+    RefreshGenresUseCaseImpl(streamRepository = streamRepository)

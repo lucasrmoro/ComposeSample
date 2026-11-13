@@ -11,3 +11,6 @@ internal class ObserveMediaDetailsUseCaseImpl(private val streamRepository: Stre
         streamRepository.observeDetails(id, region)
 
 }
+
+fun createObserveMediaDetailsUseCase(streamRepository: StreamRepository): ObserveMediaDetailsUseCase =
+    ObserveMediaDetailsUseCaseImpl(streamRepository = streamRepository)

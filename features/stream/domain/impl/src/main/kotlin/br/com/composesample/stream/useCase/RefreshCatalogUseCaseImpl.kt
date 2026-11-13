@@ -9,3 +9,6 @@ internal class RefreshCatalogUseCaseImpl(private val streamRepository: StreamRep
     override fun invoke(query: CatalogQuery) = streamRepository.refreshCatalog(query)
 
 }
+
+fun createRefreshCatalogUseCase(streamRepository: StreamRepository): RefreshCatalogUseCase =
+    RefreshCatalogUseCaseImpl(streamRepository = streamRepository)

@@ -11,3 +11,6 @@ internal class ObserveSeasonUseCaseImpl(private val streamRepository: StreamRepo
         streamRepository.observeSeason(id, season, region)
 
 }
+
+fun createObserveSeasonUseCase(streamRepository: StreamRepository): ObserveSeasonUseCase =
+    ObserveSeasonUseCaseImpl(streamRepository = streamRepository)

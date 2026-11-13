@@ -11,3 +11,6 @@ internal class RefreshMediaDetailsUseCaseImpl(private val streamRepository: Stre
         streamRepository.refreshDetails(id, region)
 
 }
+
+fun createRefreshMediaDetailsUseCase(streamRepository: StreamRepository): RefreshMediaDetailsUseCase =
+    RefreshMediaDetailsUseCaseImpl(streamRepository = streamRepository)
