@@ -244,17 +244,19 @@ task's original parent or creation point, and does not prevent branch creation.
 Fork runs may require maintainer approval according to the repository's Actions
 settings.
 
-CodeRabbit reviews new PRs and later pushes, including draft and task PRs. The
-`CodeRabbit` check is required by the `main` ruleset alongside the existing checks;
-review errors fail it. The **Verify review approvals** check requires approvals
-from `coderabbitai[bot]` and a person other than the PR author on the current
-commit. GitHub also requires two approvals and resolved review threads. Fix
-findings, push a new commit, and wait for a fresh review. For a false positive,
-explain the decision in the review thread before resolving it. If a review fails
-or its check is missing, request `@coderabbitai full review` and inspect the app
-installation and permissions. Skipped or rate-limited reviews may pass the
-`CodeRabbit` check but cannot satisfy the approval check. Automatic approvals
-require an eligible CodeRabbit plan.
+CodeRabbit is configured to review new PRs and later pushes, including draft and
+task PRs. For this public repository with fewer than ten stars, CodeRabbit
+requires a manual trigger: comment `@coderabbitai full review` after opening a
+PR and after each push. The `CodeRabbit` check is required by the `main` ruleset
+alongside the existing checks; review errors fail it. The **Verify review
+approvals** check requires approvals from `coderabbitai[bot]` and a person other
+than the PR author on the current commit. GitHub also requires two approvals
+and resolved review threads. Fix findings, push a new commit, and request a new
+review. For a false positive, explain the decision in the review thread before
+resolving it. If a review fails or its check is missing, request a full review
+and inspect the app installation and permissions. Skipped or rate-limited
+reviews may pass the `CodeRabbit` check but cannot satisfy the approval check.
+The human reviewer must have write access to the repository.
 
 Merge PRs using squash, then delete the source branch locally and remotely,
 except `main` and `develop`.
