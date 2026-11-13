@@ -1,6 +1,5 @@
 package br.com.composesample.stream.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,12 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +19,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import br.com.composesample.stream.tokens.StreamDimens
 import br.com.composesample.structural.assets_cache.AssetRequest
 import br.com.composesample.structural.designsystem.components.SampleImage
+import br.com.composesample.structural.designsystem.components.SampleIcon
+import br.com.composesample.structural.designsystem.components.SampleSurface
+import br.com.composesample.structural.designsystem.components.SampleText
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
@@ -49,39 +45,39 @@ fun SampleMediaCard(
                 .clip(RoundedCornerShape(CurrentTheme.size.xSmall))
         )
         Spacer(Modifier.height(CurrentTheme.spacing.small))
-        Text(title, style = MaterialTheme.typography.titleSmall)
+        SampleText(text = title, style = CurrentTheme.typography.titleSmall)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.xSmall)
         ) {
             rating?.let { rating ->
-                Icon(
-                    Icons.Default.Star,
-                    null,
-                    Modifier.size(StreamDimens.ratingIcon),
-                    tint = MaterialTheme.colorScheme.primary
+                SampleIcon(
+                    modifier = Modifier.size(StreamDimens.ratingIcon),
+                    icon = CurrentTheme.icon.star,
+                    contentDescription = null,
+                    tint = CurrentTheme.colors.primary
                 )
-                Text(rating, style = MaterialTheme.typography.labelSmall)
+                SampleText(text = rating, style = CurrentTheme.typography.labelSmall)
             }
-            year?.let { Text(it, style = MaterialTheme.typography.labelSmall) }
+            year?.let { SampleText(text = it, style = CurrentTheme.typography.labelSmall) }
             certification?.let { certification ->
-                Surface(
+                SampleSurface(
                     shape = RoundedCornerShape(CurrentTheme.size.xxxSmall),
-                    border = BorderStroke(CurrentTheme.stroke.thin, MaterialTheme.colorScheme.outline)
+                    outlined = true
                 ) {
-                    Text(
-                        certification,
-                        Modifier.padding(horizontal = CurrentTheme.spacing.xSmall),
-                        style = MaterialTheme.typography.labelSmall
+                    SampleText(
+                        modifier = Modifier.padding(horizontal = CurrentTheme.spacing.xSmall),
+                        text = certification,
+                        style = CurrentTheme.typography.labelSmall
                     )
                 }
             }
         }
         releaseLabel?.let {
-            Text(
-                it,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary
+            SampleText(
+                text = it,
+                style = CurrentTheme.typography.labelSmall,
+                color = CurrentTheme.color.primary
             )
         }
     }

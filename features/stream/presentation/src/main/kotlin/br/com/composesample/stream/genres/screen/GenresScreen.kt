@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -25,6 +23,8 @@ import br.com.composesample.stream.model.catalog.Genre
 import br.com.composesample.stream.model.media.MediaType
 import br.com.composesample.stream.tokens.StreamDimens
 import br.com.composesample.structural.designsystem.components.SampleScreen
+import br.com.composesample.structural.designsystem.components.SampleSurface
+import br.com.composesample.structural.designsystem.components.SampleText
 import br.com.composesample.structural.designsystem.screen.BaseScreen
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
@@ -66,11 +66,15 @@ private fun GenresContent(state: GenresUiState, back: () -> Unit, event: (Genres
                 )
             }
             items(state.genres, key = Genre::id) { genre ->
-                OutlinedCard(
+                SampleSurface(
+                    modifier = Modifier.fillMaxWidth().heightIn(min = CurrentTheme.size.xxxLarge),
                     onClick = { event(GenresUiEvent.Select(genre = genre)) },
-                    modifier = Modifier.fillMaxWidth().heightIn(min = CurrentTheme.size.xxxLarge)
+                    outlined = true
                 ) {
-                    Text(genre.name, Modifier.padding(CurrentTheme.spacing.large))
+                    SampleText(
+                        modifier = Modifier.padding(CurrentTheme.spacing.large),
+                        text = genre.name
+                    )
                 }
             }
         }

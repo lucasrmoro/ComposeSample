@@ -74,6 +74,7 @@ object CurrentTheme {
     }
 
     object icon {
+        val star: IconToken get() = SampleIcons.Star
         val person: IconToken get() = SampleIcons.Person
         val search: IconToken get() = SampleIcons.Search
         val close: IconToken get() = SampleIcons.Close
@@ -83,9 +84,15 @@ object CurrentTheme {
         val labelSmall: TypographyToken get() = SampleTypography.LabelSmall
         val labelMedium: TypographyToken get() = SampleTypography.LabelMedium
         val bodyLarge: TypographyToken get() = SampleTypography.BodyLarge
+        val headlineSmall: TypographyToken get() = SampleTypography.HeadlineSmall
+        val titleLarge: TypographyToken get() = SampleTypography.TitleLarge
+        val titleSmall: TypographyToken get() = SampleTypography.TitleSmall
+        val bodyMedium: TypographyToken get() = SampleTypography.BodyMedium
+        val bodySmall: TypographyToken get() = SampleTypography.BodySmall
     }
 
     object colors {
+        val primary = ColorToken { CurrentTheme.color.primary }
         val shimmer = ColorToken { MaterialTheme.colorScheme.outlineVariant }
         val onSurfaceVariant = ColorToken { MaterialTheme.colorScheme.onSurfaceVariant }
     }

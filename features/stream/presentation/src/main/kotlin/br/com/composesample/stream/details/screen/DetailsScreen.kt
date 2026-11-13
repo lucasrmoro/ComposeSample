@@ -14,14 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,10 +39,17 @@ import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.providers.ProviderCategory
 import br.com.composesample.stream.model.providers.WatchProvider
 import br.com.composesample.stream.tokens.StreamDimens
+import br.com.composesample.structural.designsystem.components.SampleButton
+import br.com.composesample.structural.designsystem.components.SampleButtonStyle
+import br.com.composesample.structural.designsystem.components.SampleCircularProgressIndicator
+import br.com.composesample.structural.designsystem.components.SampleDivider
+import br.com.composesample.structural.designsystem.components.SampleDropdownMenu
+import br.com.composesample.structural.designsystem.components.SampleDropdownMenuItem
 import br.com.composesample.structural.designsystem.components.SampleImage
 import br.com.composesample.structural.designsystem.components.SampleLink
 import br.com.composesample.structural.designsystem.components.SampleProfileImage
 import br.com.composesample.structural.designsystem.components.SampleScreen
+import br.com.composesample.structural.designsystem.components.SampleText
 import br.com.composesample.structural.designsystem.components.SampleVideoPlayer
 import br.com.composesample.structural.designsystem.screen.BaseScreen
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
@@ -76,12 +75,12 @@ internal class DetailsScreen(
 @Composable
 private fun Info(label: Int, value: String?) {
     if (!value.isNullOrBlank()) Column(Modifier.padding(vertical = CurrentTheme.spacing.xSmall)) {
-            Text(
-                stringResource(label),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            SampleText(
+                    text = stringResource(label),
+                style = CurrentTheme.typography.labelMedium,
+                color = CurrentTheme.color.onSurface
             )
-            Text(value, style = MaterialTheme.typography.bodyMedium)
+            SampleText(text = value, style = CurrentTheme.typography.bodyMedium)
         }
 }
 
@@ -121,27 +120,27 @@ private fun DetailsContent(
                 }
                 item {
                     Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
-                        Text(details.summary.title, style = MaterialTheme.typography.headlineSmall)
+                        SampleText(text = details.summary.title, style = CurrentTheme.typography.headlineSmall)
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small)
                         ) {
                             details.summary.rating?.let {
-                                Text(
-                                    String.format(java.util.Locale.getDefault(), RATING_FORMAT, it),
-                                    style = MaterialTheme.typography.labelMedium
+                                SampleText(
+                                        text = String.format(java.util.Locale.getDefault(), RATING_FORMAT, it),
+                                    style = CurrentTheme.typography.labelMedium
                                 )
                             }
                             details.summary.year?.let {
-                                Text(it, style = MaterialTheme.typography.labelMedium)
+                                SampleText(text = it, style = CurrentTheme.typography.labelMedium)
                             }
                             details.summary.certification?.let {
-                                Text(it, style = MaterialTheme.typography.labelMedium)
+                                SampleText(text = it, style = CurrentTheme.typography.labelMedium)
                             }
                         }
-                        Text(
-                            details.genres.joinToString(" · ", transform = Genre::name),
-                            style = MaterialTheme.typography.bodySmall
+                        SampleText(
+                                text = details.genres.joinToString(" · ", transform = Genre::name),
+                            style = CurrentTheme.typography.bodySmall
                         )
                         Info(
                             R.string.stream_runtime,
@@ -156,11 +155,11 @@ private fun DetailsContent(
                 details.overview?.let { overview ->
                     item {
                         Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
-                            Text(
-                                stringResource(R.string.stream_synopsis),
-                                style = MaterialTheme.typography.titleLarge
+                            SampleText(
+                                    text = stringResource(R.string.stream_synopsis),
+                                style = CurrentTheme.typography.titleLarge
                             )
-                            Text(overview)
+                            SampleText(text = overview)
                         }
                     }
                 }
@@ -171,30 +170,30 @@ private fun DetailsContent(
                 trailer?.let { trailer ->
                     item {
                         Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
-                            Text(
-                                stringResource(R.string.stream_trailer),
-                                style = MaterialTheme.typography.titleLarge
+                            SampleText(
+                                    text = stringResource(R.string.stream_trailer),
+                                style = CurrentTheme.typography.titleLarge
                             )
                             SampleVideoPlayer(
                                 source = VideoSource(provider = trailer.site, key = trailer.key),
                                 online = state.online
                             )
-                            Text(trailer.name, style = MaterialTheme.typography.bodySmall)
+                            SampleText(text = trailer.name, style = CurrentTheme.typography.bodySmall)
                         }
                     }
                 }
                 if (details.providers.isNotEmpty())
                     item {
                         Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
-                            Text(
-                                stringResource(R.string.stream_watch),
-                                style = MaterialTheme.typography.titleLarge
+                            SampleText(
+                                    text = stringResource(R.string.stream_watch),
+                                style = CurrentTheme.typography.titleLarge
                             )
                             details.providers
                                 .groupBy(WatchProvider::category)
                                 .forEach { (category, providers) ->
-                                    Text(
-                                        stringResource(
+                                    SampleText(
+                                            text = stringResource(
                                             when (category) {
                                                 ProviderCategory.SUBSCRIPTION ->
                                                     R.string.stream_subscription
@@ -204,7 +203,7 @@ private fun DetailsContent(
                                                 ProviderCategory.BUY -> R.string.stream_buy
                                             }
                                         ),
-                                        style = MaterialTheme.typography.titleSmall
+                                        style = CurrentTheme.typography.titleSmall
                                     )
                                     providers.forEach { provider ->
                                         Row(
@@ -221,13 +220,13 @@ private fun DetailsContent(
                                                 contentDescription = provider.name,
                                                 modifier = Modifier.size(CurrentTheme.size.xxxLarge)
                                             )
-                                            Text(provider.name)
+                                            SampleText(text = provider.name)
                                         }
                                     }
                                 }
-                            Text(
-                                stringResource(R.string.stream_justwatch),
-                                style = MaterialTheme.typography.labelSmall
+                            SampleText(
+                                    text = stringResource(R.string.stream_justwatch),
+                                style = CurrentTheme.typography.labelSmall
                             )
                             details.providerLink?.let {
                                 SampleLink(url = it, label = stringResource(R.string.stream_watch))
@@ -237,27 +236,27 @@ private fun DetailsContent(
                 if (details.seasons.isNotEmpty())
                     item {
                         Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
-                            Text(
-                                stringResource(R.string.stream_seasons),
-                                style = MaterialTheme.typography.titleLarge
+                            SampleText(
+                                    text = stringResource(R.string.stream_seasons),
+                                style = CurrentTheme.typography.titleLarge
                             )
                             var expanded by remember { mutableStateOf(false) }
                             Box {
-                                OutlinedButton(onClick = { expanded = true }) {
-                                    Text(
-                                        stringResource(
-                                            R.string.stream_season,
-                                            state.selectedSeason ?: details.seasons.first().number
-                                        )
-                                    )
-                                }
-                                DropdownMenu(
+                                SampleButton(
+                                    text = stringResource(
+                                        R.string.stream_season,
+                                        state.selectedSeason ?: details.seasons.first().number
+                                    ),
+                                    onClick = { expanded = true },
+                                    style = SampleButtonStyle.OUTLINED
+                                )
+                                SampleDropdownMenu(
                                     expanded = expanded,
                                     onDismissRequest = { expanded = false }
                                 ) {
                                     details.seasons.forEach { season ->
-                                        DropdownMenuItem(
-                                            text = { Text(season.name) },
+                                        SampleDropdownMenuItem(
+                                            text = season.name,
                                             onClick = {
                                                 expanded = false
                                                 event(
@@ -270,29 +269,29 @@ private fun DetailsContent(
                                     }
                                 }
                             }
-                            if (state.seasonLoading && state.season == null) CircularProgressIndicator()
+                            if (state.seasonLoading && state.season == null) SampleCircularProgressIndicator()
                             state.season?.episodes?.forEach { episode ->
-                                Text(
-                                    stringResource(
+                                SampleText(
+                                        text = stringResource(
                                         R.string.stream_episode,
                                         episode.number,
                                         episode.name
                                     ),
-                                    style = MaterialTheme.typography.titleSmall
+                                    style = CurrentTheme.typography.titleSmall
                                 )
                                 episode.airDate?.let {
-                                    Text(it, style = MaterialTheme.typography.labelSmall)
+                                    SampleText(text = it, style = CurrentTheme.typography.labelSmall)
                                 }
                                 episode.runtime?.let {
-                                    Text(
-                                        stringResource(R.string.stream_minutes, it),
-                                        style = MaterialTheme.typography.labelSmall
+                                    SampleText(
+                                            text = stringResource(R.string.stream_minutes, it),
+                                        style = CurrentTheme.typography.labelSmall
                                     )
                                 }
                                 episode.overview?.takeIf(String::isNotBlank)?.let {
-                                    Text(it, style = MaterialTheme.typography.bodySmall)
+                                    SampleText(text = it, style = CurrentTheme.typography.bodySmall)
                                 }
-                                HorizontalDivider(
+                                SampleDivider(
                                     Modifier.padding(vertical = CurrentTheme.spacing.small)
                                 )
                             }
@@ -301,10 +300,10 @@ private fun DetailsContent(
                 if (details.cast.isNotEmpty())
                     item {
                         Column {
-                            Text(
-                                stringResource(R.string.stream_cast),
-                                Modifier.padding(horizontal = CurrentTheme.spacing.large),
-                                style = MaterialTheme.typography.titleLarge
+                            SampleText(
+                                text = stringResource(R.string.stream_cast),
+                                modifier = Modifier.padding(horizontal = CurrentTheme.spacing.large),
+                                style = CurrentTheme.typography.titleLarge
                             )
                             LazyRow(
                                 contentPadding = PaddingValues(CurrentTheme.spacing.large),
@@ -317,12 +316,12 @@ private fun DetailsContent(
                                             contentDescription = person.name,
                                             modifier = Modifier.size(StreamDimens.portrait)
                                         )
-                                        Text(
-                                            person.name,
-                                            style = MaterialTheme.typography.labelMedium
+                                        SampleText(
+                                                text = person.name,
+                                            style = CurrentTheme.typography.labelMedium
                                         )
                                         person.role?.let {
-                                            Text(it, style = MaterialTheme.typography.labelSmall)
+                                            SampleText(text = it, style = CurrentTheme.typography.labelSmall)
                                         }
                                     }
                                 }
@@ -345,9 +344,9 @@ private fun DetailsContent(
                         if (details.crew.isNotEmpty()) {
                             ExpandableInformation(stringResource(R.string.stream_crew)) {
                                 details.crew.forEach { person ->
-                                    Text(person.name, style = MaterialTheme.typography.titleSmall)
+                                    SampleText(text = person.name, style = CurrentTheme.typography.titleSmall)
                                     person.role?.let {
-                                        Text(it, style = MaterialTheme.typography.bodySmall)
+                                        SampleText(text = it, style = CurrentTheme.typography.bodySmall)
                                     }
                                 }
                             }
@@ -357,9 +356,9 @@ private fun DetailsContent(
                                 details.videos
                                     .filter { it.key != trailer?.key }
                                     .forEach { video ->
-                                        Text(
-                                            video.name,
-                                            style = MaterialTheme.typography.titleSmall
+                                        SampleText(
+                                                text = video.name,
+                                            style = CurrentTheme.typography.titleSmall
                                         )
                                         if (video.site.equals("YouTube", true)) {
                                             SampleVideoPlayer(
@@ -379,9 +378,9 @@ private fun DetailsContent(
                                 Info(R.string.stream_revenue, details.revenue?.toString())
                             }
                         }
-                        Text(
-                            stringResource(R.string.stream_tmdb_attribution),
-                            style = MaterialTheme.typography.labelSmall,
+                        SampleText(
+                                text = stringResource(R.string.stream_tmdb_attribution),
+                            style = CurrentTheme.typography.labelSmall,
                             modifier = Modifier.padding(vertical = CurrentTheme.spacing.large)
                         )
                     }
@@ -394,9 +393,9 @@ private fun DetailsContent(
 @Composable
 private fun ExpandableInformation(title: String, content: @Composable () -> Unit) {
     var expanded by rememberSaveable { mutableStateOf(false) }
-    TextButton(onClick = { expanded = !expanded }) { Text(title) }
+    SampleButton(text = title, onClick = { expanded = !expanded }, style = SampleButtonStyle.TEXT)
     if (expanded) content()
-    HorizontalDivider()
+    SampleDivider()
 }
 
 @Preview(showBackground = true)

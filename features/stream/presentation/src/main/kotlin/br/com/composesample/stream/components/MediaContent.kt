@@ -10,10 +10,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -32,6 +28,10 @@ import br.com.composesample.stream.model.releases.ReleaseKind
 import br.com.composesample.stream.tokens.StreamDimens
 import br.com.composesample.structural.assets_cache.AssetRequest
 import br.com.composesample.structural.core.text.UiText
+import br.com.composesample.structural.designsystem.components.SampleButton
+import br.com.composesample.structural.designsystem.components.SampleButtonStyle
+import br.com.composesample.structural.designsystem.components.SampleCircularProgressIndicator
+import br.com.composesample.structural.designsystem.components.SampleText
 import br.com.composesample.structural.designsystem.text.asString
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
@@ -114,11 +114,11 @@ internal fun SummaryCard(
 
 @Composable
 internal fun LoadNotice(loading: Boolean, empty: Boolean, error: UiText?, retry: () -> Unit) {
-    if (loading && empty) CircularProgressIndicator()
+    if (loading && empty) SampleCircularProgressIndicator()
     if (error != null) {
-        Text(error.asString(), style = MaterialTheme.typography.bodySmall)
-        TextButton(onClick = retry) { Text(stringResource(R.string.stream_retry)) }
-    } else if (empty && !loading) Text(stringResource(R.string.stream_empty))
+        SampleText(text = error.asString(), style = CurrentTheme.typography.bodySmall)
+        SampleButton(text = stringResource(R.string.stream_retry), onClick = retry, style = SampleButtonStyle.TEXT)
+    } else if (empty && !loading) SampleText(text = stringResource(R.string.stream_empty))
 }
 
 @Composable
@@ -154,9 +154,9 @@ internal fun MediaGrid(
                 onClick = { onDetails(item.id) }
             )
         }
-        if (paging) item { CircularProgressIndicator() }
+        if (paging) item { SampleCircularProgressIndicator() }
         if (page.hasNextPage && !paging)
-            item { TextButton(onClick = onNext) { Text(stringResource(R.string.stream_more)) } }
+            item { SampleButton(text = stringResource(R.string.stream_more), onClick = onNext, style = SampleButtonStyle.TEXT) }
     }
 }
 
