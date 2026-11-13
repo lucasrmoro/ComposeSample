@@ -4,20 +4,49 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 
-/** Creates a required integer navigation argument with [key] as its name. */
-fun intArgument(key: String): NamedNavArgument = navArgument(name = key) { type = NavType.IntType }
+/** Creates an integer navigation argument with optional nullability and a default value. */
+fun intArgument(
+    key: String,
+    nullable: Boolean = false,
+    defaultValue: Int? = null
+): NamedNavArgument = navArgument(name = key) {
+    type = NavType.IntType
+    this.nullable = nullable
+    defaultValue?.let { this.defaultValue = it }
+}
 
-/** Creates a required long navigation argument with [key] as its name. */
-fun longArgument(key: String): NamedNavArgument =
-    navArgument(name = key) { type = NavType.LongType }
+/** Creates a long navigation argument with optional nullability and a default value. */
+fun longArgument(
+    key: String,
+    nullable: Boolean = false,
+    defaultValue: Long? = null
+): NamedNavArgument = navArgument(name = key) {
+    type = NavType.LongType
+    this.nullable = nullable
+    defaultValue?.let { this.defaultValue = it }
+}
 
-/** Creates a required float navigation argument with [key] as its name. */
-fun floatArgument(key: String): NamedNavArgument =
-    navArgument(name = key) { type = NavType.FloatType }
+/** Creates a float navigation argument with optional nullability and a default value. */
+fun floatArgument(
+    key: String,
+    nullable: Boolean = false,
+    defaultValue: Float? = null
+): NamedNavArgument = navArgument(name = key) {
+    type = NavType.FloatType
+    this.nullable = nullable
+    defaultValue?.let { this.defaultValue = it }
+}
 
-/** Creates a required boolean navigation argument with [key] as its name. */
-fun booleanArgument(key: String): NamedNavArgument =
-    navArgument(name = key) { type = NavType.BoolType }
+/** Creates a boolean navigation argument with optional nullability and a default value. */
+fun booleanArgument(
+    key: String,
+    nullable: Boolean = false,
+    defaultValue: Boolean? = null
+): NamedNavArgument = navArgument(name = key) {
+    type = NavType.BoolType
+    this.nullable = nullable
+    defaultValue?.let { this.defaultValue = it }
+}
 
 /**
  * Creates a string navigation argument with [key] as its name and optional null/default behavior.
@@ -25,10 +54,10 @@ fun booleanArgument(key: String): NamedNavArgument =
 fun stringArgument(
     key: String,
     nullable: Boolean = false,
-    defaultValue: String? = null,
+    defaultValue: String? = null
 ): NamedNavArgument =
     navArgument(name = key) {
         type = NavType.StringType
         this.nullable = nullable
-        this.defaultValue = defaultValue
+        defaultValue?.let { this.defaultValue = it }
     }
