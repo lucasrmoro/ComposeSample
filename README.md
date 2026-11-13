@@ -250,6 +250,7 @@ requires a manual trigger: comment `@coderabbitai full review` after opening a
 PR and after each push. The `CodeRabbit` check is required by the `main` ruleset
 alongside the existing checks; review errors fail it. The **Verify CodeRabbit
 approval** check requires approval from `coderabbitai[bot]` on the current
+commit. It waits for a submitted review before reporting a result on a new
 commit. A separate review ruleset requires two approvals and resolved review
 threads for other contributors. Its sole-maintainer bypass does not bypass the
 required CodeRabbit checks. Fix findings, push a new commit, and request a new
