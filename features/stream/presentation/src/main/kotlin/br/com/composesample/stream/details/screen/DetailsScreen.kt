@@ -372,7 +372,7 @@ private fun DetailsContent(
                                     }
                             }
                         }
-                        if (details.budget != null || details.revenue != null) {
+                        (details.budget ?: details.revenue)?.let { _ ->
                             ExpandableInformation(stringResource(R.string.stream_financial)) {
                                 Info(R.string.stream_budget, details.budget?.toString())
                                 Info(R.string.stream_revenue, details.revenue?.toString())

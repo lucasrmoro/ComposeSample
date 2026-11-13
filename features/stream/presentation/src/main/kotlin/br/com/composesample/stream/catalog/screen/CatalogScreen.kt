@@ -132,10 +132,12 @@ private fun ColumnScope.CatalogSearchContent(
             error = state.search.error,
             retry = { event(CatalogUiEvent.SubmitSearch) }
         )
-        if (state.search.error != null) SampleText(
-            text = stringResource(R.string.stream_offline_search),
-            style = CurrentTheme.typography.labelSmall
-        )
+        state.search.error?.let {
+            SampleText(
+                text = stringResource(R.string.stream_offline_search),
+                style = CurrentTheme.typography.labelSmall
+            )
+        }
     }
     MediaGrid(
         modifier = Modifier.weight(1f),

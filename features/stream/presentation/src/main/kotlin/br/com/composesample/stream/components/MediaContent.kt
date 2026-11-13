@@ -91,13 +91,14 @@ internal fun SummaryCard(
             val episode = event.episode
             when (event.kind) {
                 ReleaseKind.NEW_SERIES -> stringResource(R.string.stream_new_series)
-                ReleaseKind.NEW_SEASON ->
-                    if (season != null) stringResource(R.string.stream_new_season, season)
-                    else stringResource(R.string.stream_new_season_generic)
-                ReleaseKind.NEW_EPISODE ->
-                    if (season != null && episode != null)
-                        stringResource(R.string.stream_new_episode, season, episode)
-                    else stringResource(R.string.stream_new_episode_generic)
+                ReleaseKind.NEW_SEASON -> season?.let {
+                    stringResource(R.string.stream_new_season, it)
+                } ?: stringResource(R.string.stream_new_season_generic)
+                ReleaseKind.NEW_EPISODE -> season?.let { seasonNumber ->
+                    episode?.let { episodeNumber ->
+                        stringResource(R.string.stream_new_episode, seasonNumber, episodeNumber)
+                    }
+                } ?: stringResource(R.string.stream_new_episode_generic)
             }
         }
     SampleMediaCard(
@@ -115,10 +116,16 @@ internal fun SummaryCard(
 @Composable
 internal fun LoadNotice(loading: Boolean, empty: Boolean, error: UiText?, retry: () -> Unit) {
     if (loading && empty) SampleCircularProgressIndicator()
-    if (error != null) {
-        SampleText(text = error.asString(), style = CurrentTheme.typography.bodySmall)
-        SampleButton(text = stringResource(R.string.stream_retry), onClick = retry, style = SampleButtonStyle.TEXT)
-    } else if (empty && !loading) SampleText(text = stringResource(R.string.stream_empty))
+    error?.let { errorText ->
+        SampleText(text = errorText.asString(), style = CurrentTheme.typography.bodySmall)
+        SampleButton(
+            text = stringResource(R.string.stream_retry),
+            onClick = retry,
+            style = SampleButtonStyle.TEXT
+        )
+    } ?: run {
+        if (empty && !loading) SampleText(text = stringResource(R.string.stream_empty))
+    }
 }
 
 @Composable
