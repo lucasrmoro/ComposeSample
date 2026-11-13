@@ -13,7 +13,8 @@ internal object AppConfigurationModule {
     private const val FALLBACK_COUNTRY_CODE = "BR"
 
     private const val ASSETS_CACHE_DIRECTORY = "stream-images"
-    private const val ASSETS_CACHE_MAXIMUM_BYTES = 200L * 1024 * 1024
+    private const val BYTES_PER_MEBIBYTE = 1_048_576L
+    private const val ASSETS_CACHE_MAXIMUM_BYTES = 200 * BYTES_PER_MEBIBYTE
     private const val ASSETS_CACHE_MAXIMUM_AGE_DAYS = 30L
     private const val VIDEO_EMBED_ORIGIN = "https://composesample.app"
 
