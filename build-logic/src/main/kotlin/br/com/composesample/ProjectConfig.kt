@@ -19,6 +19,7 @@ object ProjectConfig {
     val COMPOSE_MODULES = setOf(
         ":app",
         ":features:featureA:presentation",
+        ":features:stream:presentation",
         ":structural:design-system",
         ":structural:di:api",
         ":structural:navigation:api"

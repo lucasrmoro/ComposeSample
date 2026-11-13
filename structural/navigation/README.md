@@ -5,7 +5,7 @@ Define os contratos de entrada das features e o registro que as conecta sem expo
 ## Módulos
 
 - `api/core`: destinos de feature, entry points Compose, registro de navegação e contrato do navegador entre features.
-- `api/<feature>`: destinos tipados agrupados por feature, como `featureA/FeatureADestination`.
+- `api/<feature>`: destinos tipados agrupados por feature, como `stream/StreamDestination`.
 - `impl`: registro de rotas mantido durante a vida do app.
 - `di`: registros de DI para o registro compartilhado de rotas.
 
@@ -17,10 +17,10 @@ Carregue `NavigationModule.init()` em `AppApplication` antes de registrar os ent
 
 ```kotlin
 NavigationModule.init()
-FeatureAModule.init(navigationRegistry = get())
+StreamModule.init(navigationRegistry = get())
 ```
 
-O DI da feature registra `createFeatureAEntryPoint()` no registro. Para a feature inicial, passe `isStartDestination = true`. Nomes de rota duplicados e múltiplos destinos iniciais são rejeitados; montar o host sem um destino inicial falha com `IllegalStateException`.
+O DI da feature registra `createStreamEntryPoint()` no registro. Para a feature inicial, passe `isStartDestination = true`. Nomes de rota duplicados e múltiplos destinos iniciais são rejeitados; montar o host sem um destino inicial falha com `IllegalStateException`.
 
 ## Uso
 

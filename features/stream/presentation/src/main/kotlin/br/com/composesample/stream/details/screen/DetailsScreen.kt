@@ -1,0 +1,356 @@
+package br.com.composesample.stream.details.screen
+
+import br.com.composesample.stream.model.catalog.Genre
+import br.com.composesample.stream.model.media.MediaId
+import br.com.composesample.stream.model.providers.ProviderCategory
+import br.com.composesample.stream.model.providers.WatchProvider
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import br.com.composesample.features.stream.presentation.R
+import br.com.composesample.stream.components.*
+import br.com.composesample.stream.details.model.*
+import br.com.composesample.stream.details.viewModel.DetailsViewModel
+import br.com.composesample.structural.designsystem.components.*
+import br.com.composesample.structural.designsystem.screen.BaseScreen
+import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
+import br.com.composesample.structural.designsystem.theme.CurrentTheme
+import br.com.composesample.stream.tokens.StreamDimens
+import br.com.composesample.structural.video_player.VideoSource
+
+internal class DetailsScreen(
+    private val detailsViewModel: DetailsViewModel,
+    private val id: MediaId,
+    private val back: () -> Unit
+) : BaseScreen<DetailsUiState, DetailsUiEffect>(detailsViewModel) {
+
+    @Composable
+    override fun Content(uiState: DetailsUiState) {
+        LaunchedEffect(id) { detailsViewModel.sendEvent(DetailsUiEvent.Start(id)) }
+        DetailsContent(uiState, back, detailsViewModel::sendEvent)
+    }
+
+    override fun consumeEffect(effect: DetailsUiEffect) = Unit
+
+}
+
+@Composable
+private fun Info(label: Int, value: String?) {
+    if (!value.isNullOrBlank())
+        Column(Modifier.padding(vertical = CurrentTheme.spacing.xSmall)) {
+            Text(
+                stringResource(label),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(value, style = MaterialTheme.typography.bodyMedium)
+        }
+}
+
+@Composable
+private fun DetailsContent(
+    state: DetailsUiState,
+    back: () -> Unit,
+    event: (DetailsUiEvent) -> Unit
+) {
+    SampleScreen(title = stringResource(R.string.stream_details), canNavigateBack = true, onNavigateBack = back) {
+        val mediaDetails = state.details
+        LazyColumn(
+            Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small)
+        ) {
+            item {
+                Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
+                    LoadNotice(
+                        state.loading,
+                        mediaDetails == null,
+                        state.error,
+                        { event(DetailsUiEvent.Retry) }
+                    )
+                }
+            }
+            mediaDetails?.let { details ->
+                item {
+                    SampleImage(
+                        request = imageRequest(details.backdropPath, ImageRole.BACKDROP),
+                        contentDescription = details.summary.title,
+                        modifier = Modifier.fillMaxWidth().height(StreamDimens.backdropHeight)
+                    )
+                }
+                item {
+                    Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
+                        Text(details.summary.title, style = MaterialTheme.typography.headlineSmall)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small)
+                        ) {
+                            details.summary.rating?.let {
+                                Text(
+                                    String.format(java.util.Locale.getDefault(), RATING_FORMAT, it),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            }
+                            details.summary.year?.let {
+                                Text(it, style = MaterialTheme.typography.labelMedium)
+                            }
+                            details.summary.certification?.let {
+                                Text(it, style = MaterialTheme.typography.labelMedium)
+                            }
+                        }
+                        Text(
+                            details.genres.joinToString(" · ", transform = Genre::name),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Info(
+                            R.string.stream_runtime,
+                            details.runtimeMinutes?.let {
+                                stringResource(R.string.stream_minutes, it)
+                            }
+                        )
+                        Info(R.string.stream_release_date, details.releaseDate)
+                        Info(R.string.stream_original_title, details.originalTitle)
+                    }
+                }
+                details.overview?.let { overview ->
+                    item {
+                        Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
+                            Text(
+                                stringResource(R.string.stream_synopsis),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            Text(overview)
+                        }
+                    }
+                }
+                val trailer =
+                    details.videos.firstOrNull {
+                        it.site.equals("YouTube", true) && it.type == "Trailer"
+                    } ?: details.videos.firstOrNull { it.site.equals("YouTube", true) }
+                trailer?.let { trailer ->
+                    item {
+                        Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
+                            Text(
+                                stringResource(R.string.stream_trailer),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            SampleVideoPlayer(
+                                source = VideoSource(provider = trailer.site, key = trailer.key),
+                                online = state.online
+                            )
+                            Text(trailer.name, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                }
+                if (details.providers.isNotEmpty())
+                    item {
+                        Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
+                            Text(
+                                stringResource(R.string.stream_watch),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            details.providers.groupBy(WatchProvider::category).forEach {
+                                (category, providers) ->
+                                Text(
+                                    stringResource(
+                                        when (category) {
+                                            ProviderCategory.SUBSCRIPTION ->
+                                                R.string.stream_subscription
+                                            ProviderCategory.FREE -> R.string.stream_free
+                                            ProviderCategory.ADS -> R.string.stream_ads
+                                            ProviderCategory.RENT -> R.string.stream_rent
+                                            ProviderCategory.BUY -> R.string.stream_buy
+                                        }
+                                    ),
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                providers.forEach { provider ->
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement =
+                                            Arrangement.spacedBy(CurrentTheme.spacing.small)
+                                    ) {
+                                        SampleImage(
+                                            request = imageRequest(provider.logoPath, ImageRole.LOGO),
+                                            contentDescription = provider.name,
+                                            modifier = Modifier.size(CurrentTheme.size.xxxLarge)
+                                        )
+                                        Text(provider.name)
+                                    }
+                                }
+                            }
+                            Text(
+                                stringResource(R.string.stream_justwatch),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                            details.providerLink?.let {
+                                SampleLink(url = it, label = stringResource(R.string.stream_watch))
+                            }
+                        }
+                    }
+                if (details.seasons.isNotEmpty())
+                    item {
+                        Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
+                            Text(
+                                stringResource(R.string.stream_seasons),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            var expanded by remember { mutableStateOf(false) }
+                            Box {
+                                OutlinedButton(onClick = { expanded = true }) {
+                                    Text(
+                                        stringResource(
+                                            R.string.stream_season,
+                                            state.selectedSeason ?: details.seasons.first().number
+                                        )
+                                    )
+                                }
+                                DropdownMenu(expanded, { expanded = false }) {
+                                    details.seasons.forEach { season ->
+                                        DropdownMenuItem(
+                                            text = { Text(season.name) },
+                                            onClick = {
+                                                expanded = false
+                                                event(
+                                                    DetailsUiEvent.SelectSeason(
+                                                        number = season.number
+                                                    )
+                                                )
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                            if (state.seasonLoading && state.season == null)
+                                CircularProgressIndicator()
+                            state.season?.episodes?.forEach { episode ->
+                                Text(
+                                    stringResource(
+                                        R.string.stream_episode,
+                                        episode.number,
+                                        episode.name
+                                    ),
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                episode.airDate?.let {
+                                    Text(it, style = MaterialTheme.typography.labelSmall)
+                                }
+                                episode.runtime?.let {
+                                    Text(
+                                        stringResource(R.string.stream_minutes, it),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
+                                episode.overview?.takeIf(String::isNotBlank)?.let {
+                                    Text(it, style = MaterialTheme.typography.bodySmall)
+                                }
+                                HorizontalDivider(Modifier.padding(vertical = CurrentTheme.spacing.small))
+                            }
+                        }
+                    }
+                if (details.cast.isNotEmpty())
+                    item {
+                        Column {
+                            Text(
+                                stringResource(R.string.stream_cast),
+                                Modifier.padding(horizontal = CurrentTheme.spacing.large),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            LazyRow(
+                                contentPadding = PaddingValues(CurrentTheme.spacing.large),
+                                horizontalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.medium)
+                            ) {
+                                items(details.cast) { person ->
+                                    Column(Modifier.width(StreamDimens.portrait)) {
+                                        SampleProfileImage(
+                                            request = imageRequest(person.imagePath, ImageRole.PROFILE),
+                                            contentDescription = person.name,
+                                            modifier = Modifier.size(StreamDimens.portrait)
+                                        )
+                                        Text(
+                                            person.name,
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                        person.role?.let {
+                                            Text(it, style = MaterialTheme.typography.labelSmall)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                item {
+                    Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
+                        ExpandableInformation(stringResource(R.string.stream_information)) {
+                            Info(R.string.stream_status, details.status)
+                            Info(R.string.stream_votes, details.voteCount?.toString())
+                            Info(R.string.stream_language, details.originalLanguage)
+                            Info(R.string.stream_languages, details.languages.joinToString(", "))
+                            Info(R.string.stream_countries, details.countries.joinToString(", "))
+                            Info(R.string.stream_companies, details.companies.joinToString(", "))
+                            details.homepage?.let {
+                                SampleLink(url = it, label = stringResource(R.string.stream_homepage))
+                            }
+                        }
+                        if (details.crew.isNotEmpty())
+                            ExpandableInformation(stringResource(R.string.stream_crew)) {
+                                details.crew.forEach { person ->
+                                    Text(person.name, style = MaterialTheme.typography.titleSmall)
+                                    person.role?.let {
+                                        Text(it, style = MaterialTheme.typography.bodySmall)
+                                    }
+                                }
+                            }
+                        if (details.videos.size > 1)
+                            ExpandableInformation(stringResource(R.string.stream_other_videos)) {
+                                details.videos
+                                    .filter { it.key != trailer?.key }
+                                    .forEach { video ->
+                                        Text(
+                                            video.name,
+                                            style = MaterialTheme.typography.titleSmall
+                                        )
+                                        if (video.site.equals("YouTube", true))
+                                            SampleVideoPlayer(
+                                                source = VideoSource(provider = video.site, key = video.key),
+                                                online = state.online
+                                            )
+                                    }
+                            }
+                        if (details.budget != null || details.revenue != null)
+                            ExpandableInformation(stringResource(R.string.stream_financial)) {
+                                Info(R.string.stream_budget, details.budget?.toString())
+                                Info(R.string.stream_revenue, details.revenue?.toString())
+                            }
+                        Text(
+                            stringResource(R.string.stream_tmdb_attribution),
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(vertical = CurrentTheme.spacing.large)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExpandableInformation(title: String, content: @Composable () -> Unit) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    TextButton(onClick = { expanded = !expanded }) { Text(title) }
+    if (expanded) content()
+    HorizontalDivider()
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DetailsPreview() {
+    ComposeSampleTheme { DetailsContent(DetailsUiState(loading = false), {}, {}) }
+}
