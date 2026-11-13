@@ -1,6 +1,7 @@
 package br.com.composesample.app
 
 import android.app.Application
+import br.com.composesample.BuildConfig
 import br.com.composesample.configuration.AppConfigurationModule
 import br.com.composesample.login.LoginModule
 import br.com.composesample.stream.di.StreamModule
@@ -10,8 +11,6 @@ import br.com.composesample.structural.analytics.initializeFirebase
 import br.com.composesample.structural.assets_cache.di.AssetsCacheModule
 import br.com.composesample.structural.biometric.di.BiometricModule
 import br.com.composesample.structural.camera.di.CameraModule
-import br.com.composesample.structural.media.di.MediaModule
-import br.com.composesample.structural.media_compression.di.MediaCompressionModule
 import br.com.composesample.structural.core.di.CoreModule
 import br.com.composesample.structural.core.di.DispatcherIO
 import br.com.composesample.structural.designsystem.di.DesignSystemModule
@@ -21,8 +20,10 @@ import br.com.composesample.structural.di.startDependencyInjection
 import br.com.composesample.structural.local_storage.di.LocalStorageModule
 import br.com.composesample.structural.localization.AppRegionProvider
 import br.com.composesample.structural.localization.di.LocalizationModule
-import br.com.composesample.structural.logger.di.LoggerModule
 import br.com.composesample.structural.logger.Logger
+import br.com.composesample.structural.logger.di.LoggerModule
+import br.com.composesample.structural.media.di.MediaModule
+import br.com.composesample.structural.media_compression.di.MediaCompressionModule
 import br.com.composesample.structural.navigation.di.NavigationModule
 import br.com.composesample.structural.network.connectivity.NetworkConnectivityProvider
 import br.com.composesample.structural.network.di.NetworkModule
@@ -98,7 +99,7 @@ class AppApplication : Application(), PushMessagingServiceHost {
         StreamModule.init(
             context = this,
             navigationRegistry = get(),
-            readAccessToken = br.com.composesample.BuildConfig.TMDB_READ_ACCESS_TOKEN
+            readAccessToken = BuildConfig.TMDB_READ_ACCESS_TOKEN
         )
     }
 
