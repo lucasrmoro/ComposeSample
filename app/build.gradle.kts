@@ -1,26 +1,15 @@
 import br.com.composesample.modules.Modules
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.sample.android.app)
     alias(libs.plugins.compose.compiler)
 }
 
-val tmdbLocalProperties = Properties().apply {
-    rootProject.file("local.properties").takeIf { it.isFile }?.inputStream()?.use(::load)
-}
-val tmdbReadAccessToken =
-    providers.environmentVariable("TMDB_READ_ACCESS_TOKEN").orNull?.takeIf(String::isNotBlank)
-        ?: tmdbLocalProperties.getProperty("TMDB_READ_ACCESS_TOKEN").orEmpty()
-val tmdbEscapedToken = tmdbReadAccessToken
-    .replace("\\", "\\\\")
-    .replace("\"", "\\\"")
-    .replace("\n", "\\n")
-    .replace("\r", "\\r")
+val tmdbReadAccessToken = gradle.extra["tmdbReadAccessToken"] as String
 
 android {
     defaultConfig {
-        buildConfigField("String", "TMDB_READ_ACCESS_TOKEN", "\"$tmdbEscapedToken\"")
+        buildConfigField("String", "TMDB_READ_ACCESS_TOKEN", "\"$tmdbReadAccessToken\"")
     }
 }
 
