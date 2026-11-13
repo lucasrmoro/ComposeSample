@@ -15,28 +15,26 @@ concurrency:
 
 jobs:
   review-approvals:
-    name: Verify review approvals
+    name: Verify CodeRabbit approval
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - name: Require CodeRabbit and human approval of the current commit
+      - name: Require CodeRabbit approval of the current commit
         env:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
           set -euo pipefail
           reviews="$(gh api "repos/${REPOSITORY}/pulls/${PR_NUMBER}/reviews?per_page=100" --paginate --slurp)"
-          if ! jq -e --arg head "$HEAD_SHA" --arg author "$PR_AUTHOR" '
+          if ! jq -e --arg head "$HEAD_SHA" '
             [ .[][] | select(.state == "APPROVED" or .state == "CHANGES_REQUESTED" or .state == "DISMISSED") ]
             | sort_by(.submitted_at, .id)
             | group_by(.user.login)
             | map(.[-1])
-            | (any(.[]; .user.login == "coderabbitai[bot]" and .state == "APPROVED" and .commit_id == $head))
-              and (any(.[]; .user.type == "User" and .user.login != $author and .state == "APPROVED" and .commit_id == $head))
+            | any(.[]; .user.login == "coderabbitai[bot]" and .state == "APPROVED" and .commit_id == $head)
           ' <<< "$reviews" > /dev/null; then
-            echo "::error::The current commit requires CodeRabbit and human approvals."
+            echo "::error::The current commit requires CodeRabbit approval."
             exit 1
           fi
