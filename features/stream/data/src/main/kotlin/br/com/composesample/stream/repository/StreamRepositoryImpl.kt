@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
 
-internal class StreamRepositoryImpl(
+class StreamRepositoryImpl(
     private val streamLocalDataSource: StreamLocalDataSource,
     private val streamRemoteDataSource: StreamRemoteDataSource,
     private val streamMapper: StreamMapper,

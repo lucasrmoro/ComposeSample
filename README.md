@@ -6,20 +6,21 @@ features, structural services, and vendor integrations can evolve behind explici
 contracts while application startup remains centralized and easy to trace.
 
 The project is an architectural reference with illustrative business logic.
-`featureA` contains list and form screens, but several repository operations still
-return placeholder values. The login feature currently provides token refresh
-infrastructure rather than a standalone login screen. Backend URLs are placeholders.
+`stream` browses TMDB movies and series, with popular titles, recent releases,
+upcoming releases, genres, search, details, and trailers. Room supplies previously
+loaded content offline. The login feature demonstrates a separate backend token
+refresh integration; it does not refresh the TMDB application credential.
 
 ## Project structure
 
 ```text
 app/                         Application startup and top-level Compose host
 features/
-  featureA/
+  stream/
     presentation/            Screens, ViewModels, MVI models, internal navigation
     domain/api/              Business models, repository and use case contracts
     domain/impl/             Use case implementations
-    data/                    Repository implementations, services, DTOs, DAOs, mappers
+    data/                    Repository implementations, data sources, DAOs, entities
     analytics/               Feature-specific tracking contract and implementation
     di/                      Feature bindings and navigation entry point registration
   login/
@@ -82,12 +83,19 @@ deliberate reexports.
 
 ### Calls at runtime
 
-For example, `GetSomethingUseCaseImpl` consumes `FeatureARepository`, declared in
-`featureA/domain/api`. `FeatureARepositoryImpl` lives in `featureA/data` and receives
-local and remote data sources. Its HTTP service consumes `network/api`'s
-`HttpClient`; Retrofit, OkHttp, and Gson remain inside `network/impl`. Every HTTP
-DTO field, including nested fields, declares `network/api`'s `@JsonName` so protocol
-names survive obfuscation.
+`ObserveCatalogUseCaseImpl` consumes `StreamRepository` from `stream/domain/api`.
+`StreamRepositoryImpl` coordinates local and remote data source contracts and
+`StreamMapper`, which converts DTOs, cache entities, and domain models. Keep representation conversions
+in dedicated mappers rather than implementing them in repositories. Repositories
+consume data source contracts rather than querying DAOs or SDK clients directly.
+Data source implementations extend
+`BaseDataSource`: use `call` for one-shot operations and preserve observable
+source flows for continuous updates. `StreamLocalDataSourceImpl` executes Room
+operations on its injected I/O dispatcher.
+
+For HTTP integrations, keep vendor clients in structural implementations. Every
+HTTP DTO field, including nested fields, declares `network/api`'s `@JsonName` so
+protocol names survive obfuscation.
 
 The intended request flow is:
 
@@ -100,8 +108,37 @@ Screen event
   -> Storage or HTTP client
 ```
 
-Results return through suspending calls or flows. The placeholder operations in
-`featureA` do not yet execute this complete request flow.
+Catalog queries and details observe Room through Flow. Refreshes persist successful
+responses before updating the screen; failures preserve previously loaded content.
+Search supports an 800 ms debounce and immediate keyboard submission. Image files
+use a shared private 200 MB least recently accessed file removal cache with a 30-day refresh age. Room stores only cache metadata; image bytes stay in private files. Posters, backdrops, cast photos and provider logos have separate directories under `cacheDir/media/stream-images`. Trailers require internet.
+
+### TMDB configuration
+
+Add the **API Read Access Token** from your TMDB account to the ignored
+`local.properties` file:
+
+```properties
+TMDB_READ_ACCESS_TOKEN=your_read_access_token
+```
+
+The build also accepts the environment variable `TMDB_READ_ACCESS_TOKEN`, which
+takes precedence when nonempty. A trusted GitHub Actions build can inject a
+repository secret into that environment variable. Builds without it still compile;
+real TMDB requests require a valid credential. Do not expose secrets to fork PRs.
+
+The dedicated TMDB client sends `Authorization: Bearer ...`; it does not use the
+login feature's refresh mechanism. Authorization is redacted from HTTP logs.
+Credentials embedded in an APK remain extractable, even when the source and CI
+configuration are private. This client does not provide a backend secret vault.
+
+The app resource language selects TMDB's `language` query parameter. Results are
+cached by media type, query, language and region. Upcoming/recent series identify
+the next/latest confirmed event once per series, using available TMDB dates;
+the API does not guarantee a complete calendar of future episodes.
+
+This development transition replaces the task database with the stream cache.
+Old task rows are removed; encrypted preferences and other app files are preserved.
 
 ## Startup and dependency injection
 
@@ -145,6 +182,16 @@ feature entry point hosts its own `NavHost` and internal backstack. Feature DI
 registers entry points during startup, and one entry point supplies the start
 destination. The launcher Activity hosts `setContent`; feature screens are Compose
 destinations. See [navigation](structural/navigation/README.md).
+
+Static UI text, accessibility labels, and preview copy use string resources.
+ViewModels expose messages as `UiText.StringResource(id, vararg params)`; screens
+resolve them with the design system's composable `UiText.asString()`. `UiText.Raw`
+is reserved for runtime content rather than translatable application copy.
+
+Repository and use case contracts return Flow. Observation stays continuous;
+one-shot reads and saves emit one result per collection. ViewModels use the
+existing `.onError { ... }.onSuccess { ... }` helpers, with `onSuccess` collecting
+the flow. Domain contracts do not expose Room, Android, or DI types.
 
 ## Structural services
 

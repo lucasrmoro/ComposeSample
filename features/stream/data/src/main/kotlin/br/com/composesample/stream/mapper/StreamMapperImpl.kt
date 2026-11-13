@@ -32,7 +32,7 @@ import br.com.composesample.stream.model.videos.VideoReference
 import br.com.composesample.structural.network.http.JsonCodec
 import br.com.composesample.structural.network.http.decode
 
-internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper {
+class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper {
 
     override fun page(entity: StreamCacheEntity?, query: CatalogQuery): CatalogPage {
         val page = pageDTO(entity) ?: return CatalogPage()

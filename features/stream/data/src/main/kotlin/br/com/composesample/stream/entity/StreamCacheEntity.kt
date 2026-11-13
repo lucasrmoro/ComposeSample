@@ -4,4 +4,4 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "stream_cache")
-internal data class StreamCacheEntity(@PrimaryKey val key: String, val payload: String)
+data class StreamCacheEntity(@PrimaryKey val key: String, val payload: String)

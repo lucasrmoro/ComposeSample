@@ -8,7 +8,7 @@ import br.com.composesample.stream.entity.StreamCacheEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-internal interface StreamDao {
+interface StreamDao {
 
     @Query("SELECT * FROM stream_cache WHERE `key` = :key")
     fun observe(key: String): Flow<StreamCacheEntity?>
