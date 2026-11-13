@@ -90,11 +90,11 @@ entrada da backstack do Navigation Compose, para que cada destino mantenha seu
 próprio ViewModel. `di/impl` implementa o provider com AndroidX `ViewModelProvider`,
 preservando o estado salvo e a retenção durante mudanças de configuração. O
 design-system consome apenas a API; não implementa DI nem a criação de ViewModels.
-The implementation uses AndroidX `viewModelFactory` with a per-type initializer
-instead of a custom Factory class. It passes the owner's CreationExtras-derived
-`SavedStateHandle` as a runtime
-parameter. A ViewModel constructor can receive it through `parameters.get()` or
-`get<SavedStateHandle>()` within its definition.
+O helper aceita `parameters: DependencyParameters` para argumentos específicos da rota,
+por exemplo `dependencyViewModel(parameters = parametersOf(mediaId))`. O provider passa
+esses valores à factory depois do `SavedStateHandle`, que continua sendo criado a partir
+das `CreationExtras` do owner. A definição DI pode ler cada valor com
+`parameters.get(MediaId::class)` e fornecê-lo diretamente ao construtor do ViewModel.
 
 Resolver um ViewModel diretamente com `get()` ignora a retenção do ciclo de vida.
 Use o helper da API Compose para ViewModels de UI. Os contratos centrais de registro

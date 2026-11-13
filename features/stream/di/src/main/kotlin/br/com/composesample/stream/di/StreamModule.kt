@@ -6,6 +6,7 @@ import br.com.composesample.stream.dataSource.StreamRemoteDataSource
 import br.com.composesample.stream.dataSource.createStreamRemoteDataSource
 import br.com.composesample.stream.details.viewModel.DetailsViewModel
 import br.com.composesample.stream.genres.viewModel.GenresViewModel
+import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.structural.core.ext.dispatcherIO
 import br.com.composesample.structural.di.dependencyModule
 import br.com.composesample.structural.di.factory
@@ -40,8 +41,9 @@ object StreamModule {
                 appRegionProvider = get()
             )
         }
-        factory {
+        factory { parameters ->
             DetailsViewModel(
+                mediaId = parameters.get(MediaId::class),
                 observeMediaDetailsUseCase = get(),
                 refreshMediaDetailsUseCase = get(),
                 observeSeasonUseCase = get(),

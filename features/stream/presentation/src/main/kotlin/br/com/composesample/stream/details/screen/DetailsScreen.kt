@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,13 +65,11 @@ import br.com.composesample.structural.video_player.VideoSource
 
 internal class DetailsScreen(
     private val detailsViewModel: DetailsViewModel,
-    private val id: MediaId,
     private val back: () -> Unit,
 ) : BaseScreen<DetailsUiState, DetailsUiEffect>(detailsViewModel) {
 
     @Composable
     override fun Content(uiState: DetailsUiState) {
-        LaunchedEffect(id) { detailsViewModel.sendEvent(DetailsUiEvent.Start(id)) }
         DetailsContent(state = uiState, back = back, event = detailsViewModel::sendEvent)
     }
 

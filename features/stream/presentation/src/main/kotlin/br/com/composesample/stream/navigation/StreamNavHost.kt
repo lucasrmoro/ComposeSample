@@ -17,6 +17,7 @@ import br.com.composesample.stream.model.catalog.CollectionKind
 import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.media.MediaType
 import br.com.composesample.structural.di.dependencyViewModel
+import br.com.composesample.structural.di.parametersOf
 import br.com.composesample.structural.navigation.core.AnimatedNavHost
 import br.com.composesample.structural.navigation.core.intArgument
 import br.com.composesample.structural.navigation.core.longArgument
@@ -76,22 +77,25 @@ internal fun StreamNavHost() {
             }.Init()
         }
         composable(
-            StreamRoutes.DETAILS,
+            route = StreamRoutes.DETAILS,
             arguments = listOf(
                 longArgument(key = StreamRoutes.Arguments.ID),
             )
         ) { entry ->
-            val viewModel: DetailsViewModel = dependencyViewModel()
             val args = requireNotNull(entry.arguments)
-            DetailsScreen(
-                viewModel,
+            val mediaId =
                 MediaId(
-                    type = MediaType.valueOf(
-                        requireNotNull(args.getString(StreamRoutes.Arguments.TYPE))
-                    ),
-                    value = args.getLong(StreamRoutes.Arguments.ID)
-                ),
-                back
+                    type =
+                        MediaType.valueOf(
+                            requireNotNull(args.getString(StreamRoutes.Arguments.TYPE))
+                        ),
+                    value = args.getLong(StreamRoutes.Arguments.ID),
+                )
+            val viewModel: DetailsViewModel =
+                dependencyViewModel(parameters = parametersOf(mediaId))
+            DetailsScreen(
+                detailsViewModel = viewModel,
+                back = back,
             ).Init()
         }
     }

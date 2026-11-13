@@ -23,15 +23,18 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class DetailsViewModel(
+    private val mediaId: MediaId,
     private val observeMediaDetailsUseCase: ObserveMediaDetailsUseCase,
     private val refreshMediaDetailsUseCase: RefreshMediaDetailsUseCase,
     private val observeSeasonUseCase: ObserveSeasonUseCase,
@@ -41,23 +44,25 @@ class DetailsViewModel(
 ) : BaseViewModel<DetailsUiState, DetailsUiEvent, DetailsUiEffect>() {
 
     private val state = MutableStateFlow(DetailsUiState())
-    override val uiState = state.asStateFlow()
-    private var id: MediaId? = null
+    override val uiState = state
+        .onStart {
+            viewModelScope.launch {
+                bind()
+                networkConnectivityProvider.connectivity.collect { status ->
+                    state.update { it.copy(online = status == ConnectivityStatus.ONLINE) }
+                }
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = DetailsUiState(),
+        )
     private var job: Job? = null
     private var seasonJob: Job? = null
 
     override fun sendEvent(event: DetailsUiEvent) {
         when (event) {
-            is DetailsUiEvent.Start ->
-                if (id == null) {
-                    id = event.id
-                    bind()
-                    launch {
-                        networkConnectivityProvider.connectivity.collect { status ->
-                            state.update { it.copy(online = status == ConnectivityStatus.ONLINE) }
-                        }
-                    }
-                }
             is DetailsUiEvent.SelectSeason -> loadSeason(event.number)
             DetailsUiEvent.Retry -> bind()
         }
@@ -73,7 +78,7 @@ class DetailsViewModel(
                 }
                 coroutineScope {
                     launch {
-                        observeMediaDetailsUseCase(requireNotNull(id), region.toCatalogRegion())
+                        observeMediaDetailsUseCase(mediaId, region.toCatalogRegion())
                             .onError(ignoreUnauthorized = false) { fail() }
                             .onSuccess {
                                 val details = this
@@ -84,7 +89,7 @@ class DetailsViewModel(
                             }
                     }
                     launch {
-                        refreshMediaDetailsUseCase(requireNotNull(id), region.toCatalogRegion())
+                        refreshMediaDetailsUseCase(mediaId, region.toCatalogRegion())
                             .onCompletion {
                                 if (currentCoroutineContext().isActive)
                                     state.update { it.copy(loading = false) }
@@ -104,7 +109,7 @@ class DetailsViewModel(
         seasonJob = viewModelScope.launch {
             coroutineScope {
                 launch {
-                    observeSeasonUseCase(requireNotNull(id), number, region)
+                    observeSeasonUseCase(mediaId, number, region)
                         .onError(ignoreUnauthorized = false) { fail() }
                         .onSuccess {
                             val season = this
@@ -112,7 +117,7 @@ class DetailsViewModel(
                         }
                 }
                 launch {
-                    refreshSeasonUseCase(requireNotNull(id), number, region)
+                    refreshSeasonUseCase(mediaId, number, region)
                         .onCompletion { state.update { it.copy(seasonLoading = false) } }
                         .onError(ignoreUnauthorized = false) { fail() }
                         .onSuccess {}
