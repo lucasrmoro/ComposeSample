@@ -1,0 +1,64 @@
+<resources>
+    <!-- Catalog screen -->
+    <string name="stream_movies">Movies</string>
+    <string name="stream_series">Series</string>
+    <string name="stream_search_movies">Search movies</string>
+    <string name="stream_search_series">Search series</string>
+    <string name="stream_genres">Genres</string>
+    <string name="stream_results">Search results</string>
+    <string name="stream_offline_search">Without internet, only previously loaded results are available.</string>
+    <string name="stream_popular">Popular</string>
+    <string name="stream_recent">New releases</string>
+    <string name="stream_upcoming">Coming soon</string>
+    <string name="stream_see_all">See all</string>
+    <string name="stream_empty">No titles found.</string>
+    <string name="stream_load_error">Could not update. Previously loaded content is still available.</string>
+    <string name="stream_retry">Try again</string>
+    <string name="stream_refresh">Refresh</string>
+    <string name="stream_more">Load more</string>
+    <string name="stream_offline_no_data">No saved content yet. Connect to the internet and try again.</string>
+    <string name="stream_credits">Credits</string>
+    <string name="stream_tmdb_name">TMDB</string>
+    <string name="stream_tmdb_attribution">This product uses the TMDB API but is not endorsed or certified by TMDB.</string>
+
+    <!-- Details screen -->
+    <string name="stream_details">Details</string>
+    <string name="stream_original_title">Original title</string>
+    <string name="stream_release_date">Release date</string>
+    <string name="stream_runtime">Runtime</string>
+    <string name="stream_minutes">%1$d min</string>
+    <string name="stream_synopsis">Synopsis</string>
+    <string name="stream_trailer">Trailer</string>
+    <string name="stream_watch">Where to watch</string>
+    <string name="stream_justwatch">Availability: JustWatch</string>
+    <string name="stream_subscription">Subscription</string>
+    <string name="stream_free">Free</string>
+    <string name="stream_ads">With ads</string>
+    <string name="stream_rent">Rent</string>
+    <string name="stream_buy">Buy</string>
+    <string name="stream_seasons">Seasons and episodes</string>
+    <string name="stream_season_count">%1$d seasons · %2$d episodes</string>
+    <string name="stream_season">Season %1$d</string>
+    <string name="stream_episode">Episode %1$d · %2$s</string>
+    <string name="stream_new_series">New series</string>
+    <string name="stream_new_season">New season · S%1$d</string>
+    <string name="stream_new_episode">New episode · S%1$d:E%2$d</string>
+    <string name="stream_new_season_generic">New season</string>
+    <string name="stream_new_episode_generic">New episode</string>
+    <string name="stream_cast">Cast</string>
+    <string name="stream_information">Information</string>
+    <string name="stream_status">Status</string>
+    <string name="stream_votes">Votes</string>
+    <string name="stream_language">Original language</string>
+    <string name="stream_languages">Spoken languages</string>
+    <string name="stream_countries">Countries</string>
+    <string name="stream_country">Region</string>
+    <string name="stream_companies">Production companies</string>
+    <string name="stream_homepage">Official website</string>
+    <string name="stream_crew">Crew</string>
+    <string name="stream_other_videos">Other videos</string>
+    <string name="stream_production">Production</string>
+    <string name="stream_financial">Budget and revenue</string>
+    <string name="stream_budget">Budget (USD)</string>
+    <string name="stream_revenue">Revenue (USD)</string>
+</resources>

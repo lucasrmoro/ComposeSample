@@ -1,31 +1,33 @@
-# Navegação
+# Navigation
 
-Define os contratos de entrada das features e o registro que as conecta sem expor suas implementações de apresentação.
+Defines feature entry contracts and the registry that connects them without exposing presentation implementations.
 
-## Módulos
+## Modules
 
-- `api/core`: destinos de feature, entry points Compose, registro de navegação e contrato do navegador entre features.
-- `api/<feature>`: destinos tipados agrupados por feature, como `featureA/FeatureADestination`.
-- `impl`: registro de rotas mantido durante a vida do app.
-- `di`: registros de DI para o registro compartilhado de rotas.
+- `api/core`: feature destinations, Compose entry points, navigation registry, and cross-feature navigator contract.
+- `api/<feature>`: typed destinations grouped by feature, such as `stream/StreamDestination`.
+- `impl`: route registry retained for the lifetime of the app.
+- `di`: DI registrations for the shared route registry.
 
-O app monta um `NavHost` do Navigation Compose a partir dos entry points registrados e mantém a backstack entre features. Cada feature registrada fornece um entry point Compose que hospeda seu próprio `NavHost` e sua backstack interna. O DI da feature registra o entry point durante a inicialização do app; uma delas deve marcar seu entry point como destino inicial. A apresentação não usa Activity de feature nem grafo XML de navegação.
+The app builds a Navigation Compose `NavHost` from registered entry points and keeps the back stack between features. Each registered feature provides a Compose entry point that hosts its own `NavHost` and internal back stack. Feature DI registers the entry point during app startup; one feature must mark its entry point as the start destination. Presentation does not use feature Activities or XML navigation graphs.
 
-## Configuração
+## Setup
 
-Carregue `NavigationModule.init()` em `AppApplication` antes de registrar os entry points das features. Passe o registro compartilhado ao DI da feature:
+Load `NavigationModule.init()` in `AppApplication` before registering feature entry points. Pass the shared registry to feature DI:
 
 ```kotlin
 NavigationModule.init()
-FeatureAModule.init(navigationRegistry = get())
+StreamModule.init(navigationRegistry = get())
 ```
 
-O DI da feature registra `createFeatureAEntryPoint()` no registro. Para a feature inicial, passe `isStartDestination = true`. Nomes de rota duplicados e múltiplos destinos iniciais são rejeitados; montar o host sem um destino inicial falha com `IllegalStateException`.
+Feature DI registers `createStreamEntryPoint()` with the registry. For the initial feature, pass `isStartDestination = true`. Duplicate route names and multiple start destinations are rejected; building the host without a start destination fails with `IllegalStateException`.
 
-## Uso
+## Usage
 
-O app cria um destino do `NavHost` para cada entry point registrado e chama seu Composable `Content`. A feature pode solicitar outra feature por `LocalFeatureNavigator.current.navigate(destination)`. O navegador empilha uma nova entrada; abrir a mesma feature outra vez cria outra entrada. O Navigation Compose trata o botão voltar primeiro na navegação interna da feature ativa e, quando ela está no destino inicial, retorna à feature chamadora.
+The app creates a `NavHost` destination for each registered entry point and calls its `Content` composable. A feature can request another feature through `LocalFeatureNavigator.current.navigate(destination)`. The navigator pushes a new entry; opening the same feature again creates another entry. Navigation Compose handles Back in the active feature's internal navigation first, then returns to the calling feature when that feature is at its start destination.
 
-O `NavHost` do app salva sua backstack e o estado dos destinos, permitindo restaurar o `NavHost` interno e o estado salvável da tela quando uma feature filha é fechada. Não retenha Activity nem `NavController` no registro global do processo.
+The app `NavHost` saves its back stack and destination state, allowing the internal `NavHost` and saveable screen state to be restored when a child feature closes. Do not retain an Activity or `NavController` in the process-wide registry.
 
-Declare destinos como implementações de `FeatureDestination` nesta API. Cada feature é dona das rotas internas e dos Composables. Não crie um módulo Gradle de navegação por feature.
+Declare destinations as `FeatureDestination` implementations in this API. Each feature owns its internal routes and composables. Do not create a Gradle navigation module per feature.
+
+Use the typed argument helpers from `api/core` to declare arguments for internal feature routes, such as `longArgument(key = Routes.Arguments.ID, defaultValue = 0L)`. These helpers keep argument names alongside shared identifiers while preserving the official Navigation Compose DSL.

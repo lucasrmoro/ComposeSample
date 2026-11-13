@@ -83,24 +83,23 @@ injection in business code. Lazy injection resolves only at first access.
 
 ## ViewModels
 
-Registre ViewModels com `factory { ... }` e dependências explícitas.
-`di/api` expõe `DependencyViewModelProvider` e o helper Compose
-`dependencyViewModel()`. O helper usa o `ViewModelStoreOwner` ativo, incluindo uma
-entrada da backstack do Navigation Compose, para que cada destino mantenha seu
-próprio ViewModel. `di/impl` implementa o provider com AndroidX `ViewModelProvider`,
-preservando o estado salvo e a retenção durante mudanças de configuração. O
-design-system consome apenas a API; não implementa DI nem a criação de ViewModels.
-The implementation uses AndroidX `viewModelFactory` with a per-type initializer
-instead of a custom Factory class. It passes the owner's CreationExtras-derived
-`SavedStateHandle` as a runtime
-parameter. A ViewModel constructor can receive it through `parameters.get()` or
-`get<SavedStateHandle>()` within its definition.
+Register ViewModels with `factory { ... }` and explicit dependencies.
+`di/api` exposes `DependencyViewModelProvider` and the Compose helper
+`dependencyViewModel()`. The helper uses the active `ViewModelStoreOwner`, including a
+Navigation Compose back stack entry, so each destination retains its own ViewModel.
+`di/impl` implements the provider with AndroidX `ViewModelProvider`, preserving saved
+state and retention across configuration changes. Design-system consumers use only the
+API; they do not implement DI or create ViewModels. The helper accepts
+`parameters: DependencyParameters` for route-specific arguments, for example
+`dependencyViewModel(parameters = parametersOf(mediaId))`. The provider passes these
+values to the factory after the `SavedStateHandle`, which is still created from the
+owner’s `CreationExtras`. A DI definition can read each value with
+`parameters.get<MediaId>()` and pass it directly to the ViewModel constructor.
 
-Resolver um ViewModel diretamente com `get()` ignora a retenção do ciclo de vida.
-Use o helper da API Compose para ViewModels de UI. Os contratos centrais de registro
-não expõem tipos Android nem Koin. O contrato separado de ciclo de vida Android na
-mesma API usa explicitamente tipos `ViewModel` e owners do AndroidX, sem expor tipos
-do backend.
+Resolving a ViewModel directly with `get()` bypasses lifecycle retention. Use the Compose
+API helper for UI ViewModels. The core registration contracts do not expose Android or
+Koin types. The separate Android lifecycle contract in the same API explicitly uses
+AndroidX `ViewModel` and owner types without exposing backend types.
 
 ## Backend boundary
 

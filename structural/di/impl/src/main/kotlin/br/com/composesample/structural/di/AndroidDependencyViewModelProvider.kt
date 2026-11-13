@@ -9,10 +9,18 @@ import kotlin.reflect.KClass
 
 internal class AndroidDependencyViewModelProvider : DependencyViewModelProvider {
 
-    override fun <T : ViewModel> get(owner: ViewModelStoreOwner, type: KClass<T>): T {
+    override fun <T : ViewModel> get(
+        owner: ViewModelStoreOwner,
+        type: KClass<T>,
+        parameters: DependencyParameters
+    ): T {
         val factory = viewModelFactory {
             addInitializer(type) {
-                Dependencies.get(type, parameters = parametersOf(createSavedStateHandle()))
+                Dependencies.get(
+                    type,
+                    parameters =
+                        parametersOf(createSavedStateHandle(), *parameters.values.toTypedArray())
+                )
             }
         }
         return ViewModelProvider(owner, factory)[type.java]

@@ -60,9 +60,9 @@ private fun ListScreenContent(
         loadingState = if (state.isLoading) LoadingState.ONLY_LOADING else LoadingState.NONE,
         floatingActionButton = {
             SampleFloatingActionButton(
+                onClick = { sendEvent(ListUiEvent.AddItemClicked) },
                 icon = CurrentTheme.icon.add,
-                contentDescription = stringResource(R.string.feature_a_add_item),
-                onClick = { sendEvent(ListUiEvent.AddItemClicked) }
+                contentDescription = stringResource(R.string.feature_a_add_item)
             )
         }
     ) {

@@ -13,7 +13,7 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.core)
     implementation(libs.androidx.navigation.compose)
     implementation(project(Modules.Structural.Localization.API))
     implementation(project(Modules.Structural.Localization.DI))
