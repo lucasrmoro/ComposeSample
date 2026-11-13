@@ -10,13 +10,13 @@ import br.com.composesample.stream.entity.StreamCacheEntity
 private const val STREAM_DATABASE_NAME = "sample_data_base"
 
 @Database(entities = [StreamCacheEntity::class], version = 3, exportSchema = false)
-abstract class StreamDatabase : RoomDatabase() {
+internal abstract class StreamDatabase : RoomDatabase() {
 
     abstract fun streamDao(): StreamDao
 
 }
 
-fun createStreamDao(context: Context): StreamDao =
+internal fun createStreamDao(context: Context): StreamDao =
     Room.databaseBuilder(
         context.applicationContext,
         StreamDatabase::class.java,

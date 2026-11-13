@@ -17,7 +17,7 @@ import java.time.Clock
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
 
-class StreamRemoteDataSourceImpl(
+internal class StreamRemoteDataSourceImpl(
     private val httpClient: HttpClient,
     private val coroutineDispatcher: CoroutineDispatcher,
     private val clock: Clock

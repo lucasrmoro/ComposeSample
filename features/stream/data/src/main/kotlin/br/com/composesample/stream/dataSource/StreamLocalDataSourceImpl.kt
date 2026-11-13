@@ -1,12 +1,14 @@
 package br.com.composesample.stream.dataSource
 
+import android.content.Context
 import br.com.composesample.stream.dao.StreamDao
+import br.com.composesample.stream.database.createStreamDao
 import br.com.composesample.stream.entity.StreamCacheEntity
 import br.com.composesample.structural.core.base.dataSource.BaseDataSource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
 
-class StreamLocalDataSourceImpl(
+internal class StreamLocalDataSourceImpl(
     private val streamDao: StreamDao,
     private val coroutineDispatcher: CoroutineDispatcher
 ) : BaseDataSource(), StreamLocalDataSource {
@@ -18,3 +20,12 @@ class StreamLocalDataSourceImpl(
     }.flowOn(coroutineDispatcher)
 
 }
+
+fun createStreamLocalDataSource(
+    context: Context,
+    coroutineDispatcher: CoroutineDispatcher
+): StreamLocalDataSource =
+    StreamLocalDataSourceImpl(
+        streamDao = createStreamDao(context = context),
+        coroutineDispatcher = coroutineDispatcher
+    )
