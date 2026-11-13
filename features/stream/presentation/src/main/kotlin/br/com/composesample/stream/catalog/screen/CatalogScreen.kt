@@ -17,13 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -47,9 +40,13 @@ import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.media.MediaSummary
 import br.com.composesample.stream.model.media.MediaType
 import br.com.composesample.stream.tokens.StreamDimens
+import br.com.composesample.structural.designsystem.components.SampleButton
+import br.com.composesample.structural.designsystem.components.SampleButtonStyle
 import br.com.composesample.structural.designsystem.components.SampleChip
 import br.com.composesample.structural.designsystem.components.SampleLink
 import br.com.composesample.structural.designsystem.components.SampleSearchBar
+import br.com.composesample.structural.designsystem.components.SampleSegmentedButtonRow
+import br.com.composesample.structural.designsystem.components.SampleText
 import br.com.composesample.structural.designsystem.screen.BaseScreen
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
@@ -69,7 +66,6 @@ internal class CatalogScreen(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CatalogContent(state: CatalogUiState, event: (CatalogUiEvent) -> Unit) {
     Column(Modifier.fillMaxSize().navigationBarsPadding()) {
@@ -82,7 +78,6 @@ private fun CatalogContent(state: CatalogUiState, event: (CatalogUiEvent) -> Uni
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CatalogHeader(state: CatalogUiState, event: (CatalogUiEvent) -> Unit) {
     Column(
@@ -91,23 +86,19 @@ private fun CatalogHeader(state: CatalogUiState, event: (CatalogUiEvent) -> Unit
             vertical = CurrentTheme.spacing.small
         )
     ) {
-        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-            MediaType.entries.forEachIndexed { index, type ->
-                SegmentedButton(
-                    selected = state.type == type,
-                    onClick = { event(CatalogUiEvent.SelectType(type = type)) },
-                    shape = SegmentedButtonDefaults.itemShape(index, MediaType.entries.size),
-                    icon = {}
-                ) {
-                    Text(
-                        stringResource(
-                            if (type == MediaType.MOVIE) R.string.stream_movies
-                            else R.string.stream_series
-                        )
-                    )
+        SampleSegmentedButtonRow(
+            modifier = Modifier.fillMaxWidth(),
+            options = listOf(
+                stringResource(R.string.stream_movies),
+                stringResource(R.string.stream_series)
+            ),
+            selectedIndex = MediaType.entries.indexOf(state.type),
+            onOptionSelected = { index ->
+                MediaType.entries.getOrNull(index)?.let { type ->
+                    event(CatalogUiEvent.SelectType(type = type))
                 }
             }
-        }
+        )
         Spacer(Modifier.height(CurrentTheme.spacing.large))
         SampleSearchBar(
             value = state.searchText,
@@ -131,9 +122,9 @@ private fun ColumnScope.CatalogSearchContent(
     event: (CatalogUiEvent) -> Unit
 ) {
     Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
-        Text(
-            stringResource(R.string.stream_results),
-            style = MaterialTheme.typography.titleMedium
+        SampleText(
+            text = stringResource(R.string.stream_results),
+            style = CurrentTheme.typography.bodyLarge
         )
         LoadNotice(
             state.search.refreshing,
@@ -141,9 +132,9 @@ private fun ColumnScope.CatalogSearchContent(
             state.search.error,
             { event(CatalogUiEvent.SubmitSearch) }
         )
-        if (state.search.error != null) Text(
-            stringResource(R.string.stream_offline_search),
-            style = MaterialTheme.typography.bodySmall
+        if (state.search.error != null) SampleText(
+            text = stringResource(R.string.stream_offline_search),
+            style = CurrentTheme.typography.labelSmall
         )
     }
     MediaGrid(
@@ -173,9 +164,11 @@ private fun ColumnScope.CatalogSections(state: CatalogUiState, event: (CatalogUi
         }
         item { CatalogAttribution() }
         item {
-            TextButton(onClick = { event(CatalogUiEvent.Refresh) }) {
-                Text(stringResource(R.string.stream_refresh))
-            }
+            SampleButton(
+                text = stringResource(R.string.stream_refresh),
+                onClick = { event(CatalogUiEvent.Refresh) },
+                style = SampleButtonStyle.TEXT
+            )
         }
     }
 }
@@ -192,10 +185,15 @@ private fun CatalogCollectionSection(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(collectionTitle(kind), style = MaterialTheme.typography.titleLarge)
-            TextButton(onClick = { event(CatalogUiEvent.OpenCollection(kind = kind)) }) {
-                Text(stringResource(R.string.stream_see_all))
-            }
+            SampleText(
+                text = collectionTitle(kind),
+                style = CurrentTheme.typography.bodyLarge
+            )
+            SampleButton(
+                text = stringResource(R.string.stream_see_all),
+                onClick = { event(CatalogUiEvent.OpenCollection(kind = kind)) },
+                style = SampleButtonStyle.TEXT
+            )
         }
         Column(Modifier.padding(horizontal = CurrentTheme.spacing.large)) {
             LoadNotice(
@@ -223,18 +221,18 @@ private fun CatalogCollectionSection(
 @Composable
 private fun CatalogAttribution() {
     Column(Modifier.padding(CurrentTheme.spacing.large)) {
-        Text(
-            stringResource(R.string.stream_credits),
-            style = MaterialTheme.typography.titleSmall
+        SampleText(
+            text = stringResource(R.string.stream_credits),
+            style = CurrentTheme.typography.bodyLarge
         )
         Image(
             painter = painterResource(R.drawable.tmdb_logo),
             contentDescription = stringResource(R.string.stream_tmdb_name),
             modifier = Modifier.width(StreamDimens.portrait)
         )
-        Text(
-            stringResource(R.string.stream_tmdb_attribution),
-            style = MaterialTheme.typography.labelSmall
+        SampleText(
+            text = stringResource(R.string.stream_tmdb_attribution),
+            style = CurrentTheme.typography.labelSmall
         )
         SampleLink(
             url = "https://www.themoviedb.org",
