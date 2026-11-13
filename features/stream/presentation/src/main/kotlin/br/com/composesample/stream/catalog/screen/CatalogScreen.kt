@@ -1,29 +1,57 @@
 package br.com.composesample.stream.catalog.screen
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import br.com.composesample.features.stream.presentation.R
+import br.com.composesample.stream.catalog.model.CatalogSection
+import br.com.composesample.stream.catalog.model.CatalogUiEffect
+import br.com.composesample.stream.catalog.model.CatalogUiEvent
+import br.com.composesample.stream.catalog.model.CatalogUiState
+import br.com.composesample.stream.catalog.viewModel.CatalogViewModel
+import br.com.composesample.stream.components.LoadNotice
+import br.com.composesample.stream.components.MediaGrid
+import br.com.composesample.stream.components.SummaryCard
+import br.com.composesample.stream.components.collectionTitle
 import br.com.composesample.stream.model.catalog.CatalogPage
 import br.com.composesample.stream.model.catalog.CollectionKind
 import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.media.MediaSummary
 import br.com.composesample.stream.model.media.MediaType
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import br.com.composesample.features.stream.presentation.R
-import br.com.composesample.stream.catalog.model.*
-import br.com.composesample.stream.catalog.viewModel.CatalogViewModel
-import br.com.composesample.stream.components.*
+import br.com.composesample.stream.tokens.StreamDimens
+import br.com.composesample.structural.designsystem.components.SampleChip
+import br.com.composesample.structural.designsystem.components.SampleLink
 import br.com.composesample.structural.designsystem.components.SampleSearchBar
 import br.com.composesample.structural.designsystem.screen.BaseScreen
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
-import br.com.composesample.stream.tokens.StreamDimens
 
 internal class CatalogScreen(
     private val catalogViewModel: CatalogViewModel,
@@ -44,7 +72,12 @@ internal class CatalogScreen(
 @Composable
 private fun CatalogContent(state: CatalogUiState, event: (CatalogUiEvent) -> Unit) {
     Column(Modifier.fillMaxSize().navigationBarsPadding()) {
-        Column(Modifier.padding(horizontal = CurrentTheme.spacing.large, vertical = CurrentTheme.spacing.small)) {
+        Column(
+            Modifier.padding(
+                horizontal = CurrentTheme.spacing.large,
+                vertical = CurrentTheme.spacing.small
+            )
+        ) {
             SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                 MediaType.entries.forEachIndexed { index, type ->
                     SegmentedButton(
@@ -72,7 +105,7 @@ private fun CatalogContent(state: CatalogUiState, event: (CatalogUiEvent) -> Uni
                 onValueChange = { event(CatalogUiEvent.SearchChanged(text = it)) },
                 onSearch = { event(CatalogUiEvent.SubmitSearch) }
             )
-            br.com.composesample.structural.designsystem.components.SampleChip(
+            SampleChip(
                 label = stringResource(R.string.stream_genres),
                 onClick = { event(CatalogUiEvent.OpenGenres) }
             )
@@ -96,14 +129,14 @@ private fun CatalogContent(state: CatalogUiState, event: (CatalogUiEvent) -> Uni
                     )
             }
             MediaGrid(
-                state.search.page,
-                CollectionKind.SEARCH,
-                false,
-                { event(CatalogUiEvent.OpenDetails(id = it)) },
-                { event(CatalogUiEvent.LoadMoreSearch) },
-                Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                page = state.search.page,
+                kind = CollectionKind.SEARCH,
+                paging = false,
+                onDetails = { event(CatalogUiEvent.OpenDetails(id = it)) },
+                onNext = { event(CatalogUiEvent.LoadMoreSearch) }
             )
-        } else
+        } else {
             LazyColumn(
                 Modifier.weight(1f),
                 contentPadding = PaddingValues(bottom = CurrentTheme.spacing.large)
@@ -137,12 +170,11 @@ private fun CatalogContent(state: CatalogUiState, event: (CatalogUiEvent) -> Uni
                             contentPadding = PaddingValues(horizontal = CurrentTheme.spacing.large),
                             horizontalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.medium)
                         ) {
-                            items(section.page.items, key = { "${it.id.type}:${it.id.value}" }) {
-                                item ->
+                            items(section.page.items, key = { "${it.id.type}:${it.id.value}" }) { item ->
                                 SummaryCard(
-                                    item,
-                                    kind,
-                                    { event(CatalogUiEvent.OpenDetails(id = item.id)) }
+                                    item = item,
+                                    kind = kind,
+                                    onClick = { event(CatalogUiEvent.OpenDetails(id = item.id)) }
                                 )
                             }
                         }
@@ -154,16 +186,16 @@ private fun CatalogContent(state: CatalogUiState, event: (CatalogUiEvent) -> Uni
                             stringResource(R.string.stream_credits),
                             style = MaterialTheme.typography.titleSmall
                         )
-                        androidx.compose.foundation.Image(
-                            androidx.compose.ui.res.painterResource(R.drawable.tmdb_logo),
-                            stringResource(R.string.stream_tmdb_name),
-                            Modifier.width(StreamDimens.portrait)
+                        Image(
+                            painter = painterResource(R.drawable.tmdb_logo),
+                            contentDescription = stringResource(R.string.stream_tmdb_name),
+                            modifier = Modifier.width(StreamDimens.portrait)
                         )
                         Text(
                             stringResource(R.string.stream_tmdb_attribution),
                             style = MaterialTheme.typography.labelSmall
                         )
-                        br.com.composesample.structural.designsystem.components.SampleLink(
+                        SampleLink(
                             url = "https://www.themoviedb.org",
                             label = stringResource(R.string.stream_tmdb_name)
                         )
@@ -175,6 +207,7 @@ private fun CatalogContent(state: CatalogUiState, event: (CatalogUiEvent) -> Uni
                     }
                 }
             }
+        }
     }
 }
 
@@ -183,31 +216,27 @@ private fun CatalogContent(state: CatalogUiState, event: (CatalogUiEvent) -> Uni
 private fun CatalogPreview() {
     ComposeSampleTheme {
         CatalogContent(
-            CatalogUiState(
-                sections =
-                    mapOf(
-                        CollectionKind.POPULAR to
-                            CatalogSection(
-                                page =
-                                    CatalogPage(
-                                        items =
-                                            listOf(
-                                                MediaSummary(
-                                                    id = MediaId(type = MediaType.MOVIE, value = 1),
-                                                    title = "Beyond the horizon",
-                                                    posterPath = null,
-                                                    year = "2026",
-                                                    rating = 7.8,
-                                                    certification = "16",
-                                                    releaseEvent = null
-                                                )
-                                            )
-                                    ),
-                                refreshing = false
+            state = CatalogUiState(
+                sections = mapOf(
+                    CollectionKind.POPULAR to CatalogSection(
+                        page = CatalogPage(
+                            items = listOf(
+                                MediaSummary(
+                                    id = MediaId(type = MediaType.MOVIE, value = 1),
+                                    title = "Beyond the horizon",
+                                    posterPath = null,
+                                    year = "2026",
+                                    rating = 7.8,
+                                    certification = "16",
+                                    releaseEvent = null
+                                )
                             )
+                        ),
+                        refreshing = false
                     )
+                )
             ),
-            {}
+            event = {}
         )
     }
 }

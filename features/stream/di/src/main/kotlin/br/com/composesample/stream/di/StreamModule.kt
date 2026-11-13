@@ -1,9 +1,9 @@
 package br.com.composesample.stream.di
 
-import br.com.composesample.stream.dataSource.StreamRemoteDataSource
-import br.com.composesample.stream.dataSource.createStreamRemoteDataSource
 import br.com.composesample.stream.catalog.viewModel.CatalogViewModel
 import br.com.composesample.stream.collection.viewModel.CollectionViewModel
+import br.com.composesample.stream.dataSource.StreamRemoteDataSource
+import br.com.composesample.stream.dataSource.createStreamRemoteDataSource
 import br.com.composesample.stream.details.viewModel.DetailsViewModel
 import br.com.composesample.stream.genres.viewModel.GenresViewModel
 import br.com.composesample.structural.core.ext.dispatcherIO
@@ -23,10 +23,40 @@ object StreamModule {
                 clock = Clock.systemUTC()
             )
         }
-        factory { CatalogViewModel(get(), get(), get(), get(), get()) }
-        factory { CollectionViewModel(get(), get(), get(), get()) }
-        factory { DetailsViewModel(get(), get(), get(), get(), get(), get()) }
-        factory { GenresViewModel(get(), get(), get()) }
+        factory {
+            CatalogViewModel(
+                observeCatalogUseCase = get(),
+                refreshCatalogUseCase = get(),
+                loadNextPageUseCase = get(),
+                appRegionProvider = get(),
+                streamAnalytics = get()
+            )
+        }
+        factory {
+            CollectionViewModel(
+                observeCatalogUseCase = get(),
+                refreshCatalogUseCase = get(),
+                loadNextPageUseCase = get(),
+                appRegionProvider = get()
+            )
+        }
+        factory {
+            DetailsViewModel(
+                observeMediaDetailsUseCase = get(),
+                refreshMediaDetailsUseCase = get(),
+                observeSeasonUseCase = get(),
+                refreshSeasonUseCase = get(),
+                appRegionProvider = get(),
+                networkConnectivityProvider = get()
+            )
+        }
+        factory {
+            GenresViewModel(
+                observeGenresUseCase = get(),
+                refreshGenresUseCase = get(),
+                appRegionProvider = get()
+            )
+        }
     }
 
     fun init() = loadModules(streamModule)

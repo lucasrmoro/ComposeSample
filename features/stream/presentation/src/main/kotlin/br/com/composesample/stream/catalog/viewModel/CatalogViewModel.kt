@@ -1,22 +1,35 @@
 package br.com.composesample.stream.catalog.viewModel
 
-import br.com.composesample.stream.model.toCatalogRegion
-import br.com.composesample.stream.model.catalog.CatalogQuery
-import br.com.composesample.stream.model.catalog.CollectionKind
-import br.com.composesample.stream.useCase.LoadNextPageUseCase
-import br.com.composesample.stream.useCase.ObserveCatalogUseCase
-import br.com.composesample.stream.useCase.RefreshCatalogUseCase
 import androidx.lifecycle.viewModelScope
 import br.com.composesample.features.stream.presentation.R
 import br.com.composesample.stream.analytics.StreamAnalytics
-import br.com.composesample.stream.catalog.model.*
+import br.com.composesample.stream.catalog.model.CatalogSection
+import br.com.composesample.stream.catalog.model.CatalogUiEffect
+import br.com.composesample.stream.catalog.model.CatalogUiEvent
+import br.com.composesample.stream.catalog.model.CatalogUiState
+import br.com.composesample.stream.model.catalog.CatalogQuery
+import br.com.composesample.stream.model.catalog.CollectionKind
+import br.com.composesample.stream.model.toCatalogRegion
+import br.com.composesample.stream.useCase.LoadNextPageUseCase
+import br.com.composesample.stream.useCase.ObserveCatalogUseCase
+import br.com.composesample.stream.useCase.RefreshCatalogUseCase
 import br.com.composesample.structural.core.base.viewModel.BaseViewModel
 import br.com.composesample.structural.core.ext.onError
 import br.com.composesample.structural.core.ext.onSuccess
 import br.com.composesample.structural.core.text.UiText
 import br.com.composesample.structural.localization.AppRegionProvider
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class CatalogViewModel(
     private val observeCatalogUseCase: ObserveCatalogUseCase,
@@ -27,17 +40,11 @@ class CatalogViewModel(
 ) : BaseViewModel<CatalogUiState, CatalogUiEvent, CatalogUiEffect>() {
 
     private val state = MutableStateFlow(CatalogUiState())
-
     override val uiState = state.asStateFlow()
-
     private var started = false
-
     private var feedJob: Job? = null
-
     private var searchJob: Job? = null
-
     private var pagingJob: Job? = null
-
     private val error
         get() = UiText.StringResource(R.string.stream_load_error)
 
@@ -113,13 +120,11 @@ class CatalogViewModel(
                     val query = query(kind)
                     state.update {
                         it.copy(
-                            sections =
-                                it.sections +
-                                    (kind to
-                                        (it.sections[kind] ?: CatalogSection()).copy(
-                                            refreshing = true,
-                                            error = null
-                                        ))
+                            sections = it.sections +
+                                (kind to (it.sections[kind] ?: CatalogSection()).copy(
+                                    refreshing = true,
+                                    error = null
+                                ))
                         )
                     }
                     launch {

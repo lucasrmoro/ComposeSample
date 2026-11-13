@@ -1,22 +1,35 @@
 package br.com.composesample.stream.details.viewModel
 
-import br.com.composesample.stream.model.toCatalogRegion
+import androidx.lifecycle.viewModelScope
+import br.com.composesample.features.stream.presentation.R
+import br.com.composesample.stream.details.model.DetailsUiEffect
+import br.com.composesample.stream.details.model.DetailsUiEvent
+import br.com.composesample.stream.details.model.DetailsUiState
 import br.com.composesample.stream.model.media.MediaId
+import br.com.composesample.stream.model.toCatalogRegion
 import br.com.composesample.stream.useCase.ObserveMediaDetailsUseCase
 import br.com.composesample.stream.useCase.ObserveSeasonUseCase
 import br.com.composesample.stream.useCase.RefreshMediaDetailsUseCase
 import br.com.composesample.stream.useCase.RefreshSeasonUseCase
-import androidx.lifecycle.viewModelScope
-import br.com.composesample.features.stream.presentation.R
-import br.com.composesample.stream.details.model.*
 import br.com.composesample.structural.core.base.viewModel.BaseViewModel
 import br.com.composesample.structural.core.ext.onError
 import br.com.composesample.structural.core.ext.onSuccess
 import br.com.composesample.structural.core.text.UiText
 import br.com.composesample.structural.localization.AppRegionProvider
-import br.com.composesample.structural.network.connectivity.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import br.com.composesample.structural.network.connectivity.ConnectivityStatus
+import br.com.composesample.structural.network.connectivity.NetworkConnectivityProvider
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class DetailsViewModel(
     private val observeMediaDetailsUseCase: ObserveMediaDetailsUseCase,
@@ -28,13 +41,9 @@ class DetailsViewModel(
 ) : BaseViewModel<DetailsUiState, DetailsUiEvent, DetailsUiEffect>() {
 
     private val state = MutableStateFlow(DetailsUiState())
-
     override val uiState = state.asStateFlow()
-
     private var id: MediaId? = null
-
     private var job: Job? = null
-
     private var seasonJob: Job? = null
 
     override fun sendEvent(event: DetailsUiEvent) {

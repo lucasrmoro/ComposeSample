@@ -1,24 +1,33 @@
 package br.com.composesample.stream.genres.screen
 
-import br.com.composesample.stream.model.catalog.Genre
-import br.com.composesample.stream.model.media.MediaType
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.composesample.features.stream.presentation.R
 import br.com.composesample.stream.components.LoadNotice
-import br.com.composesample.stream.genres.model.*
+import br.com.composesample.stream.genres.model.GenresUiEffect
+import br.com.composesample.stream.genres.model.GenresUiEvent
+import br.com.composesample.stream.genres.model.GenresUiState
 import br.com.composesample.stream.genres.viewModel.GenresViewModel
+import br.com.composesample.stream.model.catalog.Genre
+import br.com.composesample.stream.model.media.MediaType
+import br.com.composesample.stream.tokens.StreamDimens
 import br.com.composesample.structural.designsystem.components.SampleScreen
 import br.com.composesample.structural.designsystem.screen.BaseScreen
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
-import br.com.composesample.stream.tokens.StreamDimens
 
 internal class GenresScreen(
     private val genresViewModel: GenresViewModel,
@@ -39,7 +48,11 @@ internal class GenresScreen(
 
 @Composable
 private fun GenresContent(state: GenresUiState, back: () -> Unit, event: (GenresUiEvent) -> Unit) {
-    SampleScreen(title = stringResource(R.string.stream_genres), canNavigateBack = true, onNavigateBack = back) {
+    SampleScreen(
+        title = stringResource(R.string.stream_genres),
+        canNavigateBack = true,
+        onNavigateBack = back
+    ) {
         LazyColumn(
             contentPadding = PaddingValues(CurrentTheme.spacing.large),
             verticalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.small)

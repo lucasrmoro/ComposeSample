@@ -1,29 +1,60 @@
 package br.com.composesample.stream.details.screen
 
-import br.com.composesample.stream.model.catalog.Genre
-import br.com.composesample.stream.model.media.MediaId
-import br.com.composesample.stream.model.providers.ProviderCategory
-import br.com.composesample.stream.model.providers.WatchProvider
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.composesample.features.stream.presentation.R
-import br.com.composesample.stream.components.*
-import br.com.composesample.stream.details.model.*
+import br.com.composesample.stream.components.ImageRole
+import br.com.composesample.stream.components.LoadNotice
+import br.com.composesample.stream.components.RATING_FORMAT
+import br.com.composesample.stream.components.imageRequest
+import br.com.composesample.stream.details.model.DetailsUiEffect
+import br.com.composesample.stream.details.model.DetailsUiEvent
+import br.com.composesample.stream.details.model.DetailsUiState
 import br.com.composesample.stream.details.viewModel.DetailsViewModel
-import br.com.composesample.structural.designsystem.components.*
+import br.com.composesample.stream.model.catalog.Genre
+import br.com.composesample.stream.model.media.MediaId
+import br.com.composesample.stream.model.providers.ProviderCategory
+import br.com.composesample.stream.model.providers.WatchProvider
+import br.com.composesample.stream.tokens.StreamDimens
+import br.com.composesample.structural.designsystem.components.SampleImage
+import br.com.composesample.structural.designsystem.components.SampleLink
+import br.com.composesample.structural.designsystem.components.SampleProfileImage
+import br.com.composesample.structural.designsystem.components.SampleScreen
+import br.com.composesample.structural.designsystem.components.SampleVideoPlayer
 import br.com.composesample.structural.designsystem.screen.BaseScreen
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
-import br.com.composesample.stream.tokens.StreamDimens
 import br.com.composesample.structural.video_player.VideoSource
 
 internal class DetailsScreen(
@@ -44,8 +75,7 @@ internal class DetailsScreen(
 
 @Composable
 private fun Info(label: Int, value: String?) {
-    if (!value.isNullOrBlank())
-        Column(Modifier.padding(vertical = CurrentTheme.spacing.xSmall)) {
+    if (!value.isNullOrBlank()) Column(Modifier.padding(vertical = CurrentTheme.spacing.xSmall)) {
             Text(
                 stringResource(label),
                 style = MaterialTheme.typography.labelMedium,
@@ -61,7 +91,11 @@ private fun DetailsContent(
     back: () -> Unit,
     event: (DetailsUiEvent) -> Unit
 ) {
-    SampleScreen(title = stringResource(R.string.stream_details), canNavigateBack = true, onNavigateBack = back) {
+    SampleScreen(
+        title = stringResource(R.string.stream_details),
+        canNavigateBack = true,
+        onNavigateBack = back
+    ) {
         val mediaDetails = state.details
         LazyColumn(
             Modifier.fillMaxSize(),
@@ -156,36 +190,41 @@ private fun DetailsContent(
                                 stringResource(R.string.stream_watch),
                                 style = MaterialTheme.typography.titleLarge
                             )
-                            details.providers.groupBy(WatchProvider::category).forEach {
-                                (category, providers) ->
-                                Text(
-                                    stringResource(
-                                        when (category) {
-                                            ProviderCategory.SUBSCRIPTION ->
-                                                R.string.stream_subscription
-                                            ProviderCategory.FREE -> R.string.stream_free
-                                            ProviderCategory.ADS -> R.string.stream_ads
-                                            ProviderCategory.RENT -> R.string.stream_rent
-                                            ProviderCategory.BUY -> R.string.stream_buy
+                            details.providers
+                                .groupBy(WatchProvider::category)
+                                .forEach { (category, providers) ->
+                                    Text(
+                                        stringResource(
+                                            when (category) {
+                                                ProviderCategory.SUBSCRIPTION ->
+                                                    R.string.stream_subscription
+                                                ProviderCategory.FREE -> R.string.stream_free
+                                                ProviderCategory.ADS -> R.string.stream_ads
+                                                ProviderCategory.RENT -> R.string.stream_rent
+                                                ProviderCategory.BUY -> R.string.stream_buy
+                                            }
+                                        ),
+                                        style = MaterialTheme.typography.titleSmall
+                                    )
+                                    providers.forEach { provider ->
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(
+                                                CurrentTheme.spacing.small
+                                            )
+                                        ) {
+                                            SampleImage(
+                                                request = imageRequest(
+                                                    path = provider.logoPath,
+                                                    role = ImageRole.LOGO
+                                                ),
+                                                contentDescription = provider.name,
+                                                modifier = Modifier.size(CurrentTheme.size.xxxLarge)
+                                            )
+                                            Text(provider.name)
                                         }
-                                    ),
-                                    style = MaterialTheme.typography.titleSmall
-                                )
-                                providers.forEach { provider ->
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement =
-                                            Arrangement.spacedBy(CurrentTheme.spacing.small)
-                                    ) {
-                                        SampleImage(
-                                            request = imageRequest(provider.logoPath, ImageRole.LOGO),
-                                            contentDescription = provider.name,
-                                            modifier = Modifier.size(CurrentTheme.size.xxxLarge)
-                                        )
-                                        Text(provider.name)
                                     }
                                 }
-                            }
                             Text(
                                 stringResource(R.string.stream_justwatch),
                                 style = MaterialTheme.typography.labelSmall
@@ -212,7 +251,10 @@ private fun DetailsContent(
                                         )
                                     )
                                 }
-                                DropdownMenu(expanded, { expanded = false }) {
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false }
+                                ) {
                                     details.seasons.forEach { season ->
                                         DropdownMenuItem(
                                             text = { Text(season.name) },
@@ -228,8 +270,7 @@ private fun DetailsContent(
                                     }
                                 }
                             }
-                            if (state.seasonLoading && state.season == null)
-                                CircularProgressIndicator()
+                            if (state.seasonLoading && state.season == null) CircularProgressIndicator()
                             state.season?.episodes?.forEach { episode ->
                                 Text(
                                     stringResource(
@@ -251,7 +292,9 @@ private fun DetailsContent(
                                 episode.overview?.takeIf(String::isNotBlank)?.let {
                                     Text(it, style = MaterialTheme.typography.bodySmall)
                                 }
-                                HorizontalDivider(Modifier.padding(vertical = CurrentTheme.spacing.small))
+                                HorizontalDivider(
+                                    Modifier.padding(vertical = CurrentTheme.spacing.small)
+                                )
                             }
                         }
                     }
@@ -299,7 +342,7 @@ private fun DetailsContent(
                                 SampleLink(url = it, label = stringResource(R.string.stream_homepage))
                             }
                         }
-                        if (details.crew.isNotEmpty())
+                        if (details.crew.isNotEmpty()) {
                             ExpandableInformation(stringResource(R.string.stream_crew)) {
                                 details.crew.forEach { person ->
                                     Text(person.name, style = MaterialTheme.typography.titleSmall)
@@ -308,7 +351,8 @@ private fun DetailsContent(
                                     }
                                 }
                             }
-                        if (details.videos.size > 1)
+                        }
+                        if (details.videos.size > 1) {
                             ExpandableInformation(stringResource(R.string.stream_other_videos)) {
                                 details.videos
                                     .filter { it.key != trailer?.key }
@@ -317,18 +361,24 @@ private fun DetailsContent(
                                             video.name,
                                             style = MaterialTheme.typography.titleSmall
                                         )
-                                        if (video.site.equals("YouTube", true))
+                                        if (video.site.equals("YouTube", true)) {
                                             SampleVideoPlayer(
-                                                source = VideoSource(provider = video.site, key = video.key),
+                                                source = VideoSource(
+                                                    provider = video.site,
+                                                    key = video.key
+                                                ),
                                                 online = state.online
                                             )
+                                        }
                                     }
                             }
-                        if (details.budget != null || details.revenue != null)
+                        }
+                        if (details.budget != null || details.revenue != null) {
                             ExpandableInformation(stringResource(R.string.stream_financial)) {
                                 Info(R.string.stream_budget, details.budget?.toString())
                                 Info(R.string.stream_revenue, details.revenue?.toString())
                             }
+                        }
                         Text(
                             stringResource(R.string.stream_tmdb_attribution),
                             style = MaterialTheme.typography.labelSmall,

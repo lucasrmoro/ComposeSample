@@ -1,18 +1,29 @@
 package br.com.composesample.stream.genres.viewModel
 
+import androidx.lifecycle.viewModelScope
+import br.com.composesample.features.stream.presentation.R
+import br.com.composesample.stream.genres.model.GenresUiEffect
+import br.com.composesample.stream.genres.model.GenresUiEvent
+import br.com.composesample.stream.genres.model.GenresUiState
 import br.com.composesample.stream.model.toCatalogRegion
 import br.com.composesample.stream.useCase.ObserveGenresUseCase
 import br.com.composesample.stream.useCase.RefreshGenresUseCase
-import androidx.lifecycle.viewModelScope
-import br.com.composesample.features.stream.presentation.R
-import br.com.composesample.stream.genres.model.*
 import br.com.composesample.structural.core.base.viewModel.BaseViewModel
 import br.com.composesample.structural.core.ext.onError
 import br.com.composesample.structural.core.ext.onSuccess
 import br.com.composesample.structural.core.text.UiText
 import br.com.composesample.structural.localization.AppRegionProvider
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class GenresViewModel(
     private val observeGenresUseCase: ObserveGenresUseCase,
@@ -21,9 +32,7 @@ class GenresViewModel(
 ) : BaseViewModel<GenresUiState, GenresUiEvent, GenresUiEffect>() {
 
     private val state = MutableStateFlow(GenresUiState())
-
     override val uiState = state.asStateFlow()
-
     private var job: Job? = null
 
     override fun sendEvent(event: GenresUiEvent) {

@@ -1,20 +1,26 @@
 package br.com.composesample.stream.collection.screen
 
-import br.com.composesample.stream.model.catalog.CollectionKind
-import br.com.composesample.stream.model.media.MediaType
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import br.com.composesample.stream.collection.model.*
+import br.com.composesample.stream.collection.model.CollectionUiEffect
+import br.com.composesample.stream.collection.model.CollectionUiEvent
+import br.com.composesample.stream.collection.model.CollectionUiState
 import br.com.composesample.stream.collection.viewModel.CollectionViewModel
-import br.com.composesample.stream.components.*
+import br.com.composesample.stream.components.LoadNotice
+import br.com.composesample.stream.components.MediaGrid
+import br.com.composesample.stream.components.collectionTitle
+import br.com.composesample.stream.model.catalog.CollectionKind
+import br.com.composesample.stream.model.media.MediaType
+import br.com.composesample.stream.tokens.StreamDimens
 import br.com.composesample.structural.designsystem.components.SampleScreen
 import br.com.composesample.structural.designsystem.screen.BaseScreen
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.designsystem.theme.CurrentTheme
-import br.com.composesample.stream.tokens.StreamDimens
 
 internal class CollectionScreen(
     private val collectionViewModel: CollectionViewModel,
@@ -61,12 +67,12 @@ private fun CollectionContent(
                 )
             }
             MediaGrid(
-                state.page,
-                state.query?.kind ?: CollectionKind.POPULAR,
-                state.paging,
-                { event(CollectionUiEvent.OpenDetails(id = it)) },
-                { event(CollectionUiEvent.NextPage) },
-                Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                page = state.page,
+                kind = state.query?.kind ?: CollectionKind.POPULAR,
+                paging = state.paging,
+                onDetails = { event(CollectionUiEvent.OpenDetails(id = it)) },
+                onNext = { event(CollectionUiEvent.NextPage) }
             )
         }
     }
