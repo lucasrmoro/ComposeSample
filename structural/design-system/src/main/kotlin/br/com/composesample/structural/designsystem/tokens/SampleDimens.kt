@@ -34,8 +34,13 @@ internal object SampleDimens {
     object FontSize {
         val LabelSmall = 11.sp
         val LabelMedium = 12.sp
+        val BodySmall = 12.sp
+        val BodyMedium = 14.sp
+        val TitleSmall = 14.sp
         val BodyLarge = 16.sp
         val SectionTitle = 20.sp
+        val TitleLarge = 22.sp
+        val HeadlineSmall = 24.sp
     }
 
     object LineHeight {
