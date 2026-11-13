@@ -8,12 +8,14 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import br.com.composesample.structural.designsystem.tokens.ColorToken
 import br.com.composesample.structural.designsystem.tokens.IconToken
 import br.com.composesample.structural.designsystem.tokens.SampleDimens
 import br.com.composesample.structural.designsystem.tokens.SampleIcons
 import br.com.composesample.structural.designsystem.tokens.SamplePalette
-import br.com.composesample.structural.designsystem.tokens.SampleTypography
 import br.com.composesample.structural.designsystem.tokens.TypographyToken
 
 data class ComposeSampleColors(
@@ -82,14 +84,63 @@ object CurrentTheme {
     }
 
     object typography {
-        val labelSmall: TypographyToken get() = SampleTypography.LabelSmall
-        val labelMedium: TypographyToken get() = SampleTypography.LabelMedium
-        val bodyLarge: TypographyToken get() = SampleTypography.BodyLarge
-        val headlineSmall: TypographyToken get() = SampleTypography.HeadlineSmall
-        val titleLarge: TypographyToken get() = SampleTypography.TitleLarge
-        val titleSmall: TypographyToken get() = SampleTypography.TitleSmall
-        val bodyMedium: TypographyToken get() = SampleTypography.BodyMedium
-        val bodySmall: TypographyToken get() = SampleTypography.BodySmall
+        val labelSmall = TypographyToken(
+            TextStyle(
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.Medium,
+                fontSize = SampleDimens.FontSize.LabelSmall,
+                lineHeight = SampleDimens.LineHeight.Label,
+                letterSpacing = SampleDimens.LetterSpacing.Label
+            )
+        )
+        val labelMedium = TypographyToken(
+            TextStyle(
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.Medium,
+                fontSize = SampleDimens.FontSize.LabelMedium,
+                lineHeight = SampleDimens.LineHeight.Label,
+                letterSpacing = SampleDimens.LetterSpacing.Label
+            )
+        )
+        val bodyLarge = TypographyToken(
+            TextStyle(
+                fontFamily = FontFamily.Default,
+                fontWeight = FontWeight.Normal,
+                fontSize = SampleDimens.FontSize.BodyLarge,
+                lineHeight = SampleDimens.LineHeight.Body,
+                letterSpacing = SampleDimens.LetterSpacing.Body
+            )
+        )
+        val headlineSmall = TypographyToken(
+            TextStyle(
+                fontSize = SampleDimens.FontSize.HeadlineSmall,
+                fontWeight = FontWeight.Normal
+            )
+        )
+        val titleLarge = TypographyToken(
+            TextStyle(
+                fontSize = SampleDimens.FontSize.TitleLarge,
+                fontWeight = FontWeight.Normal
+            )
+        )
+        val titleSmall = TypographyToken(
+            TextStyle(
+                fontSize = SampleDimens.FontSize.TitleSmall,
+                fontWeight = FontWeight.Medium
+            )
+        )
+        val bodyMedium = TypographyToken(
+            TextStyle(
+                fontSize = SampleDimens.FontSize.BodyMedium,
+                fontWeight = FontWeight.Normal
+            )
+        )
+        val bodySmall = TypographyToken(
+            TextStyle(
+                fontSize = SampleDimens.FontSize.BodySmall,
+                fontWeight = FontWeight.Normal
+            )
+        )
     }
 
     object colors {
