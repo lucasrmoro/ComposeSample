@@ -1,7 +1,7 @@
 package br.com.composesample.structural.assets_cache
 
 /**
- * Application-selected storage, capacity, refresh age. Age is
+ * Consumer-selected storage, capacity, and refresh age. Age is
  * measured since the last successful download, independently of least recently accessed file
  * removal access time.
  */

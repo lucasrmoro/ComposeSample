@@ -1,3 +1,13 @@
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    settingsDir.resolve("local.properties").takeIf { it.isFile }?.inputStream()?.use(::load)
+}
+val tmdbReadAccessToken =
+    providers.environmentVariable("TMDB_READ_ACCESS_TOKEN").orNull?.takeIf(String::isNotBlank)
+        ?: localProperties.getProperty("TMDB_READ_ACCESS_TOKEN").orEmpty()
+gradle.extra["tmdbReadAccessToken"] = tmdbReadAccessToken
+
 pluginManagement {
     includeBuild("build-logic")
     repositories {
@@ -100,13 +110,6 @@ include(
 // Features
 include(
     ":features",
-    ":features:featureA",
-    ":features:featureA:analytics",
-    ":features:featureA:data",
-    ":features:featureA:di",
-    ":features:featureA:domain:api",
-    ":features:featureA:domain:impl",
-    ":features:featureA:presentation",
     ":features:login:analytics",
     ":features:login:data",
     ":features:login:di",

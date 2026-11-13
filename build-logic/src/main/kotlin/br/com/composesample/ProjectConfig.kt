@@ -18,7 +18,6 @@ object ProjectConfig {
     const val PROGUARD_RULES = "proguard-rules.pro"
     val COMPOSE_MODULES = setOf(
         ":app",
-        ":features:featureA:presentation",
         ":features:stream:presentation",
         ":structural:design-system",
         ":structural:di:api",

@@ -29,12 +29,9 @@ Each qualifier has one shared client:
   current app language through the language interceptor. The login token-refresh service uses
   this client to avoid recursive authentication.
 
-Feature DI can use `DependencyResolver.httpClient` and `httpClientNoAuth`, or resolve
-`HttpClient` directly with a qualifier. It registers its own typed service implementations:
-
-```kotlin
-singleton<FeatureAService> { FeatureAServiceImpl(httpClient = httpClient) }
-```
+Feature DI can resolve `ConfiguredHttpClientProvider` and call `create()` with
+`HttpClientOptions` when it needs a client with a separate base URL or headers. The
+provider keeps those clients independent from the application login client.
 
 ## Requests and typed responses
 

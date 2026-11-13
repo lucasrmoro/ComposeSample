@@ -4,7 +4,7 @@ import br.com.composesample.stream.model.catalog.CatalogRegion
 import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.repository.StreamRepository
 
-internal class RefreshMediaDetailsUseCaseImpl(private val streamRepository: StreamRepository) :
+class RefreshMediaDetailsUseCaseImpl(private val streamRepository: StreamRepository) :
     RefreshMediaDetailsUseCase {
 
     override fun invoke(id: MediaId, region: CatalogRegion) =

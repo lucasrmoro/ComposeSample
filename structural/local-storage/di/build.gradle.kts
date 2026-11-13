@@ -8,6 +8,5 @@ dependencies {
     implementation(project(Modules.Structural.LocalStorage.API))
     implementation(project(Modules.Structural.LocalStorage.IMPL))
     implementation(project(Modules.Structural.Core.MAIN))
-    implementation(project(Modules.Feature.FeatureA.DATA))
     implementation(project(Modules.Structural.DI.API))
 }
