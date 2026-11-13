@@ -74,6 +74,7 @@ object CurrentTheme {
     }
 
     object icon {
+        val add: IconToken get() = SampleIcons.Add
         val person: IconToken get() = SampleIcons.Person
         val search: IconToken get() = SampleIcons.Search
         val close: IconToken get() = SampleIcons.Close
@@ -86,6 +87,7 @@ object CurrentTheme {
     }
 
     object colors {
+        val onSecondary = ColorToken { CurrentTheme.color.onSecondary }
         val shimmer = ColorToken { MaterialTheme.colorScheme.outlineVariant }
         val onSurfaceVariant = ColorToken { MaterialTheme.colorScheme.onSurfaceVariant }
     }

@@ -5,10 +5,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -21,6 +17,7 @@ import br.com.composesample.featureA.list.viewModel.ListViewModel
 import br.com.composesample.featureA.model.SomeModel
 import br.com.composesample.features.featureA.presentation.R
 import br.com.composesample.structural.designsystem.components.LoadingState
+import br.com.composesample.structural.designsystem.components.SampleFloatingActionButton
 import br.com.composesample.structural.designsystem.components.SampleScreen
 import br.com.composesample.structural.designsystem.components.SampleText
 import br.com.composesample.structural.designsystem.screen.BaseScreen
@@ -62,13 +59,11 @@ private fun ListScreenContent(
         onNavigateBack = {},
         loadingState = if (state.isLoading) LoadingState.ONLY_LOADING else LoadingState.NONE,
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { sendEvent(ListUiEvent.AddItemClicked) },
-                containerColor = CurrentTheme.color.secondary,
-                contentColor = CurrentTheme.color.onSecondary
-            ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.feature_a_add_item))
-            }
+            SampleFloatingActionButton(
+                icon = CurrentTheme.icon.add,
+                contentDescription = stringResource(R.string.feature_a_add_item),
+                onClick = { sendEvent(ListUiEvent.AddItemClicked) }
+            )
         }
     ) {
         LazyColumn(
