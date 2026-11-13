@@ -9,7 +9,6 @@ import br.com.composesample.stream.model.catalog.CatalogRegion
 import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.media.MediaType
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -17,7 +16,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
 
-class StreamRepositoryImpl(
+internal class StreamRepositoryImpl(
     private val streamLocalDataSource: StreamLocalDataSource,
     private val streamRemoteDataSource: StreamRemoteDataSource,
     private val streamMapper: StreamMapper,
@@ -115,3 +114,16 @@ class StreamRepositoryImpl(
     }.flowOn(coroutineDispatcher)
 
 }
+
+fun createStreamRepository(
+    streamLocalDataSource: StreamLocalDataSource,
+    streamRemoteDataSource: StreamRemoteDataSource,
+    streamMapper: StreamMapper,
+    coroutineDispatcher: CoroutineDispatcher
+): StreamRepository =
+    StreamRepositoryImpl(
+        streamLocalDataSource = streamLocalDataSource,
+        streamRemoteDataSource = streamRemoteDataSource,
+        streamMapper = streamMapper,
+        coroutineDispatcher = coroutineDispatcher
+    )

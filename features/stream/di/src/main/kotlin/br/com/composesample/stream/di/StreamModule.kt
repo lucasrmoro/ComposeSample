@@ -18,7 +18,7 @@ import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.media.MediaType
 import br.com.composesample.stream.navigation.createStreamEntryPoint
 import br.com.composesample.stream.repository.StreamRepository
-import br.com.composesample.stream.repository.StreamRepositoryImpl
+import br.com.composesample.stream.repository.createStreamRepository
 import br.com.composesample.stream.useCase.LoadNextPageUseCase
 import br.com.composesample.stream.useCase.LoadNextPageUseCaseImpl
 import br.com.composesample.stream.useCase.ObserveCatalogUseCase
@@ -79,7 +79,7 @@ object StreamModule {
             }
             factory<StreamMapper> { createStreamMapper(jsonCodec = get()) }
             singleton<StreamRepository> {
-                StreamRepositoryImpl(
+                createStreamRepository(
                     streamLocalDataSource = get(),
                     streamRemoteDataSource = get(),
                     streamMapper = get(),
