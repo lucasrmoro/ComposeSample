@@ -57,8 +57,8 @@ class StreamRepositoryImpl(
             }
             val next = (previous?.page ?: 0) + 1
             val page = streamRemoteDataSource.page(query, next).single()
-            val entity = streamMapper.pageEntity(query, page, previous)
-            streamLocalDataSource.save(entity).single()
+            val payload = streamMapper.pagePayload(query, page, previous)
+            streamLocalDataSource.save(key = query.key, payload = payload).single()
             emit(Unit)
         }
     }.flowOn(coroutineDispatcher)
@@ -73,10 +73,8 @@ class StreamRepositoryImpl(
     override fun refreshGenres(type: MediaType, region: CatalogRegion) = flow {
         streamLocalDataSource
             .save(
-                streamMapper.entity(
-                    genreKey(type, region),
-                    streamRemoteDataSource.genres(type).single()
-                )
+                key = genreKey(type, region),
+                payload = streamMapper.payload(streamRemoteDataSource.genres(type).single())
             )
             .single()
         emit(Unit)
@@ -92,10 +90,8 @@ class StreamRepositoryImpl(
     override fun refreshDetails(id: MediaId, region: CatalogRegion) = flow {
         streamLocalDataSource
             .save(
-                streamMapper.entity(
-                    detailsKey(id, region),
-                    streamRemoteDataSource.details(id).single()
-                )
+                key = detailsKey(id, region),
+                payload = streamMapper.payload(streamRemoteDataSource.details(id).single())
             )
             .single()
         emit(Unit)
@@ -111,10 +107,8 @@ class StreamRepositoryImpl(
     override fun refreshSeason(id: MediaId, season: Int, region: CatalogRegion) = flow {
         streamLocalDataSource
             .save(
-                streamMapper.entity(
-                    seasonKey(id, season, region),
-                    streamRemoteDataSource.season(id, season).single()
-                )
+                key = seasonKey(id, season, region),
+                payload = streamMapper.payload(streamRemoteDataSource.season(id, season).single())
             )
             .single()
         emit(Unit)

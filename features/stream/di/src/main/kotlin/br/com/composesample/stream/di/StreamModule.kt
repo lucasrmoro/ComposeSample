@@ -11,11 +11,11 @@ import br.com.composesample.stream.dataSource.createStreamLocalDataSource
 import br.com.composesample.stream.dataSource.createStreamRemoteDataSource
 import br.com.composesample.stream.details.viewModel.DetailsViewModel
 import br.com.composesample.stream.genres.viewModel.GenresViewModel
+import br.com.composesample.stream.mapper.StreamMapper
+import br.com.composesample.stream.mapper.createStreamMapper
 import br.com.composesample.stream.model.catalog.CollectionKind
 import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.media.MediaType
-import br.com.composesample.stream.mapper.StreamMapper
-import br.com.composesample.stream.mapper.StreamMapperImpl
 import br.com.composesample.stream.navigation.createStreamEntryPoint
 import br.com.composesample.stream.repository.StreamRepository
 import br.com.composesample.stream.repository.StreamRepositoryImpl
@@ -77,7 +77,7 @@ object StreamModule {
                     clock = Clock.systemUTC()
                 )
             }
-            factory<StreamMapper> { StreamMapperImpl(jsonCodec = get()) }
+            factory<StreamMapper> { createStreamMapper(jsonCodec = get()) }
             singleton<StreamRepository> {
                 StreamRepositoryImpl(
                     streamLocalDataSource = get(),

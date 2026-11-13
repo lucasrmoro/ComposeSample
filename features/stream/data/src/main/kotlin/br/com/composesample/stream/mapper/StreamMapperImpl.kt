@@ -11,7 +11,6 @@ import br.com.composesample.stream.dto.releases.ReleaseRespDTO
 import br.com.composesample.stream.dto.seasons.EpisodeRespDTO
 import br.com.composesample.stream.dto.seasons.SeasonRespDTO
 import br.com.composesample.stream.dto.videos.VideoRespDTO
-import br.com.composesample.stream.entity.StreamCacheEntity
 import br.com.composesample.stream.model.catalog.CatalogPage
 import br.com.composesample.stream.model.catalog.CatalogQuery
 import br.com.composesample.stream.model.catalog.CatalogRegion
@@ -32,33 +31,40 @@ import br.com.composesample.stream.model.videos.VideoReference
 import br.com.composesample.structural.network.http.JsonCodec
 import br.com.composesample.structural.network.http.decode
 
-class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper {
+internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper {
 
-    override fun page(entity: StreamCacheEntity?, query: CatalogQuery): CatalogPage {
-        val page = pageDTO(entity) ?: return CatalogPage()
+    override fun page(payload: String?, query: CatalogQuery): CatalogPage {
+        val page = pageDTO(payload) ?: return CatalogPage()
         return CatalogPage(
             items = page.results.map { summary(it, query.type, query.region) },
             hasNextPage = page.page < page.totalPages
         )
     }
 
-    override fun pageDTO(entity: StreamCacheEntity?): PageRespDTO? = entity?.let {
-        jsonCodec.decode<PageRespDTO>(it.payload)
-    }
+    override fun pageDTO(payload: String?): PageRespDTO? =
+        payload?.let { jsonCodec.decode<PageRespDTO>(it) }
 
-    override fun pageEntity(
+    override fun pagePayload(
         query: CatalogQuery,
         page: PageRespDTO,
         previous: PageRespDTO?
-    ): StreamCacheEntity {
+    ): String {
         val merged =
             if (previous == null) page
             else page.copy(results = (previous.results + page.results).distinctBy(MediaRespDTO::id))
-        return entity(query.key, merged)
+        return payload(merged)
     }
 
-    override fun entity(key: String, value: Any) =
-        StreamCacheEntity(key = key, payload = jsonCodec.encode(value))
+    override fun payload(value: Any): String = jsonCodec.encode(value)
+
+    override fun details(payload: String?, id: MediaId, region: CatalogRegion): MediaDetails? =
+        payload?.let { jsonCodec.decode<MediaRespDTO>(it) }?.let { mediaDetails(it, id, region) }
+
+    override fun genres(payload: String?): List<Genre> =
+        payload?.let { jsonCodec.decode<GenresRespDTO>(it).genres.map(::genre) }.orEmpty()
+
+    override fun season(payload: String?): SeasonDetails? =
+        payload?.let { jsonCodec.decode<SeasonRespDTO>(it) }?.let(::season)
 
     private fun summary(dto: MediaRespDTO, type: MediaType, region: CatalogRegion): MediaSummary {
         val date = if (type == MediaType.MOVIE) dto.releaseDate else dto.firstAirDate
@@ -105,9 +111,6 @@ class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper {
                 }
         }
 
-    override fun genres(entity: StreamCacheEntity?): List<Genre> =
-        entity?.let { jsonCodec.decode<GenresRespDTO>(it.payload).genres.map(::genre) }.orEmpty()
-
     private fun genre(dto: GenreRespDTO) = Genre(id = dto.id, name = dto.name)
 
     private fun person(dto: PersonRespDTO) =
@@ -121,15 +124,6 @@ class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper {
             type = dto.type,
             official = dto.official
         )
-
-    override fun details(
-        entity: StreamCacheEntity?,
-        id: MediaId,
-        region: CatalogRegion
-    ): MediaDetails? {
-        val dto = entity?.let { jsonCodec.decode<MediaRespDTO>(it.payload) } ?: return null
-        return mediaDetails(dto, id, region)
-    }
 
     private fun mediaDetails(dto: MediaRespDTO, id: MediaId, region: CatalogRegion) =
         MediaDetails(
@@ -206,15 +200,13 @@ class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper {
                 )
             }
 
-    override fun season(entity: StreamCacheEntity?): SeasonDetails? {
-        val dto = entity?.let { jsonCodec.decode<SeasonRespDTO>(it.payload) } ?: return null
-        return SeasonDetails(
+    private fun season(dto: SeasonRespDTO) =
+        SeasonDetails(
             number = dto.number,
             name = dto.name,
             overview = dto.overview,
             episodes = dto.episodes.orEmpty().map(::episode)
         )
-    }
 
     private fun episode(dto: EpisodeRespDTO) =
         EpisodeDetails(
@@ -227,3 +219,6 @@ class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper {
         )
 
 }
+
+fun createStreamMapper(jsonCodec: JsonCodec): StreamMapper =
+    StreamMapperImpl(jsonCodec = jsonCodec)
