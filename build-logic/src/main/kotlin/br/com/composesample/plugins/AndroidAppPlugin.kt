@@ -1,7 +1,6 @@
 package br.com.composesample.plugins
 
 import br.com.composesample.Plugins
-import br.com.composesample.ProjectConfig
 import br.com.composesample.ext.implementation
 import br.com.composesample.modules.Modules
 import br.com.composesample.plugins.base.BasePlugin
@@ -26,12 +25,6 @@ class AndroidAppPlugin : BasePlugin() {
 
     private fun Project.setupConfig() = extensions.configure<ApplicationExtension> {
         setupProjectConfig(this)
-        defaultConfig.apply {
-            applicationId = ProjectConfig.APP_ID
-            targetSdk = ProjectConfig.TARGET_SDK
-            versionCode = ProjectConfig.VERSION_CODE
-            versionName = ProjectConfig.VERSION_NAME
-        }
     }
 
     private fun Project.setupDependencies() = dependencies {
@@ -56,7 +49,6 @@ class AndroidAppPlugin : BasePlugin() {
         implementation(project(Modules.Structural.DesignSystem.MAIN))
         implementation(project(Modules.Structural.DesignSystem.DI))
         implementation(libs.material)
-        implementation(libs.bundles.android)
         implementation(project(Modules.Structural.DI.API))
         implementation(project(Modules.Structural.Logger.API))
         implementation(project(Modules.Structural.Logger.DI))

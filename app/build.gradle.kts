@@ -10,6 +10,10 @@ val tmdbReadAccessToken = gradle.extra["tmdbReadAccessToken"] as String
 
 android {
     defaultConfig {
+        applicationId = namespace
+        targetSdk = 36
+        versionCode = 1
+        versionName = "1.0"
         stringBuildConfigField(name = "TMDB_READ_ACCESS_TOKEN", value = tmdbReadAccessToken)
     }
 }
@@ -42,4 +46,5 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.navigation.compose)
+    testImplementation(libs.androidx.junit)
 }
