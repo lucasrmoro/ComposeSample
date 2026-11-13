@@ -94,7 +94,7 @@ API; they do not implement DI or create ViewModels. The helper accepts
 `dependencyViewModel(parameters = parametersOf(mediaId))`. The provider passes these
 values to the factory after the `SavedStateHandle`, which is still created from the
 owner’s `CreationExtras`. A DI definition can read each value with
-`parameters.get(MediaId::class)` and pass it directly to the ViewModel constructor.
+`parameters.get<MediaId>()` and pass it directly to the ViewModel constructor.
 
 Resolving a ViewModel directly with `get()` bypasses lifecycle retention. Use the Compose
 API helper for UI ViewModels. The core registration contracts do not expose Android or

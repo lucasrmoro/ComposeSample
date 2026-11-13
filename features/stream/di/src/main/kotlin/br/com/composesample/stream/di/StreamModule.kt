@@ -43,7 +43,7 @@ object StreamModule {
         }
         factory { parameters ->
             DetailsViewModel(
-                mediaId = parameters.get(MediaId::class),
+                mediaId = parameters.get<MediaId>(),
                 observeMediaDetailsUseCase = get(),
                 refreshMediaDetailsUseCase = get(),
                 observeSeasonUseCase = get(),
