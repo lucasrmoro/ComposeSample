@@ -52,114 +52,131 @@ private const val TMDB_BASE_URL = "https://api.themoviedb.org/3/"
 private const val AUTHORIZATION_HEADER = "Authorization"
 private const val BEARER_SCHEME = "Bearer"
 
+private data class StreamConfiguration(val readAccessToken: String)
+
 object StreamModule {
-    fun init(context: Context, navigationRegistry: NavigationRegistry, readAccessToken: String) {
-        val dataModule = dependencyModule {
-            singleton<StreamLocalDataSource> {
-                createStreamLocalDataSource(
-                    context = context,
-                    coroutineDispatcher = dispatcherIO
-                )
-            }
-            singleton<StreamRemoteDataSource> {
-                createStreamRemoteDataSource(
-                    httpClient = get<ConfiguredHttpClientProvider>().create(
-                        options = HttpClientOptions(
-                            baseUrl = TMDB_BASE_URL,
-                            headers = readAccessToken.takeIf(String::isNotBlank)?.let {
-                                mapOf(AUTHORIZATION_HEADER to "$BEARER_SCHEME $it")
-                            } ?: emptyMap(),
-                            useAppLanguage = true
-                        )
-                    ),
-                    coroutineDispatcher = dispatcherIO,
-                    clock = Clock.systemUTC()
-                )
-            }
-            factory<StreamMapper> { createStreamMapper(jsonCodec = get()) }
-            singleton<StreamRepository> {
-                createStreamRepository(
-                    streamLocalDataSource = get(),
-                    streamRemoteDataSource = get(),
-                    streamMapper = get(),
-                    coroutineDispatcher = dispatcherIO
-                )
-            }
+
+    private fun configurationModule(readAccessToken: String) = dependencyModule {
+        singleton { StreamConfiguration(readAccessToken = readAccessToken) }
+    }
+
+    private val dataModule = dependencyModule {
+        singleton<StreamLocalDataSource> {
+            createStreamLocalDataSource(
+                context = get<Context>(),
+                coroutineDispatcher = dispatcherIO
+            )
         }
-        val domainModule = dependencyModule {
-            factory<ObserveCatalogUseCase> {
-                createObserveCatalogUseCase(streamRepository = get())
-            }
-            factory<RefreshCatalogUseCase> {
-                createRefreshCatalogUseCase(streamRepository = get())
-            }
-            factory<LoadNextPageUseCase> {
-                createLoadNextPageUseCase(streamRepository = get())
-            }
-            factory<ObserveGenresUseCase> {
-                createObserveGenresUseCase(streamRepository = get())
-            }
-            factory<RefreshGenresUseCase> {
-                createRefreshGenresUseCase(streamRepository = get())
-            }
-            factory<ObserveMediaDetailsUseCase> {
-                createObserveMediaDetailsUseCase(streamRepository = get())
-            }
-            factory<RefreshMediaDetailsUseCase> {
-                createRefreshMediaDetailsUseCase(streamRepository = get())
-            }
-            factory<ObserveSeasonUseCase> {
-                createObserveSeasonUseCase(streamRepository = get())
-            }
-            factory<RefreshSeasonUseCase> {
-                createRefreshSeasonUseCase(streamRepository = get())
-            }
+        singleton<StreamRemoteDataSource> {
+            val readAccessToken = get<StreamConfiguration>().readAccessToken
+            createStreamRemoteDataSource(
+                httpClient = get<ConfiguredHttpClientProvider>().create(
+                    options = HttpClientOptions(
+                        baseUrl = TMDB_BASE_URL,
+                        headers = readAccessToken.takeIf(String::isNotBlank)?.let {
+                            mapOf(AUTHORIZATION_HEADER to "$BEARER_SCHEME $it")
+                        } ?: emptyMap(),
+                        useAppLanguage = true
+                    )
+                ),
+                coroutineDispatcher = dispatcherIO,
+                clock = Clock.systemUTC()
+            )
         }
-        val presentationModule = dependencyModule {
-            singleton<StreamAnalytics> { createStreamAnalytics(provider = get()) }
-            factory {
-                CatalogViewModel(
-                    observeCatalogUseCase = get(),
-                    refreshCatalogUseCase = get(),
-                    loadNextPageUseCase = get(),
-                    appRegionProvider = get(),
-                    streamAnalytics = get()
-                )
-            }
-            factory { parameters ->
-                CollectionViewModel(
-                    type = parameters.get<MediaType>(),
-                    kind = parameters.get<CollectionKind>(),
-                    genreId = parameters.get<Int>().takeIf { it > 0 },
-                    observeCatalogUseCase = get(),
-                    refreshCatalogUseCase = get(),
-                    loadNextPageUseCase = get(),
-                    appRegionProvider = get()
-                )
-            }
-            factory { parameters ->
-                DetailsViewModel(
-                    mediaId = parameters.get<MediaId>(),
-                    observeMediaDetailsUseCase = get(),
-                    refreshMediaDetailsUseCase = get(),
-                    observeSeasonUseCase = get(),
-                    refreshSeasonUseCase = get(),
-                    appRegionProvider = get(),
-                    networkConnectivityProvider = get()
-                )
-            }
-            factory {
-                GenresViewModel(
-                    observeGenresUseCase = get(),
-                    refreshGenresUseCase = get(),
-                    appRegionProvider = get()
-                )
-            }
+        factory<StreamMapper> { createStreamMapper(jsonCodec = get()) }
+        singleton<StreamRepository> {
+            createStreamRepository(
+                streamLocalDataSource = get(),
+                streamRemoteDataSource = get(),
+                streamMapper = get(),
+                coroutineDispatcher = dispatcherIO
+            )
         }
-        loadModules(dataModule, domainModule, presentationModule)
+    }
+
+    private val domainModule = dependencyModule {
+        factory<ObserveCatalogUseCase> {
+            createObserveCatalogUseCase(streamRepository = get())
+        }
+        factory<RefreshCatalogUseCase> {
+            createRefreshCatalogUseCase(streamRepository = get())
+        }
+        factory<LoadNextPageUseCase> {
+            createLoadNextPageUseCase(streamRepository = get())
+        }
+        factory<ObserveGenresUseCase> {
+            createObserveGenresUseCase(streamRepository = get())
+        }
+        factory<RefreshGenresUseCase> {
+            createRefreshGenresUseCase(streamRepository = get())
+        }
+        factory<ObserveMediaDetailsUseCase> {
+            createObserveMediaDetailsUseCase(streamRepository = get())
+        }
+        factory<RefreshMediaDetailsUseCase> {
+            createRefreshMediaDetailsUseCase(streamRepository = get())
+        }
+        factory<ObserveSeasonUseCase> {
+            createObserveSeasonUseCase(streamRepository = get())
+        }
+        factory<RefreshSeasonUseCase> {
+            createRefreshSeasonUseCase(streamRepository = get())
+        }
+    }
+
+    private val presentationModule = dependencyModule {
+        singleton<StreamAnalytics> { createStreamAnalytics(provider = get()) }
+        factory {
+            CatalogViewModel(
+                observeCatalogUseCase = get(),
+                refreshCatalogUseCase = get(),
+                loadNextPageUseCase = get(),
+                appRegionProvider = get(),
+                streamAnalytics = get()
+            )
+        }
+        factory { parameters ->
+            CollectionViewModel(
+                type = parameters.get<MediaType>(),
+                kind = parameters.get<CollectionKind>(),
+                genreId = parameters.get<Int>().takeIf { it > 0 },
+                observeCatalogUseCase = get(),
+                refreshCatalogUseCase = get(),
+                loadNextPageUseCase = get(),
+                appRegionProvider = get()
+            )
+        }
+        factory { parameters ->
+            DetailsViewModel(
+                mediaId = parameters.get<MediaId>(),
+                observeMediaDetailsUseCase = get(),
+                refreshMediaDetailsUseCase = get(),
+                observeSeasonUseCase = get(),
+                refreshSeasonUseCase = get(),
+                appRegionProvider = get(),
+                networkConnectivityProvider = get()
+            )
+        }
+        factory {
+            GenresViewModel(
+                observeGenresUseCase = get(),
+                refreshGenresUseCase = get(),
+                appRegionProvider = get()
+            )
+        }
+    }
+
+    fun init(navigationRegistry: NavigationRegistry, readAccessToken: String) {
+        loadModules(
+            configurationModule(readAccessToken = readAccessToken),
+            dataModule,
+            domainModule,
+            presentationModule
+        )
         navigationRegistry.register(
             entryPoint = createStreamEntryPoint(),
             isStartDestination = true
         )
     }
+
 }

@@ -97,7 +97,6 @@ class AppApplication : Application(), PushMessagingServiceHost {
     private fun setupFeatureModules() {
         LoginModule.init()
         StreamModule.init(
-            context = this,
             navigationRegistry = get(),
             readAccessToken = BuildConfig.TMDB_READ_ACCESS_TOKEN
         )
