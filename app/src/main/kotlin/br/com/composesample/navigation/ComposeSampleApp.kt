@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -14,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.com.composesample.structural.designsystem.components.SampleConnectionBanner
 import br.com.composesample.structural.designsystem.components.SampleClearFocusOnOutsideTap
+import br.com.composesample.structural.designsystem.components.SampleSurface
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
 import br.com.composesample.structural.navigation.core.AnimatedNavHost
 import br.com.composesample.structural.navigation.core.FeatureDestination
@@ -39,7 +39,7 @@ fun ComposeSampleApp(
         content = {
             SampleClearFocusOnOutsideTap(
                 content = {
-                    Surface(
+                    SampleSurface(
                         modifier = Modifier.fillMaxSize(),
                         content = {
                             Column(
