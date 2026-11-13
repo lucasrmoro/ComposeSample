@@ -1,7 +1,6 @@
 package br.com.composesample.stream.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.com.composesample.stream.catalog.model.CatalogUiEffect
@@ -20,7 +19,9 @@ import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.media.MediaType
 import br.com.composesample.structural.di.dependencyViewModel
 import br.com.composesample.structural.navigation.core.AnimatedNavHost
-import br.com.composesample.structural.navigation.core.navArgument
+import br.com.composesample.structural.navigation.core.intArgument
+import br.com.composesample.structural.navigation.core.longArgument
+import br.com.composesample.structural.navigation.core.stringArgument
 
 @Composable
 internal fun StreamNavHost() {
@@ -60,12 +61,8 @@ internal fun StreamNavHost() {
         composable(
             StreamRoutes.COLLECTION,
             arguments = listOf(
-                StreamRoutes.Arguments.GENRE.navArgument { type = NavType.IntType },
-                StreamRoutes.Arguments.TITLE.navArgument {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                }
+                intArgument(key = StreamRoutes.Arguments.GENRE),
+                stringArgument(key = StreamRoutes.Arguments.TITLE, nullable = true),
             )
         ) { entry ->
             val viewModel: CollectionViewModel = dependencyViewModel()
@@ -88,7 +85,7 @@ internal fun StreamNavHost() {
         composable(
             StreamRoutes.DETAILS,
             arguments = listOf(
-                StreamRoutes.Arguments.ID.navArgument { type = NavType.LongType }
+                longArgument(key = StreamRoutes.Arguments.ID),
             )
         ) { entry ->
             val viewModel: DetailsViewModel = dependencyViewModel()
