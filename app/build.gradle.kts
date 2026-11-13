@@ -1,3 +1,4 @@
+import br.com.composesample.ext.stringBuildConfigField
 import br.com.composesample.modules.Modules
 
 plugins {
@@ -9,7 +10,7 @@ val tmdbReadAccessToken = gradle.extra["tmdbReadAccessToken"] as String
 
 android {
     defaultConfig {
-        buildConfigField("String", "TMDB_READ_ACCESS_TOKEN", "\"$tmdbReadAccessToken\"")
+        stringBuildConfigField(name = "TMDB_READ_ACCESS_TOKEN", value = tmdbReadAccessToken)
     }
 }
 

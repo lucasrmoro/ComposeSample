@@ -10,7 +10,7 @@ import br.com.composesample.Flavors.DEFAULT_DIMEN
 import br.com.composesample.Flavors.DEV
 import br.com.composesample.Flavors.PRD
 import br.com.composesample.ProjectConfig
-import br.com.composesample.ext.setStringBuildConfigField
+import br.com.composesample.ext.stringBuildConfigField
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.LibraryExtension
@@ -78,13 +78,13 @@ abstract class BasePlugin : Plugin<Project> {
         productFlavors {
             create(DEV) {
                 setupAppName(isDev = true)
-                setStringBuildConfigField(name = API_BASE_URL, value = API_BASE_URL_DEV)
+                stringBuildConfigField(name = API_BASE_URL, value = API_BASE_URL_DEV)
                 dimension = DEFAULT_DIMEN
             }
 
             create(PRD) {
                 setupAppName(isDev = false)
-                setStringBuildConfigField(name = API_BASE_URL, value = API_BASE_URL_PRD)
+                stringBuildConfigField(name = API_BASE_URL, value = API_BASE_URL_PRD)
                 dimension = DEFAULT_DIMEN
             }
         }
