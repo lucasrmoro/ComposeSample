@@ -1,6 +1,6 @@
 package br.com.composesample.structural.navigation.core
 
-import java.net.URLEncoder
+import android.net.Uri
 
 /** Encodes an arbitrary label as a single navigation argument. */
-fun encodeRouteValue(value: String): String = URLEncoder.encode(value, "UTF-8").replace("+", "%20")
+fun encodeRouteValue(value: String): String = Uri.encode(value)
