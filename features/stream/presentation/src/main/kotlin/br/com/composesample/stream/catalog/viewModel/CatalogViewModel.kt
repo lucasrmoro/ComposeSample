@@ -24,9 +24,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -40,8 +42,20 @@ class CatalogViewModel(
 ) : BaseViewModel<CatalogUiState, CatalogUiEvent, CatalogUiEffect>() {
 
     private val state = MutableStateFlow(CatalogUiState())
-    override val uiState = state.asStateFlow()
-    private var started = false
+    override val uiState = state
+        .onStart {
+            viewModelScope.launch {
+                appRegionProvider.region.collect {
+                    bindFeed()
+                    search(immediate = false)
+                }
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = CatalogUiState()
+        )
     private var feedJob: Job? = null
     private var searchJob: Job? = null
     private var pagingJob: Job? = null
@@ -50,16 +64,6 @@ class CatalogViewModel(
 
     override fun sendEvent(event: CatalogUiEvent) {
         when (event) {
-            CatalogUiEvent.Start ->
-                if (!started) {
-                    started = true
-                    launch {
-                        appRegionProvider.region.collect {
-                            bindFeed()
-                            search(false)
-                        }
-                    }
-                }
             is CatalogUiEvent.SelectType -> {
                 if (state.value.type != event.type) {
                     state.update {
