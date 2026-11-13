@@ -1,6 +1,7 @@
 package br.com.composesample.plugins
 
 import br.com.composesample.Plugins
+import br.com.composesample.ext.debugImplementation
 import br.com.composesample.ext.implementation
 import br.com.composesample.modules.Modules
 import br.com.composesample.plugins.base.BasePlugin
@@ -37,15 +38,12 @@ class PresentationPlugin : BasePlugin() {
             implementation(project(Modules.Structural.DesignSystem.MAIN))
             implementation(project(Modules.Structural.Logger.API))
             implementation(project(Modules.Structural.DI.API))
-            add("implementation", platform(libs.androidx.compose.bom))
+            implementation(platform(libs.androidx.compose.bom))
             implementation(libs.androidx.compose.runtime)
             implementation(libs.androidx.compose.foundation)
             implementation(libraries.findLibrary("androidx-compose-ui").get())
             implementation(libs.androidx.compose.ui.tooling.preview)
-            add(
-                "debugImplementation",
-                libraries.findLibrary("androidx-compose-ui-tooling").get().get()
-            )
+            debugImplementation(libraries.findLibrary("androidx-compose-ui-tooling").get())
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.navigation.compose)
             implementation(libs.bundles.android)
