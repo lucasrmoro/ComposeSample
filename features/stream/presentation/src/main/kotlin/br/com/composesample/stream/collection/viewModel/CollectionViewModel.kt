@@ -6,6 +6,8 @@ import br.com.composesample.stream.collection.model.CollectionUiEffect
 import br.com.composesample.stream.collection.model.CollectionUiEvent
 import br.com.composesample.stream.collection.model.CollectionUiState
 import br.com.composesample.stream.model.catalog.CatalogQuery
+import br.com.composesample.stream.model.catalog.CollectionKind
+import br.com.composesample.stream.model.media.MediaType
 import br.com.composesample.stream.model.toCatalogRegion
 import br.com.composesample.stream.useCase.LoadNextPageUseCase
 import br.com.composesample.stream.useCase.ObserveCatalogUseCase
@@ -20,41 +22,45 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class CollectionViewModel(
+    type: MediaType,
+    kind: CollectionKind,
+    genreId: Int?,
     private val observeCatalogUseCase: ObserveCatalogUseCase,
     private val refreshCatalogUseCase: RefreshCatalogUseCase,
     private val loadNextPageUseCase: LoadNextPageUseCase,
     private val appRegionProvider: AppRegionProvider
 ) : BaseViewModel<CollectionUiState, CollectionUiEvent, CollectionUiEffect>() {
 
-    private val state = MutableStateFlow(CollectionUiState())
-    override val uiState = state.asStateFlow()
+    private val initialQuery = CatalogQuery(
+        type = type,
+        kind = kind,
+        region = appRegionProvider.region.value.toCatalogRegion(),
+        genreId = genreId
+    )
+    private val initialState = CollectionUiState(query = initialQuery)
+    private val state = MutableStateFlow(initialState)
+    override val uiState = state
+        .onStart { viewModelScope.launch { bind() } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = initialState
+        )
     private var job: Job? = null
     private var pageJob: Job? = null
 
     override fun sendEvent(event: CollectionUiEvent) {
         when (event) {
-            is CollectionUiEvent.Start ->
-                if (job == null) {
-                    state.update {
-                        it.copy(
-                            query = CatalogQuery(
-                                type = event.type,
-                                kind = event.kind,
-                                region = appRegionProvider.region.value.toCatalogRegion(),
-                                genreId = event.genreId
-                            )
-                        )
-                    }
-                    bind()
-                }
             is CollectionUiEvent.OpenDetails -> sendEffect(CollectionUiEffect.Details(event.id))
             CollectionUiEvent.Retry -> bind()
             CollectionUiEvent.NextPage ->
@@ -64,7 +70,7 @@ class CollectionViewModel(
                         state.value.error == null &&
                         state.value.page.hasNextPage
                 ) {
-                    val query = state.value.query ?: return
+                    val query = state.value.query
                     state.update { it.copy(paging = true, error = null) }
                     pageJob = viewModelScope.launch {
                         loadNextPageUseCase(query)
@@ -81,8 +87,7 @@ class CollectionViewModel(
         pageJob?.cancel()
         job = viewModelScope.launch {
             appRegionProvider.region.collectLatest { region ->
-                val query =
-                    requireNotNull(state.value.query).copy(region = region.toCatalogRegion())
+                val query = initialQuery.copy(region = region.toCatalogRegion())
                 state.update { it.copy(query = query, loading = true, error = null) }
                 coroutineScope {
                     launch {

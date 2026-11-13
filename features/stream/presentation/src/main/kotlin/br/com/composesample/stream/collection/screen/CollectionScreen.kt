@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.composesample.stream.collection.model.CollectionUiEffect
@@ -14,6 +13,8 @@ import br.com.composesample.stream.collection.viewModel.CollectionViewModel
 import br.com.composesample.stream.components.LoadNotice
 import br.com.composesample.stream.components.MediaGrid
 import br.com.composesample.stream.components.collectionTitle
+import br.com.composesample.stream.model.catalog.CatalogQuery
+import br.com.composesample.stream.model.catalog.CatalogRegion
 import br.com.composesample.stream.model.catalog.CollectionKind
 import br.com.composesample.stream.model.media.MediaType
 import br.com.composesample.stream.tokens.StreamDimens
@@ -24,9 +25,7 @@ import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 internal class CollectionScreen(
     private val collectionViewModel: CollectionViewModel,
-    private val type: MediaType,
     private val kind: CollectionKind,
-    private val genreId: Int?,
     private val title: String?,
     private val back: () -> Unit,
     private val onNavigate: (CollectionUiEffect) -> Unit
@@ -34,14 +33,11 @@ internal class CollectionScreen(
 
     @Composable
     override fun Content(uiState: CollectionUiState) {
-        LaunchedEffect(type, kind, genreId) {
-            collectionViewModel.sendEvent(CollectionUiEvent.Start(type, kind, genreId))
-        }
         CollectionContent(
-            uiState,
-            title ?: collectionTitle(kind),
-            back,
-            collectionViewModel::sendEvent
+            state = uiState,
+            title = title ?: collectionTitle(kind),
+            back = back,
+            event = collectionViewModel::sendEvent
         )
     }
 
@@ -69,7 +65,7 @@ private fun CollectionContent(
             MediaGrid(
                 modifier = Modifier.weight(1f),
                 page = state.page,
-                kind = state.query?.kind ?: CollectionKind.POPULAR,
+                kind = state.query.kind,
                 paging = state.paging,
                 onDetails = { event(CollectionUiEvent.OpenDetails(id = it)) },
                 onNext = { event(CollectionUiEvent.NextPage) }
@@ -83,10 +79,21 @@ private fun CollectionContent(
 private fun CollectionPreview() {
     ComposeSampleTheme {
         CollectionContent(
-            CollectionUiState(loading = false),
-            "Popular",
-            {},
-            {}
+            state = CollectionUiState(
+                query = CatalogQuery(
+                    type = MediaType.MOVIE,
+                    kind = CollectionKind.POPULAR,
+                    region = CatalogRegion(
+                        languageTag = "en-US",
+                        countryCode = "US",
+                        timeZoneId = "UTC"
+                    )
+                ),
+                loading = false
+            ),
+            title = "Popular",
+            back = {},
+            event = {}
         )
     }
 }

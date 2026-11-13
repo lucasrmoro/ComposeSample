@@ -64,19 +64,20 @@ internal fun StreamNavHost() {
                 stringArgument(key = StreamRoutes.Arguments.TITLE, nullable = true)
             )
         ) { entry ->
-            val viewModel: CollectionViewModel = dependencyViewModel()
             val args = requireNotNull(entry.arguments)
+            val type = MediaType.valueOf(
+                requireNotNull(args.getString(StreamRoutes.Arguments.TYPE))
+            )
+            val kind = CollectionKind.valueOf(
+                requireNotNull(args.getString(StreamRoutes.Arguments.KIND))
+            )
+            val genreId = args.getInt(StreamRoutes.Arguments.GENRE).takeIf { it > 0 }
+            val viewModel: CollectionViewModel = dependencyViewModel(
+                parameters = parametersOf(type, kind, genreId ?: 0)
+            )
             CollectionScreen(
                 collectionViewModel = viewModel,
-                type =
-                    MediaType.valueOf(
-                        requireNotNull(args.getString(StreamRoutes.Arguments.TYPE))
-                    ),
-                kind =
-                    CollectionKind.valueOf(
-                        requireNotNull(args.getString(StreamRoutes.Arguments.KIND))
-                    ),
-                genreId = args.getInt(StreamRoutes.Arguments.GENRE).takeIf { it > 0 },
+                kind = kind,
                 title = args.getString(StreamRoutes.Arguments.TITLE),
                 back = back,
                 onNavigate = { effect ->
