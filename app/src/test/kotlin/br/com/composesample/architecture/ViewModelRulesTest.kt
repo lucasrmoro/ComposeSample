@@ -79,7 +79,18 @@ class ViewModelRulesTest {
 
     private fun ClassDeclaration.propertySource(sourceLines: List<String>, property: PropertyDeclaration): String {
         if (property.sourceLine <= 0) return ""
-        val nextMemberLine = (properties.map { it.sourceLine } + functions.map { it.sourceLine })
+        val propertyIndentation = sourceLines.getOrNull(property.sourceLine - 1).orEmpty()
+            .takeWhile(Char::isWhitespace)
+            .length
+        val unparsedMemberLines = sourceLines.mapIndexedNotNull { index, line ->
+            val lineIndentation = line.takeWhile(Char::isWhitespace).length
+            if (lineIndentation <= propertyIndentation && unparsedMemberDeclarationPattern.containsMatchIn(line)) {
+                index + 1
+            } else {
+                null
+            }
+        }
+        val nextMemberLine = (properties.map { it.sourceLine } + functions.map { it.sourceLine } + unparsedMemberLines)
             .filter { line -> line > property.sourceLine }
             .minOrNull() ?: sourceLines.size + 1
         return sourceLines
@@ -94,6 +105,12 @@ class ViewModelRulesTest {
         val readOnlyStateInitializerPattern = Regex("\\b_uiState\\.asStateFlow\\(\\)")
         val kotlinBlockCommentPattern = Regex("/\\*[\\s\\S]*?\\*/")
         val kotlinLineCommentPattern = Regex("//[^\\r\\n]*")
+        val unparsedMemberDeclarationPattern = Regex(
+            "^\\s*(?:(?:private|protected|internal|public|open|abstract|sealed|data|enum|" +
+                "annotation|value|inner|expect|actual|companion|const|override|final|lateinit|" +
+                "suspend|inline|operator|infix|tailrec|external)\\s+)*" +
+                "(?:init\\b|class\\b|interface\\b|object\\b|constructor\\b|fun\\b|val\\b|var\\b)"
+        )
     }
 
 }
