@@ -59,7 +59,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: platform-tools, platforms;android-36, build-tools;36.0.0
+          packages: platform-tools platforms;android-36 build-tools;36.0.0
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
       - name: Assemble dev debug APK
@@ -84,7 +84,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: platform-tools, platforms;android-36, build-tools;36.0.0
+          packages: platform-tools platforms;android-36 build-tools;36.0.0
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
       - name: Run Android Lint
@@ -109,7 +109,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: platform-tools, platforms;android-36, build-tools;36.0.0
+          packages: platform-tools platforms;android-36 build-tools;36.0.0
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
       - name: Run app unit tests
@@ -134,7 +134,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: platform-tools, platforms;android-36, build-tools;36.0.0
+          packages: platform-tools platforms;android-36 build-tools;36.0.0
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v5
       - name: Validate configured module graph
