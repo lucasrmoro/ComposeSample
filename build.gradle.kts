@@ -93,13 +93,15 @@ tasks.named("architectureCheck") {
     )
 }
 
-project(":app").tasks.named("testDevDebugUnitTest") {
-    dependsOn(
-        ":app:processDevDebugMainManifest",
-        ":app:processDevReleaseMainManifest",
-        ":app:processPrdDebugMainManifest",
-        ":app:processPrdReleaseMainManifest"
-    )
+project(":app").tasks.configureEach {
+    if (name == "testDevDebugUnitTest") {
+        dependsOn(
+            ":app:processDevDebugMainManifest",
+            ":app:processDevReleaseMainManifest",
+            ":app:processPrdDebugMainManifest",
+            ":app:processPrdReleaseMainManifest"
+        )
+    }
 }
 
 buildscript {
