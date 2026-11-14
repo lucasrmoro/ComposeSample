@@ -1,10 +1,10 @@
 package br.com.composesample.structural.network.authenticator
 
-import br.com.composesample.login.repository.LoginRepository
 import br.com.composesample.structural.core.ext.plusSpacing
 import br.com.composesample.structural.local_storage.prefs.PreferencesDataSource
 import br.com.composesample.structural.local_storage.prefs.PreferencesDataSource.Companion.ACCESS_TOKEN
 import br.com.composesample.structural.local_storage.prefs.PreferencesDataSource.Companion.REFRESH_TOKEN
+import br.com.composesample.structural.network.AccessTokenRefresher
 import br.com.composesample.structural.network.NetworkConstants.AUTHORIZATION_HEADER
 import br.com.composesample.structural.network.NetworkConstants.BEARER_TOKEN_TYPE
 import br.com.composesample.structural.session.AppSessionProvider
@@ -15,7 +15,7 @@ import okhttp3.Route
 
 internal class NetworkAuthenticator(
     private val appSessionProvider: AppSessionProvider,
-    private val loginRepository: LoginRepository,
+    private val accessTokenRefresher: AccessTokenRefresher,
     private val preferencesDataSource: PreferencesDataSource
 ) : Authenticator {
 
@@ -51,7 +51,7 @@ internal class NetworkAuthenticator(
 
     private suspend fun getRemoteAccessToken(): String =
         runCatching {
-            loginRepository.refreshToken(preferencesDataSource.getString(REFRESH_TOKEN).orEmpty())
+            accessTokenRefresher.refreshAccessToken(preferencesDataSource.getString(REFRESH_TOKEN).orEmpty())
         }.getOrNull() ?: FETCH_REMOTE_REFRESH_TOKEN_ERROR
 
     private fun Response.shouldRefreshAccessToken(localAccessToken: String): Boolean =

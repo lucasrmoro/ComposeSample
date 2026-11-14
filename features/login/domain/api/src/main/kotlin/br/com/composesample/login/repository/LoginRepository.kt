@@ -1,7 +1,9 @@
 package br.com.composesample.login.repository
 
+import kotlinx.coroutines.flow.Flow
+
 interface LoginRepository {
 
-    suspend fun refreshToken(refreshToken: String): String?
+    fun refreshToken(refreshToken: String): Flow<String?>
 
 }

@@ -5,6 +5,7 @@ import br.com.composesample.structural.di.dependencyModule
 import br.com.composesample.structural.di.get
 import br.com.composesample.structural.di.loadModules
 import br.com.composesample.structural.di.singleton
+import br.com.composesample.structural.network.AccessTokenRefresher
 import br.com.composesample.structural.network.connectivity.NetworkConnectivityProvider
 import br.com.composesample.structural.network.createNetworkAuthenticator
 import br.com.composesample.structural.network.createNetworkConnectivityProvider
@@ -50,7 +51,7 @@ object NetworkModule {
         singleton<Authenticator> {
             createNetworkAuthenticator(
                 appSessionProvider = get(),
-                loginRepository = get(),
+                accessTokenRefresher = get(),
                 preferencesDataSource = get()
             )
         }

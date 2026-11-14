@@ -1,12 +1,9 @@
 package br.com.composesample.plugins
 
 import br.com.composesample.Plugins
-import br.com.composesample.ext.implementation
-import br.com.composesample.modules.Modules
 import br.com.composesample.plugins.base.BaseLibraryPlugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.dependencies
 
 class DomainPlugin : BaseLibraryPlugin() {
 
@@ -15,11 +12,6 @@ class DomainPlugin : BaseLibraryPlugin() {
         apply(plugin = Plugins.KOTLIN_ANDROID)
     }
 
-    override fun setupDependencies(project: Project) = with(project) {
-        dependencies {
-            implementation(project(Modules.Structural.Core.MAIN))
-            implementation(project(Modules.Structural.Logger.API))
-        }
-    }
+    override fun setupDependencies(project: Project) = Unit
 
 }

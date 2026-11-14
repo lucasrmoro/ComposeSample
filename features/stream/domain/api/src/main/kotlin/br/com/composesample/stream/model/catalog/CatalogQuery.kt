@@ -1,11 +1,12 @@
 package br.com.composesample.stream.model.catalog
 
 import br.com.composesample.stream.model.media.MediaType
+import br.com.composesample.structural.localization.AppRegion
 
 data class CatalogQuery(
     val type: MediaType,
     val kind: CollectionKind,
-    val region: CatalogRegion,
+    val region: AppRegion,
     val genreId: Int? = null,
     val searchText: String = ""
 ) {

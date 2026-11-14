@@ -1,13 +1,13 @@
 package br.com.composesample.stream.repository
 
-import br.com.composesample.structural.core.concurrency.KeyedMutex
 import br.com.composesample.stream.dataSource.StreamLocalDataSource
 import br.com.composesample.stream.dataSource.StreamRemoteDataSource
 import br.com.composesample.stream.mapper.StreamMapper
 import br.com.composesample.stream.model.catalog.CatalogQuery
-import br.com.composesample.stream.model.catalog.CatalogRegion
 import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.media.MediaType
+import br.com.composesample.structural.core.concurrency.KeyedMutex
+import br.com.composesample.structural.localization.AppRegion
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -25,13 +25,13 @@ internal class StreamRepositoryImpl(
 
     private val catalogLocks = KeyedMutex<String>()
 
-    private fun detailsKey(id: MediaId, region: CatalogRegion) =
+    private fun detailsKey(id: MediaId, region: AppRegion) =
         "details:${id.type}:${id.value}:${region.languageTag}:${region.countryCode}"
 
-    private fun genreKey(type: MediaType, region: CatalogRegion) =
+    private fun genreKey(type: MediaType, region: AppRegion) =
         "genres:$type:${region.languageTag}"
 
-    private fun seasonKey(id: MediaId, season: Int, region: CatalogRegion) =
+    private fun seasonKey(id: MediaId, season: Int, region: AppRegion) =
         "season:${detailsKey(id, region)}:$season"
 
     override fun observeCatalog(query: CatalogQuery) =
@@ -62,14 +62,14 @@ internal class StreamRepositoryImpl(
         }
     }.flowOn(coroutineDispatcher)
 
-    override fun observeGenres(type: MediaType, region: CatalogRegion) =
+    override fun observeGenres(type: MediaType, region: AppRegion) =
         streamLocalDataSource
             .observe(genreKey(type, region))
             .map(streamMapper::genres)
             .distinctUntilChanged()
             .flowOn(coroutineDispatcher)
 
-    override fun refreshGenres(type: MediaType, region: CatalogRegion) = flow {
+    override fun refreshGenres(type: MediaType, region: AppRegion) = flow {
         streamLocalDataSource
             .save(
                 key = genreKey(type, region),
@@ -82,14 +82,14 @@ internal class StreamRepositoryImpl(
         emit(Unit)
     }.flowOn(coroutineDispatcher)
 
-    override fun observeDetails(id: MediaId, region: CatalogRegion) =
+    override fun observeDetails(id: MediaId, region: AppRegion) =
         streamLocalDataSource
             .observe(detailsKey(id, region))
             .map { streamMapper.details(it, id, region) }
             .distinctUntilChanged()
             .flowOn(coroutineDispatcher)
 
-    override fun refreshDetails(id: MediaId, region: CatalogRegion) = flow {
+    override fun refreshDetails(id: MediaId, region: AppRegion) = flow {
         streamLocalDataSource
             .save(
                 key = detailsKey(id, region),
@@ -99,14 +99,14 @@ internal class StreamRepositoryImpl(
         emit(Unit)
     }.flowOn(coroutineDispatcher)
 
-    override fun observeSeason(id: MediaId, season: Int, region: CatalogRegion) =
+    override fun observeSeason(id: MediaId, season: Int, region: AppRegion) =
         streamLocalDataSource
             .observe(seasonKey(id, season, region))
             .map(streamMapper::season)
             .distinctUntilChanged()
             .flowOn(coroutineDispatcher)
 
-    override fun refreshSeason(id: MediaId, season: Int, region: CatalogRegion) = flow {
+    override fun refreshSeason(id: MediaId, season: Int, region: AppRegion) = flow {
         streamLocalDataSource
             .save(
                 key = seasonKey(id, season, region),

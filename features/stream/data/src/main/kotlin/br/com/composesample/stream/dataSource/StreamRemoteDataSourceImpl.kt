@@ -8,7 +8,7 @@ import br.com.composesample.stream.model.catalog.CatalogQuery
 import br.com.composesample.stream.model.catalog.CollectionKind
 import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.media.MediaType
-import br.com.composesample.stream.query.CatalogQueryParameters
+import br.com.composesample.stream.dataSource.query.CatalogQueryParameters
 import br.com.composesample.structural.core.base.dataSource.BaseDataSource
 import br.com.composesample.structural.network.http.HttpClient
 import br.com.composesample.structural.network.http.HttpRequest

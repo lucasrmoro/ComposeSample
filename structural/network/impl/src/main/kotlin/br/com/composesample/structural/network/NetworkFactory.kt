@@ -1,7 +1,6 @@
 package br.com.composesample.structural.network
 
 import android.content.Context
-import br.com.composesample.login.repository.LoginRepository
 import br.com.composesample.structural.local_storage.prefs.PreferencesDataSource
 import br.com.composesample.structural.network.authenticator.NetworkAuthenticator
 import br.com.composesample.structural.network.connectivity.NetworkConnectivityProvider
@@ -16,9 +15,14 @@ fun createNetworkConnectivityProvider(context: Context): NetworkConnectivityProv
 
 fun createNetworkAuthenticator(
     appSessionProvider: AppSessionProvider,
-    loginRepository: LoginRepository,
+    accessTokenRefresher: AccessTokenRefresher,
     preferencesDataSource: PreferencesDataSource
-): Authenticator = NetworkAuthenticator(appSessionProvider, loginRepository, preferencesDataSource)
+): Authenticator =
+    NetworkAuthenticator(
+        appSessionProvider = appSessionProvider,
+        accessTokenRefresher = accessTokenRefresher,
+        preferencesDataSource = preferencesDataSource
+    )
 
 fun createNetworkInterceptor(preferencesDataSource: PreferencesDataSource): Interceptor =
     NetworkInterceptor(preferencesDataSource)

@@ -1,0 +1,92 @@
+name: Quality gate report
+description: Summarize pull request gate results with correction examples
+inputs:
+  results-json:
+    description: JSON representation of the dependent job results
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Write Markdown report and job summary
+      shell: bash
+      env:
+        GATE_RESULTS_JSON: ${{ inputs.results-json }}
+      run: python3 "$GITHUB_ACTION_PATH/report.py"
+    - name: Publish report in pull request
+      if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+      uses: actions/github-script@v8
+      env:
+        GATE_RESULTS_JSON: ${{ inputs.results-json }}
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          const marker = '<!-- pull-request-quality-gates-report -->';
+          const results = JSON.parse(process.env.GATE_RESULTS_JSON);
+          const gateNames = { lint: 'Lint' };
+          const failedGates = Object.entries(gateNames)
+            .filter(([job]) => results[job]?.result === 'failure');
+          if (failedGates.length === 0) return;
+
+          const { owner, repo } = context.repo;
+          const issue_number = context.issue.number;
+          const checkRuns = await github.paginate(github.rest.checks.listForRef, {
+            owner, repo, ref: context.sha, per_page: 100
+          });
+          const violations = [];
+          for (const [job, gateName] of failedGates) {
+            const gateRuns = checkRuns.filter(check => check.name === gateName && check.conclusion === 'failure');
+            for (const check of gateRuns) {
+              const annotations = await github.paginate(github.rest.checks.listAnnotations, {
+                owner, repo, check_run_id: check.id, per_page: 100
+              });
+              for (const annotation of annotations) {
+                if (!annotation.path || !annotation.start_line) continue;
+                const relativePath = path.posix.normalize(annotation.path);
+                if (relativePath === '.github' || relativePath.startsWith('.github/')) continue;
+                if (relativePath.startsWith('../') || path.posix.isAbsolute(relativePath)) continue;
+                const sourcePath = path.join(process.env.GITHUB_WORKSPACE, relativePath);
+                if (!fs.existsSync(sourcePath) || !fs.statSync(sourcePath).isFile()) continue;
+                const location = `${annotation.path}#L${annotation.start_line}`;
+                const fileUrl = `${context.serverUrl}/${owner}/${repo}/blob/${context.sha}/${location}`;
+                const detail = (annotation.message || annotation.title || 'Check violation')
+                  .replace(/\r\n?|\n/g, '<br>')
+                  .replaceAll('|', '\\|');
+                violations.push(`| ${gateName} | [${location}](${fileUrl}) | ${detail} |`);
+              }
+            }
+          }
+          if (violations.length === 0) return;
+
+          const body = [
+            marker,
+            '## Quality gate violations',
+            '',
+            '| Gate | File and line | Violation |',
+            '| --- | --- | --- |',
+            ...violations,
+            ''
+          ].join('\n');
+          const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });
+          const previousReports = comments.filter(comment => comment.user?.type === 'Bot' && comment.body?.startsWith(marker));
+
+          await github.rest.issues.createComment({ owner, repo, issue_number, body });
+
+          for (const comment of previousReports) {
+            const status = await github.graphql(`
+              query($subjectId: ID!) {
+                node(id: $subjectId) {
+                  ... on IssueComment { isMinimized }
+                }
+              }
+            `, { subjectId: comment.node_id });
+            if (status.node?.isMinimized) continue;
+
+            await github.graphql(`
+              mutation($subjectId: ID!) {
+                minimizeComment(input: { subjectId: $subjectId, classifier: OUTDATED }) {
+                  minimizedComment { isMinimized }
+                }
+              }
+            `, { subjectId: comment.node_id });
+          }

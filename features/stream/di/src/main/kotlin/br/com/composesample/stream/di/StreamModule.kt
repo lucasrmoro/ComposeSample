@@ -3,14 +3,14 @@ package br.com.composesample.stream.di
 import android.content.Context
 import br.com.composesample.stream.analytics.StreamAnalytics
 import br.com.composesample.stream.analytics.createStreamAnalytics
-import br.com.composesample.stream.catalog.viewModel.CatalogViewModel
-import br.com.composesample.stream.collection.viewModel.CollectionViewModel
+import br.com.composesample.stream.viewModel.catalog.CatalogViewModel
+import br.com.composesample.stream.viewModel.collection.CollectionViewModel
 import br.com.composesample.stream.dataSource.StreamLocalDataSource
 import br.com.composesample.stream.dataSource.StreamRemoteDataSource
 import br.com.composesample.stream.dataSource.createStreamLocalDataSource
 import br.com.composesample.stream.dataSource.createStreamRemoteDataSource
-import br.com.composesample.stream.details.viewModel.DetailsViewModel
-import br.com.composesample.stream.genres.viewModel.GenresViewModel
+import br.com.composesample.stream.viewModel.details.DetailsViewModel
+import br.com.composesample.stream.viewModel.genres.GenresViewModel
 import br.com.composesample.stream.mapper.StreamMapper
 import br.com.composesample.stream.mapper.createStreamMapper
 import br.com.composesample.stream.model.catalog.CollectionKind
@@ -157,11 +157,12 @@ object StreamModule {
                 networkConnectivityProvider = get()
             )
         }
-        factory {
+        factory { parameters ->
             GenresViewModel(
                 observeGenresUseCase = get(),
                 refreshGenresUseCase = get(),
-                appRegionProvider = get()
+                appRegionProvider = get(),
+                type = parameters.get<MediaType>()
             )
         }
     }

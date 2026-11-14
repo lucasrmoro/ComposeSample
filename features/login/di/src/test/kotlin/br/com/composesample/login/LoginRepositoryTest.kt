@@ -14,8 +14,12 @@ import br.com.composesample.structural.di.stopDependencyInjection
 import br.com.composesample.structural.network.di.NetworkModule
 import br.com.composesample.structural.network.http.HttpClientConfiguration
 import br.com.composesample.structural.network.exception.HttpException
+import br.com.composesample.structural.localization.AppRegion
+import br.com.composesample.structural.localization.AppRegionProvider
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.MutableStateFlow
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
@@ -39,6 +43,17 @@ class LoginRepositoryTest {
         loadModules(
             dependencyModule {
                 singleton { HttpClientConfiguration(baseUrl = server.url("/").toString()) }
+                singleton<AppRegionProvider> {
+                    object : AppRegionProvider {
+
+                        override val region = MutableStateFlow(
+                            AppRegion(languageTag = "en", countryCode = "US", timeZoneId = "UTC")
+                        )
+
+                        override fun start() = Unit
+
+                    }
+                }
                 singleton<LoginAnalytics> {
                     object : LoginAnalytics {
 
@@ -64,11 +79,11 @@ class LoginRepositoryTest {
             """{"AccessToken":"new-access-token","RefreshToken":"new-refresh-token"}"""
         ))
 
-        val accessToken = Dependencies.get<LoginRepository>().refreshToken("refresh-token")
+        val accessToken = Dependencies.get<LoginRepository>().refreshToken("refresh-token").first()
 
         assertEquals("new-access-token", accessToken)
         val request = server.takeRequest(1, TimeUnit.SECONDS)
-        assertEquals("/auth/refresh-token/refresh-token", request?.path)
+        assertEquals("/auth/refresh-token/refresh-token?language=en", request?.path)
         assertNull(request?.getHeader("Authorization"))
         assertEquals(1, server.requestCount)
     }
@@ -78,7 +93,7 @@ class LoginRepositoryTest {
         server.enqueue(MockResponse().setResponseCode(401))
 
         val error = runCatching {
-            Dependencies.get<LoginRepository>().refreshToken("expired-refresh-token")
+            Dependencies.get<LoginRepository>().refreshToken("expired-refresh-token").first()
         }.exceptionOrNull()
 
         assertEquals(401, (error as? HttpException)?.statusCode)

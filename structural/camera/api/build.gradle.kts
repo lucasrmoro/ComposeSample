@@ -5,6 +5,6 @@ plugins {
 }
 
 dependencies {
-    api(libs.androidx.activity.ktx)
     api(project(Modules.Structural.Media.API))
+    api(libs.androidx.activity)
 }

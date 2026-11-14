@@ -5,5 +5,5 @@
 /.kotlin
 local.properties
 .idea
-/docs/*
+/docs/
 AGENTS.md

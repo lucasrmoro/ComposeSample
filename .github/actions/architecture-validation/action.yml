@@ -1,0 +1,10 @@
+name: Architecture validation
+description: Run the architecture gate
+runs:
+  using: composite
+  steps:
+    - name: Set up Android build
+      uses: ./.github/actions/android-setup
+    - name: Run architecture checks
+      shell: bash
+      run: ./gradlew architectureCheck
