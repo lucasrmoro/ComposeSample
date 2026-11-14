@@ -13,7 +13,7 @@ def main():
     workspace = Path(os.environ.get("GITHUB_WORKSPACE", ".")).resolve()
     root = ET.parse(report).getroot()
     for issue in root.findall("issue"):
-        if issue.get("severity", "").lower() != "error":
+        if issue.get("severity", "").lower() not in {"error", "fatal"}:
             continue
         for location in issue.findall("location"):
             source = Path(location.get("file", ""))

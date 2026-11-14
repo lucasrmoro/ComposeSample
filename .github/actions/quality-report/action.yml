@@ -25,6 +25,8 @@ runs:
         GATE_RESULTS_JSON: ${{ inputs.results-json }}
       with:
         script: |
+          const fs = require('fs');
+          const path = require('path');
           const marker = '<!-- pull-request-quality-gates-report -->';
           const results = JSON.parse(process.env.GATE_RESULTS_JSON);
           const gateNames = { lint: 'Lint' };
@@ -46,9 +48,16 @@ runs:
               });
               for (const annotation of annotations) {
                 if (!annotation.path || !annotation.start_line) continue;
+                const relativePath = path.posix.normalize(annotation.path);
+                if (relativePath === '.github' || relativePath.startsWith('.github/')) continue;
+                if (relativePath.startsWith('../') || path.posix.isAbsolute(relativePath)) continue;
+                const sourcePath = path.join(process.env.GITHUB_WORKSPACE, relativePath);
+                if (!fs.existsSync(sourcePath) || !fs.statSync(sourcePath).isFile()) continue;
                 const location = `${annotation.path}#L${annotation.start_line}`;
                 const fileUrl = `${context.serverUrl}/${owner}/${repo}/blob/${context.sha}/${location}`;
-                const detail = (annotation.message || annotation.title || 'Check violation').replaceAll('|', '\\|');
+                const detail = (annotation.message || annotation.title || 'Check violation')
+                  .replace(/\r\n?|\n/g, '<br>')
+                  .replaceAll('|', '\\|');
                 violations.push(`| ${gateName} | [${location}](${fileUrl}) | ${detail} |`);
               }
             }
