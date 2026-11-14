@@ -7,7 +7,6 @@ plugins {
 
 dependencies {
     implementation(project(Modules.Structural.Core.MAIN))
-    implementation(project(Modules.Feature.FeatureA.DATA))
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
     implementation(project(Modules.Structural.LocalStorage.API))

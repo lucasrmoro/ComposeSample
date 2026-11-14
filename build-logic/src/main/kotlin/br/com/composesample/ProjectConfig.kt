@@ -18,7 +18,7 @@ object ProjectConfig {
     const val PROGUARD_RULES = "proguard-rules.pro"
     val COMPOSE_MODULES = setOf(
         ":app",
-        ":features:featureA:presentation",
+        ":features:stream:presentation",
         ":structural:design-system",
         ":structural:di:api",
         ":structural:navigation:api"
@@ -29,6 +29,7 @@ internal object Plugins {
     const val ANDROID_APPLICATION = "com.android.application"
     const val ANDROID_LIBRARY = "com.android.library"
     const val KOTLIN_ANDROID = "org.jetbrains.kotlin.android"
+    const val COMPOSE_COMPILER = "org.jetbrains.kotlin.plugin.compose"
     const val KSP = "com.google.devtools.ksp"
 }
 

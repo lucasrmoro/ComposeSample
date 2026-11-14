@@ -7,7 +7,14 @@ import kotlin.reflect.KClass
 /** Android lifecycle bridge. Implementations retain instances in the owner's store, never in the DI singleton. */
 interface DependencyViewModelProvider {
 
-    /** Uses the owner's creation extras to restore SavedStateHandle and resolve constructor dependencies. */
-    fun <T : ViewModel> get(owner: ViewModelStoreOwner, type: KClass<T>): T
+    /**
+     * Resolves the ViewModel with the owner's saved-state handle and caller-provided constructor
+     * arguments.
+     */
+    fun <T : ViewModel> get(
+        owner: ViewModelStoreOwner,
+        type: KClass<T>,
+        parameters: DependencyParameters = DependencyParameters()
+    ): T
 
 }

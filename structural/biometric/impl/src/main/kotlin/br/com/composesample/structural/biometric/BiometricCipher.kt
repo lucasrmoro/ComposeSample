@@ -41,19 +41,12 @@ internal class BiometricCipher {
     }
 
     private companion object {
-
         const val TRANSFORMATION = "AES/GCM/NoPadding"
-
         const val IV_SIZE = 12
-
         const val TAG_SIZE = 128
-
         const val FORMAT_VERSION: Byte = 1
-
         const val VERSION_SIZE = 1
-
         const val HEADER_SIZE = VERSION_SIZE + IV_SIZE
-
     }
 
 }

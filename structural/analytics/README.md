@@ -37,7 +37,7 @@ Construct events inside the feature analytics implementation:
 
 ```kotlin
 AnalyticsEvent(
-    "feature_a_list_load_finished",
+    "stream_list_load_finished",
     "page" to page.toString(),
     "item_count" to itemCount.toString()
 )

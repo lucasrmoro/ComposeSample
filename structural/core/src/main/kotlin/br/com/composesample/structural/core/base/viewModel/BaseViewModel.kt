@@ -3,8 +3,8 @@ package br.com.composesample.structural.core.base.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -29,4 +29,5 @@ abstract class BaseViewModel<State, Event, Effect> : ViewModel(), UiViewModel<St
         effectChannel.close()
         viewModelScope.cancel()
     }
+
 }
