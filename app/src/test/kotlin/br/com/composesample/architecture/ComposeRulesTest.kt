@@ -14,14 +14,14 @@ import java.io.File
 class ComposeRulesTest {
 
     @Test
-    fun `viewmodels must expose uiState through asStateFlow`() {
+    fun `viewmodels must expose private _uiState as public uiState through asStateFlow`() {
         Konture.files {
             that().satisfy { file: FileDeclarationContext ->
                 file.isFeaturePresentationSource() &&
                     file.declaration.packageName.hasPackageSegment("viewModel") &&
                     file.declaration.classes.any { declaration -> declaration.name.endsWith("ViewModel") }
             }
-            should().satisfy(description = "read-only uiState exposure", predicate = { file: FileDeclarationContext ->
+            should().satisfy(description = "private and read-only ViewModel state naming", predicate = { file: FileDeclarationContext ->
                 readOnlyUiStatePattern.containsMatchIn(File(file.declaration.filePath).readText())
             })
         }
@@ -198,7 +198,8 @@ class ComposeRulesTest {
 
     private companion object {
         val readOnlyUiStatePattern = Regex(
-            "(?:override\\s+)?val\\s+uiState(?:\\s*:\\s*[^=]+)?\\s*=\\s*[A-Za-z_]\\w*\\.asStateFlow\\(\\)"
+            "private\\s+val\\s+_uiState(?:\\s*:\\s*[^=]+)?\\s*=\\s*MutableStateFlow\\(" +
+                "(?s).*?override\\s+val\\s+uiState(?:\\s*:\\s*[^=]+)?\\s*=\\s*_uiState\\.asStateFlow\\(\\)"
         )
         val manifestCommentPattern = Regex("<!--.*?-->", RegexOption.DOT_MATCHES_ALL)
         val manifestActivityPattern = Regex("<activity(?=[\\s>])")

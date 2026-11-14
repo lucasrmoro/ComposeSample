@@ -43,8 +43,8 @@ class CatalogViewModel(
     private val streamAnalytics: StreamAnalytics
 ) : BaseViewModel<CatalogUiState, CatalogUiEvent, CatalogUiEffect>() {
 
-    private val state = MutableStateFlow(CatalogUiState())
-    override val uiState = state.asStateFlow()
+    private val _uiState = MutableStateFlow(CatalogUiState())
+    override val uiState = _uiState.asStateFlow()
         .onStart {
             viewModelScope.launch {
                 appRegionProvider.region.collect {
@@ -67,8 +67,8 @@ class CatalogViewModel(
     override fun sendEvent(event: CatalogUiEvent) {
         when (event) {
             is CatalogUiEvent.SelectType -> {
-                if (state.value.type != event.type) {
-                    state.update {
+                if (_uiState.value.type != event.type) {
+                    _uiState.update {
                         it.copy(
                             type = event.type,
                             sections = emptyMap(),
@@ -80,21 +80,21 @@ class CatalogViewModel(
                 }
             }
             is CatalogUiEvent.SearchChanged -> {
-                state.update { it.copy(searchText = event.text) }
+                _uiState.update { it.copy(searchText = event.text) }
                 search(false)
             }
             CatalogUiEvent.SubmitSearch -> search(true)
             CatalogUiEvent.OpenGenres ->
                 sendEffect(
                     CatalogUiEffect.Navigate(
-                        destination = StreamDestination.Genres(type = state.value.type)
+                        destination = StreamDestination.Genres(type = _uiState.value.type)
                     )
                 )
             is CatalogUiEvent.OpenCollection ->
                 sendEffect(
                     CatalogUiEffect.Navigate(
                         destination =
-                            StreamDestination.Collection(type = state.value.type, kind = event.kind)
+                            StreamDestination.Collection(type = _uiState.value.type, kind = event.kind)
                     )
                 )
             is CatalogUiEvent.OpenDetails ->
@@ -104,19 +104,19 @@ class CatalogViewModel(
                     )
                 )
             CatalogUiEvent.Refresh ->
-                if (state.value.searchText.isBlank()) bindFeed() else search(true)
+                if (_uiState.value.searchText.isBlank()) bindFeed() else search(true)
             CatalogUiEvent.LoadMoreSearch ->
                 if (
                     pagingJob?.isActive != true &&
-                        !state.value.search.refreshing &&
-                        state.value.search.error == null &&
-                        state.value.search.page.hasNextPage
+                        !_uiState.value.search.refreshing &&
+                        _uiState.value.search.error == null &&
+                        _uiState.value.search.page.hasNextPage
                 ) {
                     val query = query(CollectionKind.SEARCH)
                     pagingJob = viewModelScope.launch {
                         loadNextPageUseCase(query)
                             .onError(ignoreUnauthorized = false) {
-                                state.update { it.copy(search = it.search.copy(error = error)) }
+                                _uiState.update { it.copy(search = it.search.copy(error = error)) }
                             }
                             .onSuccess {}
                     }
@@ -126,10 +126,10 @@ class CatalogViewModel(
 
     private fun query(kind: CollectionKind) =
         CatalogQuery(
-            type = state.value.type,
+            type = _uiState.value.type,
             kind = kind,
             region = appRegionProvider.region.value.toCatalogRegion(),
-            searchText = if (kind == CollectionKind.SEARCH) state.value.searchText.trim() else ""
+            searchText = if (kind == CollectionKind.SEARCH) _uiState.value.searchText.trim() else ""
         )
 
     private fun bindFeed() {
@@ -139,7 +139,7 @@ class CatalogViewModel(
             listOf(CollectionKind.POPULAR, CollectionKind.RECENT, CollectionKind.UPCOMING)
                 .forEach { kind ->
                     val query = query(kind)
-                    state.update {
+                    _uiState.update {
                         it.copy(
                             sections = it.sections +
                                 (kind to (it.sections[kind] ?: CatalogSection()).copy(
@@ -173,7 +173,7 @@ class CatalogViewModel(
     }
 
     private fun updateSection(kind: CollectionKind, transform: (CatalogSection) -> CatalogSection) {
-        state.update {
+        _uiState.update {
             it.copy(
                 sections = it.sections + (kind to transform(it.sections[kind] ?: CatalogSection()))
             )
@@ -185,33 +185,33 @@ class CatalogViewModel(
         pagingJob?.cancel()
         val query = query(CollectionKind.SEARCH)
         if (query.searchText.isBlank()) {
-            state.update { it.copy(search = CatalogSection(refreshing = false)) }
+            _uiState.update { it.copy(search = CatalogSection(refreshing = false)) }
             return
         }
-        state.update { it.copy(search = CatalogSection(refreshing = true)) }
+        _uiState.update { it.copy(search = CatalogSection(refreshing = true)) }
         searchJob = viewModelScope.launch {
             if (!immediate) delay(800)
             coroutineScope {
                 launch {
                     observeCatalogUseCase(query)
                         .onError(ignoreUnauthorized = false) {
-                            state.update { it.copy(search = it.search.copy(error = error)) }
+                            _uiState.update { it.copy(search = it.search.copy(error = error)) }
                         }
                         .onSuccess {
                             val page = this
-                            state.update { it.copy(search = it.search.copy(page = page)) }
+                            _uiState.update { it.copy(search = it.search.copy(page = page)) }
                         }
                 }
                 launch {
                     refreshCatalogUseCase(query)
                         .onCompletion {
                             if (currentCoroutineContext().isActive)
-                                state.update {
+                                _uiState.update {
                                     it.copy(search = it.search.copy(refreshing = false))
                                 }
                         }
                         .onError(ignoreUnauthorized = false) {
-                            state.update { it.copy(search = it.search.copy(error = error)) }
+                            _uiState.update { it.copy(search = it.search.copy(error = error)) }
                         }
                         .onSuccess {}
                 }

@@ -33,8 +33,8 @@ class GenresViewModel(
     private val type: MediaType
 ) : BaseViewModel<GenresUiState, GenresUiEvent, GenresUiEffect>() {
 
-    private val state = MutableStateFlow(GenresUiState(type = type))
-    override val uiState = state.asStateFlow()
+    private val _uiState = MutableStateFlow(GenresUiState(type = type))
+    override val uiState = _uiState.asStateFlow()
     private var job: Job? = null
 
     init {
@@ -44,7 +44,7 @@ class GenresViewModel(
     override fun sendEvent(event: GenresUiEvent) {
         when (event) {
             is GenresUiEvent.Select ->
-                sendEffect(GenresUiEffect.Collection(state.value.type, event.genre))
+                sendEffect(GenresUiEffect.Collection(_uiState.value.type, event.genre))
             GenresUiEvent.Retry -> bind()
         }
     }
@@ -53,21 +53,21 @@ class GenresViewModel(
         job?.cancel()
         job = viewModelScope.launch {
             appRegionProvider.region.collectLatest { region ->
-                state.update { it.copy(loading = true, error = null) }
+                _uiState.update { it.copy(loading = true, error = null) }
                 coroutineScope {
                     launch {
-                        observeGenresUseCase(state.value.type, region.toCatalogRegion())
+                        observeGenresUseCase(_uiState.value.type, region.toCatalogRegion())
                             .onError(ignoreUnauthorized = false) { fail() }
                             .onSuccess {
                                 val genres = this
-                                state.update { it.copy(genres = genres) }
+                                _uiState.update { it.copy(genres = genres) }
                             }
                     }
                     launch {
-                        refreshGenresUseCase(state.value.type, region.toCatalogRegion())
+                        refreshGenresUseCase(_uiState.value.type, region.toCatalogRegion())
                             .onCompletion {
                                 if (currentCoroutineContext().isActive)
-                                    state.update { it.copy(loading = false) }
+                                    _uiState.update { it.copy(loading = false) }
                             }
                             .onError(ignoreUnauthorized = false) { fail() }
                             .onSuccess {}
@@ -78,7 +78,7 @@ class GenresViewModel(
     }
 
     private fun fail() {
-        state.update { it.copy(error = UiText.StringResource(R.string.stream_load_error)) }
+        _uiState.update { it.copy(error = UiText.StringResource(R.string.stream_load_error)) }
     }
 
 }

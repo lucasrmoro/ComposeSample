@@ -49,8 +49,8 @@ class CollectionViewModel(
         genreId = genreId
     )
     private val initialState = CollectionUiState(query = initialQuery)
-    private val state = MutableStateFlow(initialState)
-    override val uiState = state.asStateFlow()
+    private val _uiState = MutableStateFlow(initialState)
+    override val uiState = _uiState.asStateFlow()
         .onStart { viewModelScope.launch { bind() } }
         .stateIn(
             scope = viewModelScope,
@@ -67,15 +67,15 @@ class CollectionViewModel(
             CollectionUiEvent.NextPage ->
                 if (
                     pageJob?.isActive != true &&
-                        !state.value.loading &&
-                        state.value.error == null &&
-                        state.value.page.hasNextPage
+                        !_uiState.value.loading &&
+                        _uiState.value.error == null &&
+                        _uiState.value.page.hasNextPage
                 ) {
-                    val query = state.value.query
-                    state.update { it.copy(paging = true, error = null) }
+                    val query = _uiState.value.query
+                    _uiState.update { it.copy(paging = true, error = null) }
                     pageJob = viewModelScope.launch {
                         loadNextPageUseCase(query)
-                            .onCompletion { state.update { it.copy(paging = false) } }
+                            .onCompletion { _uiState.update { it.copy(paging = false) } }
                             .onError(ignoreUnauthorized = false) { fail() }
                             .onSuccess {}
                     }
@@ -91,21 +91,21 @@ class CollectionViewModel(
                 pageJob?.cancel()
                 pageJob = null
                 val query = initialQuery.copy(region = region.toCatalogRegion())
-                state.update { it.copy(query = query, loading = true, paging = false, error = null) }
+                _uiState.update { it.copy(query = query, loading = true, paging = false, error = null) }
                 coroutineScope {
                     launch {
                         observeCatalogUseCase(query)
                             .onError(ignoreUnauthorized = false) { fail() }
                             .onSuccess {
                                 val page = this
-                                state.update { it.copy(page = page) }
+                                _uiState.update { it.copy(page = page) }
                             }
                     }
                     launch {
                         refreshCatalogUseCase(query)
                             .onCompletion {
                                 if (currentCoroutineContext().isActive)
-                                    state.update { it.copy(loading = false) }
+                                    _uiState.update { it.copy(loading = false) }
                             }
                             .onError(ignoreUnauthorized = false) { fail() }
                             .onSuccess {}
@@ -116,7 +116,7 @@ class CollectionViewModel(
     }
 
     private fun fail() {
-        state.update { it.copy(error = UiText.StringResource(R.string.stream_load_error)) }
+        _uiState.update { it.copy(error = UiText.StringResource(R.string.stream_load_error)) }
     }
 
 }

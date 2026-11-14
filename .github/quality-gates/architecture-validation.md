@@ -45,8 +45,9 @@ runs explicitly in pull request validation and is not attached to app builds.
   visual components come from the design system.
 - `UiState`, `UiEvent`, and `UiEffect` declarations live in presentation model packages.
 - Feature domain API imports do not expose platform/vendor, DTO, or entity types.
-- ViewModels expose `uiState` through `.asStateFlow()` and do not publicly expose
-  `MutableStateFlow` or Compose `MutableState` holders.
+- ViewModels keep mutable state in private `_uiState`, expose it as public `uiState`
+  through `.asStateFlow()`, and do not publicly expose `MutableStateFlow` or Compose
+  `MutableState` holders.
 
 ## ComposeRules
 
