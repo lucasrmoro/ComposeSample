@@ -291,20 +291,14 @@ task's original parent or creation point, and does not prevent branch creation.
 Fork runs may require maintainer approval according to the repository's Actions
 settings.
 
-CodeRabbit is configured to review new PRs and later pushes, including draft and
-task PRs. For this public repository with fewer than ten stars, CodeRabbit
-requires a manual trigger: comment `@coderabbitai full review` after opening a
-PR and after each push. The `CodeRabbit` check is required by the `main` ruleset
-alongside the existing checks; review errors fail it. The **Verify CodeRabbit
-approval** check requires approval from `coderabbitai[bot]` on the current
-commit. It waits for a submitted review before reporting a result on a new
-commit. A separate review ruleset requires two approvals and resolved review
-threads for other contributors. Its sole-maintainer bypass does not bypass the
-required CodeRabbit checks. Fix findings, push a new commit, and request a new
-review. For a false positive, explain the decision in the review thread before
-resolving it. If a review fails or its check is missing, request a full review
-and inspect the app installation and permissions. Skipped or rate-limited
-reviews may pass the `CodeRabbit` check but cannot satisfy the approval check.
+The **Pull request validation** workflow runs branch and title checks, build,
+lint, unit tests, and module graph validation. After those validations pass,
+request an advisory CodeRabbit review with the PR comment
+`@coderabbitai full review`. CodeRabbit review findings and status are
+informational; neither a CodeRabbit approval nor a completed review is required
+to merge. This comment does not rerun the validation workflow. CodeRabbit
+feedback does not replace the separate human review ruleset, which requires two
+approvals and resolved review threads for other contributors.
 
 Merge PRs using squash, then delete the source branch locally and remotely,
 except `main` and `develop`.
