@@ -2,6 +2,7 @@ package br.com.composesample.architecture
 
 import io.github.baole.konture.FileDeclarationContext
 import io.github.baole.konture.Module
+import java.io.File
 
 internal val featurePresentationModulePathPattern = Regex("^:features:[^:]+:presentation$")
 internal val featureDomainApiModulePathPattern = Regex("^:features:[^:]+:domain:api$")
@@ -9,11 +10,32 @@ internal val structuralApiModulePathPattern = Regex("^:structural:[^:]+:api$")
 internal val structuralDiModulePathPattern = Regex("^:structural:[^:]+:di$")
 internal val structuralImplModulePathPattern = Regex("^:structural:[^:]+:impl$")
 internal val featureDomainApiPackageRoots = setOf("model", "repository", "useCase")
+internal val structuralApiPackages: Set<String> by lazy {
+    findProjectRoot()
+        .resolve("structural")
+        .walkTopDown()
+        .filter { file -> file.isFile && file.extension == "kt" && file.path.contains("/api/src/main/kotlin/") }
+        .mapNotNull { file -> packageDeclarationPattern.find(file.readText())?.groupValues?.get(1) }
+        .toSet()
+}
 
 internal val architectureBasePackage: String =
     requireNotNull(System.getProperty("architectureBasePackage")) {
         "The app namespace must be passed to architecture tests"
     }
+
+internal fun findProjectRoot(): File {
+    var directory = File(System.getProperty("user.dir") ?: ".").absoluteFile
+    while (!directory.resolve("settings.gradle.kts").exists()) {
+        val parent = directory.parentFile ?: break
+        directory = parent
+    }
+    return directory
+}
+
+internal fun String.isStructuralApiImport(): Boolean =
+    structuralApiPackages.any { packageName -> startsWith("$packageName.") } &&
+        !contains(".dto.") && !contains(".entity.")
 
 internal fun FileDeclarationContext.isFeaturePresentationSource(): Boolean =
     modulePath.matches(featurePresentationModulePathPattern)
@@ -81,3 +103,5 @@ internal val structuralApiAllowedPlatformImports = setOf(
     "androidx.navigation.compose.NavHost",
     "androidx.navigation.navArgument"
 )
+
+private val packageDeclarationPattern = Regex("(?m)^package\\s+([A-Za-z0-9_.]+)")

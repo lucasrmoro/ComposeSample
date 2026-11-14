@@ -32,6 +32,7 @@ class ImportRulesTest {
         startsWith("android.app.") ||
             startsWith("android.view.") ||
             startsWith("android.widget.") ||
+            startsWith("androidx.compose.material.") ||
             startsWith("androidx.compose.material3.") ||
             startsWith("androidx.compose.material.icons.") ||
             startsWith("com.google.android.material.")

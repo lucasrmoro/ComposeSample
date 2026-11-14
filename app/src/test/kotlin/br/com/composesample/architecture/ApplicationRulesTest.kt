@@ -7,6 +7,7 @@ import io.github.baole.konture.files
 import io.github.baole.konture.modules
 import org.junit.Test
 import java.io.File
+import javax.xml.parsers.DocumentBuilderFactory
 
 class ApplicationRulesTest {
 
@@ -25,17 +26,16 @@ class ApplicationRulesTest {
                     violations.add("Activity declarations are only allowed in :app, found in ${module.path}")
                 }
                 if (module.path == ":app") {
-                    val projectRoot = findProjectRoot()
-                    val manifestActivityCount = listOf("app", "features", "structural")
-                        .sumOf { sourceRoot ->
-                            projectRoot.resolve(sourceRoot)
-                                .walkTopDown()
-                                .onEnter { directory -> directory.name != "build" }
-                                .filter { file -> file.isFile && file.name == "AndroidManifest.xml" }
-                                .sumOf { manifest -> manifest.readText().countActivityDeclarations() }
+                    supportedVariants.forEach { variant ->
+                        val manifest = findProjectRoot().resolve(
+                            "app/build/intermediates/merged_manifest/$variant/process${variant.replaceFirstChar(Char::uppercase)}MainManifest/AndroidManifest.xml"
+                        )
+                        val activities = manifest.takeIf(File::exists)?.let(::activityNamesFromMergedManifest)
+                        if (activities == null || activities.size != 1) {
+                            violations.add(
+                                "The $variant merged manifest must declare exactly one Activity; found ${activities?.size ?: "no manifest"}"
+                            )
                         }
-                    if (manifestActivityCount != 1) {
-                        violations.add("The project must declare exactly one Activity in manifests; found $manifestActivityCount")
                     }
                 }
             }
@@ -63,22 +63,19 @@ class ApplicationRulesTest {
         }
     }
 
-    private fun findProjectRoot(): File {
-        var directory = File(System.getProperty("user.dir") ?: ".").absoluteFile
-        while (!directory.resolve("settings.gradle.kts").exists()) {
-            val parent = directory.parentFile ?: break
-            directory = parent
-        }
-        return directory
+    private fun activityNamesFromMergedManifest(manifest: File): Set<String> {
+        val documentBuilderFactory = DocumentBuilderFactory.newInstance().apply { isNamespaceAware = true }
+        val document = documentBuilderFactory.newDocumentBuilder().parse(manifest)
+        val activities = document.getElementsByTagName("activity")
+        return (0 until activities.length)
+            .mapNotNull { index -> activities.item(index).attributes?.getNamedItemNS(androidNamespace, "name")?.nodeValue }
+            .filter { name -> name.startsWith("$architectureBasePackage.") }
+            .toSet()
     }
 
-    private fun String.countActivityDeclarations(): Int =
-        replace(manifestCommentPattern, "")
-            .let { manifest -> manifestActivityPattern.findAll(manifest).count() }
-
     private companion object {
-        val manifestCommentPattern = Regex("<!--.*?-->", RegexOption.DOT_MATCHES_ALL)
-        val manifestActivityPattern = Regex("<activity(?=[\\s>])")
+        const val androidNamespace = "http://schemas.android.com/apk/res/android"
+        val supportedVariants = listOf("devDebug", "devRelease", "prdDebug", "prdRelease")
     }
 
 }

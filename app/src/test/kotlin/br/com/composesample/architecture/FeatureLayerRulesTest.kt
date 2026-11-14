@@ -22,7 +22,8 @@ class FeatureLayerRulesTest {
                 ":features:*:data",
                 ":features:*:di",
                 ":features:*:domain:impl",
-                ":features:*:presentation"
+                ":features:*:presentation",
+                ":structural:design-system"
             )
         }
     }
@@ -34,7 +35,8 @@ class FeatureLayerRulesTest {
             should().notDependOn(
                 ":features:*:data",
                 ":features:*:di",
-                ":features:*:presentation"
+                ":features:*:presentation",
+                ":structural:design-system"
             )
         }
     }

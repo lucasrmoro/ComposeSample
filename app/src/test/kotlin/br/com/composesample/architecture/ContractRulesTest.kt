@@ -28,22 +28,17 @@ class ContractRulesTest {
     }
 
     private fun String.isAllowedStructuralApiImport(): Boolean =
-        (startsWith("$architectureBasePackage.structural.") && !importsDataImplementationType()) ||
+        isStructuralApiImport() ||
             isStandardApiImport() || this in structuralApiAllowedPlatformImports
 
     private fun String.isAllowedFeatureDomainApiImport(featureName: String): Boolean {
         val featurePackage = "$architectureBasePackage.$featureName."
         val isOwnDomainContract = startsWith(featurePackage) &&
             removePrefix(featurePackage).substringBefore('.') in featureDomainApiPackageRoots
-        val isStructuralContract = startsWith("$architectureBasePackage.structural.") &&
-            !importsDataImplementationType()
+        val isStructuralContract = isStructuralApiImport()
         return isOwnDomainContract || isStructuralContract || isStandardApiImport()
     }
 
     private fun String.isStandardApiImport(): Boolean =
         startsWith("java.") || startsWith("kotlin.") || startsWith("kotlinx.coroutines.flow.")
-
-    private fun String.importsDataImplementationType(): Boolean =
-        contains(".dto.") || contains(".entity.")
-
 }
