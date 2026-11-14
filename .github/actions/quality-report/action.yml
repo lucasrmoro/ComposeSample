@@ -27,12 +27,7 @@ runs:
         script: |
           const marker = '<!-- pull-request-quality-gates-report -->';
           const results = JSON.parse(process.env.GATE_RESULTS_JSON);
-          const gateNames = {
-            build: 'Build',
-            lint: 'Lint',
-            'unit-tests': 'Unit tests',
-            'architecture-validation': 'Architecture validation'
-          };
+          const gateNames = { lint: 'Lint' };
           const failedGates = Object.entries(gateNames)
             .filter(([job]) => results[job]?.result === 'failure');
           if (failedGates.length === 0) return;

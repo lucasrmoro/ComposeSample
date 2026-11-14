@@ -8,3 +8,7 @@ runs:
     - name: Run Android Lint
       shell: bash
       run: ./gradlew :app:lintDevDebug
+    - name: Annotate Android Lint errors
+      if: ${{ always() }}
+      shell: bash
+      run: python3 .github/actions/quality-report/emit-lint-annotations.py
