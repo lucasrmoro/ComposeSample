@@ -1,0 +1,10 @@
+name: Android Lint
+description: Run Android Lint for the dev debug variant
+runs:
+  using: composite
+  steps:
+    - name: Set up Android build
+      uses: ./.github/actions/android-setup
+    - name: Run Android Lint
+      shell: bash
+      run: ./gradlew :app:lintDevDebug

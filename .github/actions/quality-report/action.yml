@@ -1,0 +1,59 @@
+name: Quality gate report
+description: Summarize pull request gate results with correction examples
+inputs:
+  results-json:
+    description: JSON representation of the dependent job results
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Write Markdown report and job summary
+      shell: bash
+      env:
+        GATE_RESULTS_JSON: ${{ inputs.results-json }}
+      run: python3 "$GITHUB_ACTION_PATH/report.py"
+    - name: Upload Markdown report
+      uses: actions/upload-artifact@v4
+      with:
+        name: pull-request-quality-gates
+        path: quality-gates-report.md
+        if-no-files-found: error
+    - name: Publish report in pull request
+      if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+      uses: actions/github-script@v8
+      with:
+        script: |
+          const fs = require('fs');
+          const marker = '<!-- pull-request-quality-gates-report -->';
+          const body = `${marker}\n${fs.readFileSync('quality-gates-report.md', 'utf8')}`;
+          const { owner, repo } = context.repo;
+          const issue_number = context.issue.number;
+          const comments = await github.paginate(github.rest.issues.listComments, {
+            owner,
+            repo,
+            issue_number
+          });
+          const previousReports = comments.filter(comment =>
+            comment.user?.type === 'Bot' && comment.body?.startsWith(marker)
+          );
+
+          await github.rest.issues.createComment({ owner, repo, issue_number, body });
+
+          for (const comment of previousReports) {
+            const status = await github.graphql(`
+              query($subjectId: ID!) {
+                node(id: $subjectId) {
+                  ... on IssueComment { isMinimized }
+                }
+              }
+            `, { subjectId: comment.node_id });
+            if (status.node?.isMinimized) continue;
+
+            await github.graphql(`
+              mutation($subjectId: ID!) {
+                minimizeComment(input: { subjectId: $subjectId, classifier: OUTDATED }) {
+                  minimizedComment { isMinimized }
+                }
+              }
+            `, { subjectId: comment.node_id });
+          }
