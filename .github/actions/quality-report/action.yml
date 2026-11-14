@@ -12,12 +12,6 @@ runs:
       env:
         GATE_RESULTS_JSON: ${{ inputs.results-json }}
       run: python3 "$GITHUB_ACTION_PATH/report.py"
-    - name: Upload Markdown report
-      uses: actions/upload-artifact@v4
-      with:
-        name: pull-request-quality-gates
-        path: quality-gates-report.md
-        if-no-files-found: error
     - name: Publish report in pull request
       if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
       uses: actions/github-script@v8
