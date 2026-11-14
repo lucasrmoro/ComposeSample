@@ -263,7 +263,6 @@ private fun CatalogPreview() {
                                     year = "2026",
                                     rating = 7.8,
                                     certification = "16",
-                                    releaseEvent = null
                                 )
                             )
                         ),

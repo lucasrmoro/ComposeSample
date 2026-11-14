@@ -90,7 +90,6 @@ private fun MediaGridPreview() {
                         year = "2026",
                         rating = null,
                         certification = null,
-                        releaseEvent = null
                     )
                 )
             ),

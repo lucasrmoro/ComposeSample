@@ -3,7 +3,6 @@ package br.com.composesample.stream.dto.media
 import br.com.composesample.stream.dto.catalog.GenreRespDTO
 import br.com.composesample.stream.dto.credits.CreditsRespDTO
 import br.com.composesample.stream.dto.providers.WatchProvidersRespDTO
-import br.com.composesample.stream.dto.releases.EventRespDTO
 import br.com.composesample.stream.dto.releases.ReleaseDatesRespDTO
 import br.com.composesample.stream.dto.seasons.EpisodeRespDTO
 import br.com.composesample.stream.dto.seasons.SeasonRespDTO
@@ -41,6 +40,5 @@ data class MediaRespDTO(
     @JsonName("seasons") val seasons: List<SeasonRespDTO>? = null,
     @JsonName("number_of_episodes") val numberOfEpisodes: Int? = null,
     @JsonName("next_episode_to_air") val nextEpisode: EpisodeRespDTO? = null,
-    @JsonName("last_episode_to_air") val lastEpisode: EpisodeRespDTO? = null,
-    @JsonName("stream_release_event") val event: EventRespDTO? = null
+    @JsonName("last_episode_to_air") val lastEpisode: EpisodeRespDTO? = null
 )

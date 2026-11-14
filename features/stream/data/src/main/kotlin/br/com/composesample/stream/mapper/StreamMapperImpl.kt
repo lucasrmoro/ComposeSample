@@ -22,8 +22,6 @@ import br.com.composesample.stream.model.media.MediaSummary
 import br.com.composesample.stream.model.media.MediaType
 import br.com.composesample.stream.model.providers.ProviderCategory
 import br.com.composesample.stream.model.providers.WatchProvider
-import br.com.composesample.stream.model.releases.ReleaseEvent
-import br.com.composesample.stream.model.releases.ReleaseKind
 import br.com.composesample.stream.model.seasons.EpisodeDetails
 import br.com.composesample.stream.model.seasons.SeasonDetails
 import br.com.composesample.stream.model.seasons.SeasonSummary
@@ -74,8 +72,7 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
             posterPath = dto.posterPath,
             year = date?.take(4)?.takeIf { it.length == 4 },
             rating = dto.voteAverage?.takeIf { (dto.voteCount ?: 0) > 0 },
-            certification = certification(dto, type, region),
-            releaseEvent = releaseEvent(dto)
+            certification = certification(dto, type, region)
         )
     }
 
@@ -96,20 +93,6 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
             ?.firstOrNull { it.country == region.countryCode }
             ?.rating
             ?.takeIf(String::isNotBlank)
-
-    private fun releaseEvent(dto: MediaRespDTO): ReleaseEvent? =
-        dto.event?.let { event ->
-            ReleaseKind.entries
-                .firstOrNull { it.name == event.kind }
-                ?.let {
-                    ReleaseEvent(
-                        kind = it,
-                        date = event.date,
-                        season = event.season,
-                        episode = event.episode
-                    )
-                }
-        }
 
     private fun genre(dto: GenreRespDTO) = Genre(id = dto.id, name = dto.name)
 

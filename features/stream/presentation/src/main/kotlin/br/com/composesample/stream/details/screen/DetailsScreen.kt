@@ -323,17 +323,17 @@ private fun CastSection(cast: List<PersonCredit>) {
             horizontalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.medium)
         ) {
             items(cast) { person ->
-                key(person.imagePath) {
-                    Column(modifier = Modifier.width(StreamDimens.portrait)) {
-                    SampleProfileImage(
-                        request = imageRequest(person.imagePath, ImageRole.PROFILE),
-                        contentDescription = person.name,
-                        modifier = Modifier.size(StreamDimens.portrait)
-                    )
+                Column(modifier = Modifier.width(StreamDimens.portrait)) {
+                    key(person.imagePath) {
+                        SampleProfileImage(
+                            request = imageRequest(person.imagePath, ImageRole.PROFILE),
+                            contentDescription = person.name,
+                            modifier = Modifier.size(StreamDimens.portrait)
+                        )
+                    }
                     SampleText(text = person.name, style = CurrentTheme.typography.labelMedium)
                     person.role?.let {
                         SampleText(text = it, style = CurrentTheme.typography.labelSmall)
-                    }
                     }
                 }
             }
@@ -522,8 +522,7 @@ private fun previewMediaDetails() =
                 posterPath = null,
                 year = "2024",
                 rating = 8.2,
-                certification = "TV-14",
-                releaseEvent = null
+                certification = "TV-14"
             ),
         originalTitle = "Example series",
         overview = "A story about an unexpected journey.",

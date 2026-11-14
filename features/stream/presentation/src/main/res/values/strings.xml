@@ -40,11 +40,6 @@
     <string name="stream_season_count">%1$d seasons · %2$d episodes</string>
     <string name="stream_season">Season %1$d</string>
     <string name="stream_episode">Episode %1$d · %2$s</string>
-    <string name="stream_new_series">New series</string>
-    <string name="stream_new_season">New season · S%1$d</string>
-    <string name="stream_new_episode">New episode · S%1$d:E%2$d</string>
-    <string name="stream_new_season_generic">New season</string>
-    <string name="stream_new_episode_generic">New episode</string>
     <string name="stream_cast">Cast</string>
     <string name="stream_information">Information</string>
     <string name="stream_status">Status</string>
