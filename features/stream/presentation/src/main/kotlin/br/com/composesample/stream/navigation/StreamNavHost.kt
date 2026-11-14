@@ -3,16 +3,16 @@ package br.com.composesample.stream.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import br.com.composesample.stream.catalog.screen.CatalogScreen
-import br.com.composesample.stream.catalog.viewModel.CatalogViewModel
-import br.com.composesample.stream.collection.model.CollectionUiEffect
-import br.com.composesample.stream.collection.screen.CollectionScreen
-import br.com.composesample.stream.collection.viewModel.CollectionViewModel
-import br.com.composesample.stream.details.screen.DetailsScreen
-import br.com.composesample.stream.details.viewModel.DetailsViewModel
-import br.com.composesample.stream.genres.model.GenresUiEffect
-import br.com.composesample.stream.genres.screen.GenresScreen
-import br.com.composesample.stream.genres.viewModel.GenresViewModel
+import br.com.composesample.stream.ui.screen.catalog.CatalogScreen
+import br.com.composesample.stream.viewModel.catalog.CatalogViewModel
+import br.com.composesample.stream.model.collection.CollectionUiEffect
+import br.com.composesample.stream.ui.screen.collection.CollectionScreen
+import br.com.composesample.stream.viewModel.collection.CollectionViewModel
+import br.com.composesample.stream.ui.screen.details.DetailsScreen
+import br.com.composesample.stream.viewModel.details.DetailsViewModel
+import br.com.composesample.stream.model.genres.GenresUiEffect
+import br.com.composesample.stream.ui.screen.genres.GenresScreen
+import br.com.composesample.stream.viewModel.genres.GenresViewModel
 import br.com.composesample.stream.model.catalog.CollectionKind
 import br.com.composesample.stream.model.media.MediaId
 import br.com.composesample.stream.model.media.MediaType
@@ -37,13 +37,12 @@ internal fun StreamNavHost() {
             ).Init()
         }
         composable(StreamRoutes.GENRES) { entry ->
-            val viewModel: GenresViewModel = dependencyViewModel()
             val type = MediaType.valueOf(
                 requireNotNull(entry.arguments?.getString(StreamRoutes.Arguments.TYPE))
             )
+            val viewModel: GenresViewModel = dependencyViewModel(parameters = parametersOf(type))
             GenresScreen(
                 genresViewModel = viewModel,
-                type = type,
                 back = back,
                 onNavigate = { effect ->
                     when (effect) {

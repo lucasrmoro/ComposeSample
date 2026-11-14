@@ -23,6 +23,10 @@ pluginManagement {
     }
 }
 
+plugins {
+    id("io.github.baole.konture") version "1.0.4"
+}
+
 dependencyResolutionManagement {
     repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {

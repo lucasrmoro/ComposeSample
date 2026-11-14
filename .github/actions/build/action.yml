@@ -1,0 +1,10 @@
+name: Build
+description: Assemble the dev debug APK
+runs:
+  using: composite
+  steps:
+    - name: Set up Android build
+      uses: ./.github/actions/android-setup
+    - name: Assemble dev debug APK
+      shell: bash
+      run: ./gradlew :app:assembleDevDebug

@@ -279,8 +279,9 @@ PR titles use `<branch-type>: <description>`, matching the source branch prefix:
 resulting behavior, related issues, affected modules, and validation results.
 Use N/A with a reason for irrelevant sections; attach screenshots for visual changes.
 
-The **Validate PR title** check runs after branch validation and reruns when the
-title is edited, without requiring a new commit. For `docs/update-guide`,
+The **Validate PR title** check runs alongside branch validation and reruns when the
+title is edited, without requiring a new commit. The Android checks start only after
+both metadata checks pass. For `docs/update-guide`,
 `docs: update guide` is valid; `fix: update guide`, `docs(guide): update guide`,
 and `docs:` are invalid. The check validates format and prefix, not English prose
 quality or commit messages.
@@ -314,6 +315,18 @@ Describe incompatible changes and migration in the PR body and add a
 `BREAKING CHANGE:` footer to the commit.
 
 ## Validation
+
+The pull request workflow's required checks and their exact rules are documented in
+[`.github/quality-gates`](.github/quality-gates/README.md). Run the architecture checks
+locally with:
+
+```sh
+./gradlew architectureCheck
+```
+
+The task generates the Konture layout from the Gradle project graph and runs the
+architecture tests in the app test source set. See the gate documentation for the
+current rules and their scope.
 
 ```sh
 ./gradlew :app:testDevDebugUnitTest

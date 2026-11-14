@@ -3,18 +3,21 @@ package br.com.composesample.login.repository
 import br.com.composesample.login.analytics.LoginAnalytics
 import br.com.composesample.login.dataSource.LoginRemoteDataSource
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.single
 
 class LoginRepositoryImpl(
     private val loginRemoteDataSource: LoginRemoteDataSource,
     private val analytics: LoginAnalytics
 ) : LoginRepository {
 
-    override suspend fun refreshToken(refreshToken: String): String? {
+    override fun refreshToken(refreshToken: String): Flow<String?> = flow {
         analytics.tokenRefreshStarted()
-        return try {
-            val accessToken = loginRemoteDataSource.refreshToken(refreshToken).accessToken
+        try {
+            val accessToken = loginRemoteDataSource.refreshToken(refreshToken).single().accessToken
             analytics.tokenRefreshFinished(succeeded = !accessToken.isNullOrBlank())
-            accessToken
+            emit(accessToken)
         } catch (exception: CancellationException) {
             throw exception
         } catch (exception: Exception) {

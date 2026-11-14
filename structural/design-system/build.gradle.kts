@@ -13,6 +13,7 @@ dependencies {
     implementation(project(Modules.Structural.AssetsCache.API))
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.material)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.ui.core)

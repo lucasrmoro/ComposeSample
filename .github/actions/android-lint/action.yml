@@ -1,0 +1,21 @@
+name: Android Lint
+description: Run Android Lint for the dev debug variant
+runs:
+  using: composite
+  steps:
+    - name: Set up Android build
+      uses: ./.github/actions/android-setup
+    - name: Run Android Lint
+      shell: bash
+      run: ./gradlew :app:lintDevDebug
+    - name: Annotate Android Lint errors
+      if: ${{ always() }}
+      shell: bash
+      run: python3 .github/actions/quality-report/emit-lint-annotations.py
+    - name: Upload Android Lint HTML report
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-lint-report
+        path: app/build/reports/lint-results-devDebug.html
+        if-no-files-found: warn

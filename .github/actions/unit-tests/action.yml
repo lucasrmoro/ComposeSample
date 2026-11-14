@@ -1,0 +1,10 @@
+name: Unit tests
+description: Run app unit tests for the dev debug variant
+runs:
+  using: composite
+  steps:
+    - name: Set up Android build
+      uses: ./.github/actions/android-setup
+    - name: Run app unit tests
+      shell: bash
+      run: ./gradlew :app:testDevDebugUnitTest
