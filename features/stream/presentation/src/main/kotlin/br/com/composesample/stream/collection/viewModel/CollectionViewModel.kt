@@ -8,7 +8,7 @@ import br.com.composesample.stream.collection.model.CollectionUiState
 import br.com.composesample.stream.model.catalog.CatalogQuery
 import br.com.composesample.stream.model.catalog.CollectionKind
 import br.com.composesample.stream.model.media.MediaType
-import br.com.composesample.stream.model.toCatalogRegion
+import br.com.composesample.stream.ui.toCatalogRegion
 import br.com.composesample.stream.useCase.LoadNextPageUseCase
 import br.com.composesample.stream.useCase.ObserveCatalogUseCase
 import br.com.composesample.stream.useCase.RefreshCatalogUseCase
@@ -23,6 +23,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
@@ -49,7 +50,7 @@ class CollectionViewModel(
     )
     private val initialState = CollectionUiState(query = initialQuery)
     private val state = MutableStateFlow(initialState)
-    override val uiState = state
+    override val uiState = state.asStateFlow()
         .onStart { viewModelScope.launch { bind() } }
         .stateIn(
             scope = viewModelScope,

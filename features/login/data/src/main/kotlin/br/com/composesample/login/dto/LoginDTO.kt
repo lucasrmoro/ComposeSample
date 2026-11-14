@@ -1,4 +1,4 @@
-package br.com.composesample.login.model
+package br.com.composesample.login.dto
 
 import br.com.composesample.structural.network.http.JsonName
 

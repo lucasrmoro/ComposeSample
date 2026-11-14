@@ -10,9 +10,9 @@ import br.com.composesample.stream.collection.model.CollectionUiEffect
 import br.com.composesample.stream.collection.model.CollectionUiEvent
 import br.com.composesample.stream.collection.model.CollectionUiState
 import br.com.composesample.stream.collection.viewModel.CollectionViewModel
-import br.com.composesample.stream.components.LoadNotice
-import br.com.composesample.stream.components.MediaGrid
-import br.com.composesample.stream.components.collectionTitle
+import br.com.composesample.stream.ui.components.LoadNotice
+import br.com.composesample.stream.ui.components.MediaGrid
+import br.com.composesample.stream.ui.components.collectionTitle
 import br.com.composesample.stream.model.catalog.CatalogQuery
 import br.com.composesample.stream.model.catalog.CatalogRegion
 import br.com.composesample.stream.model.catalog.CollectionKind

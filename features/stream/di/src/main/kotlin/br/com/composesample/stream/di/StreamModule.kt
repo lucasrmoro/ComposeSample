@@ -157,11 +157,12 @@ object StreamModule {
                 networkConnectivityProvider = get()
             )
         }
-        factory {
+        factory { parameters ->
             GenresViewModel(
                 observeGenresUseCase = get(),
                 refreshGenresUseCase = get(),
-                appRegionProvider = get()
+                appRegionProvider = get(),
+                type = parameters.get<MediaType>()
             )
         }
     }

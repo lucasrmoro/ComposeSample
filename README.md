@@ -315,6 +315,18 @@ Describe incompatible changes and migration in the PR body and add a
 
 ## Validation
 
+The pull request workflow's required checks and their exact rules are documented in
+[`.github/quality-gates`](.github/quality-gates/README.md). Run the architecture checks
+locally with:
+
+```sh
+./gradlew architectureCheck
+```
+
+The task generates the Konture layout from the Gradle project graph and runs the
+architecture tests in the app test source set. See the gate documentation for the
+current rules and their scope.
+
 ```sh
 ./gradlew :app:testDevDebugUnitTest
 ./gradlew :app:lintDevDebug

@@ -1,4 +1,4 @@
-package br.com.composesample.stream.components
+package br.com.composesample.stream.ui.components
 
 import br.com.composesample.structural.assets_cache.AssetRequest
 import br.com.composesample.structural.assets_cache.AssetsCacheConfiguration

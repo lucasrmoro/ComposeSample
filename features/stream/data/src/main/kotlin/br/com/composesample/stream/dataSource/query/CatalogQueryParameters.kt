@@ -1,4 +1,4 @@
-package br.com.composesample.stream.query
+package br.com.composesample.stream.dataSource.query
 
 import br.com.composesample.stream.model.catalog.CatalogQuery
 import br.com.composesample.stream.model.catalog.CollectionKind

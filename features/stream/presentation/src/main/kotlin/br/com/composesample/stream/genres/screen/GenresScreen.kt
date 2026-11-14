@@ -9,18 +9,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.composesample.features.stream.presentation.R
-import br.com.composesample.stream.components.LoadNotice
+import br.com.composesample.stream.ui.components.LoadNotice
 import br.com.composesample.stream.genres.model.GenresUiEffect
 import br.com.composesample.stream.genres.model.GenresUiEvent
 import br.com.composesample.stream.genres.model.GenresUiState
 import br.com.composesample.stream.genres.viewModel.GenresViewModel
 import br.com.composesample.stream.model.catalog.Genre
-import br.com.composesample.stream.model.media.MediaType
 import br.com.composesample.stream.tokens.StreamDimens
 import br.com.composesample.structural.designsystem.components.SampleScreen
 import br.com.composesample.structural.designsystem.components.SampleSurface
@@ -31,14 +29,12 @@ import br.com.composesample.structural.designsystem.theme.CurrentTheme
 
 internal class GenresScreen(
     private val genresViewModel: GenresViewModel,
-    private val type: MediaType,
     private val back: () -> Unit,
     private val onNavigate: (GenresUiEffect) -> Unit
 ) : BaseScreen<GenresUiState, GenresUiEffect>(genresViewModel) {
 
     @Composable
     override fun Content(uiState: GenresUiState) {
-        LaunchedEffect(type) { genresViewModel.sendEvent(GenresUiEvent.Start(type)) }
         GenresContent(uiState, back, genresViewModel::sendEvent)
     }
 

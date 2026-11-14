@@ -1,4 +1,4 @@
-package br.com.composesample.stream.components
+package br.com.composesample.stream.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable

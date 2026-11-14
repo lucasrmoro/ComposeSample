@@ -67,6 +67,10 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.material)
     testImplementation(libs.androidx.junit)
+    testImplementation(libs.konture)
+}
+
+tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
+    systemProperty("architectureBasePackage", requireNotNull(android.namespace))
 }

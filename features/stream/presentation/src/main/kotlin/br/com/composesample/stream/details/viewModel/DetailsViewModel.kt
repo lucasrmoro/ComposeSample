@@ -6,7 +6,7 @@ import br.com.composesample.stream.details.model.DetailsUiEffect
 import br.com.composesample.stream.details.model.DetailsUiEvent
 import br.com.composesample.stream.details.model.DetailsUiState
 import br.com.composesample.stream.model.media.MediaId
-import br.com.composesample.stream.model.toCatalogRegion
+import br.com.composesample.stream.ui.toCatalogRegion
 import br.com.composesample.stream.useCase.ObserveMediaDetailsUseCase
 import br.com.composesample.stream.useCase.ObserveSeasonUseCase
 import br.com.composesample.stream.useCase.RefreshMediaDetailsUseCase
@@ -24,6 +24,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onCompletion
@@ -44,7 +45,7 @@ class DetailsViewModel(
 ) : BaseViewModel<DetailsUiState, DetailsUiEvent, DetailsUiEffect>() {
 
     private val state = MutableStateFlow(DetailsUiState())
-    override val uiState = state
+    override val uiState = state.asStateFlow()
         .onStart {
             viewModelScope.launch {
                 bind()

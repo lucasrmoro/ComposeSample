@@ -37,13 +37,12 @@ internal fun StreamNavHost() {
             ).Init()
         }
         composable(StreamRoutes.GENRES) { entry ->
-            val viewModel: GenresViewModel = dependencyViewModel()
             val type = MediaType.valueOf(
                 requireNotNull(entry.arguments?.getString(StreamRoutes.Arguments.TYPE))
             )
+            val viewModel: GenresViewModel = dependencyViewModel(parameters = parametersOf(type))
             GenresScreen(
                 genresViewModel = viewModel,
-                type = type,
                 back = back,
                 onNavigate = { effect ->
                     when (effect) {

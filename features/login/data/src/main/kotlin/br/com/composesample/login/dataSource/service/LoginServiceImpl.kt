@@ -1,6 +1,6 @@
-package br.com.composesample.login.service
+package br.com.composesample.login.dataSource.service
 
-import br.com.composesample.login.model.LoginDTO
+import br.com.composesample.login.dto.LoginDTO
 import br.com.composesample.structural.network.http.HttpClient
 import br.com.composesample.structural.network.http.HttpRequest
 import br.com.composesample.structural.network.http.get

@@ -3,13 +3,13 @@ package br.com.composesample.stream.catalog.viewModel
 import androidx.lifecycle.viewModelScope
 import br.com.composesample.features.stream.presentation.R
 import br.com.composesample.stream.analytics.StreamAnalytics
-import br.com.composesample.stream.catalog.model.CatalogSection
+import br.com.composesample.stream.catalog.model.CatalogUiState.CatalogSection
 import br.com.composesample.stream.catalog.model.CatalogUiEffect
 import br.com.composesample.stream.catalog.model.CatalogUiEvent
 import br.com.composesample.stream.catalog.model.CatalogUiState
 import br.com.composesample.stream.model.catalog.CatalogQuery
 import br.com.composesample.stream.model.catalog.CollectionKind
-import br.com.composesample.stream.model.toCatalogRegion
+import br.com.composesample.stream.ui.toCatalogRegion
 import br.com.composesample.stream.navigation.StreamDestination
 import br.com.composesample.stream.useCase.LoadNextPageUseCase
 import br.com.composesample.stream.useCase.ObserveCatalogUseCase
@@ -26,6 +26,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
@@ -43,7 +44,7 @@ class CatalogViewModel(
 ) : BaseViewModel<CatalogUiState, CatalogUiEvent, CatalogUiEffect>() {
 
     private val state = MutableStateFlow(CatalogUiState())
-    override val uiState = state
+    override val uiState = state.asStateFlow()
         .onStart {
             viewModelScope.launch {
                 appRegionProvider.region.collect {

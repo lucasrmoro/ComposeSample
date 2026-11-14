@@ -26,10 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import br.com.composesample.features.stream.presentation.R
-import br.com.composesample.stream.components.ImageRole
-import br.com.composesample.stream.components.LoadNotice
-import br.com.composesample.stream.components.RATING_FORMAT
-import br.com.composesample.stream.components.imageRequest
+import br.com.composesample.stream.ui.components.ImageRole
+import br.com.composesample.stream.ui.components.LoadNotice
+import br.com.composesample.stream.ui.components.RATING_FORMAT
+import br.com.composesample.stream.ui.components.imageRequest
 import br.com.composesample.stream.details.model.DetailsUiEffect
 import br.com.composesample.stream.details.model.DetailsUiEvent
 import br.com.composesample.stream.details.model.DetailsUiState

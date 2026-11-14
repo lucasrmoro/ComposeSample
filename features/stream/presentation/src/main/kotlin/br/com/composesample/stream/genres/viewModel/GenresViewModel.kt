@@ -5,7 +5,8 @@ import br.com.composesample.features.stream.presentation.R
 import br.com.composesample.stream.genres.model.GenresUiEffect
 import br.com.composesample.stream.genres.model.GenresUiEvent
 import br.com.composesample.stream.genres.model.GenresUiState
-import br.com.composesample.stream.model.toCatalogRegion
+import br.com.composesample.stream.model.media.MediaType
+import br.com.composesample.stream.ui.toCatalogRegion
 import br.com.composesample.stream.useCase.ObserveGenresUseCase
 import br.com.composesample.stream.useCase.RefreshGenresUseCase
 import br.com.composesample.structural.core.base.viewModel.BaseViewModel
@@ -28,20 +29,20 @@ import kotlinx.coroutines.launch
 class GenresViewModel(
     private val observeGenresUseCase: ObserveGenresUseCase,
     private val refreshGenresUseCase: RefreshGenresUseCase,
-    private val appRegionProvider: AppRegionProvider
+    private val appRegionProvider: AppRegionProvider,
+    private val type: MediaType
 ) : BaseViewModel<GenresUiState, GenresUiEvent, GenresUiEffect>() {
 
-    private val state = MutableStateFlow(GenresUiState())
+    private val state = MutableStateFlow(GenresUiState(type = type))
     override val uiState = state.asStateFlow()
     private var job: Job? = null
 
+    init {
+        bind()
+    }
+
     override fun sendEvent(event: GenresUiEvent) {
         when (event) {
-            is GenresUiEvent.Start ->
-                if (job == null) {
-                    state.update { it.copy(type = event.type) }
-                    bind()
-                }
             is GenresUiEvent.Select ->
                 sendEffect(GenresUiEffect.Collection(state.value.type, event.genre))
             GenresUiEvent.Retry -> bind()

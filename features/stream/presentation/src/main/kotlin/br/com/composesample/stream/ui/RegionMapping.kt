@@ -1,4 +1,4 @@
-package br.com.composesample.stream.model
+package br.com.composesample.stream.ui
 
 import br.com.composesample.stream.model.catalog.CatalogRegion
 import br.com.composesample.structural.localization.AppRegion
