@@ -73,4 +73,12 @@ dependencies {
 
 tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
     systemProperty("architectureBasePackage", requireNotNull(android.namespace))
+    if (name == "testDevDebugUnitTest") {
+        dependsOn(
+            "processDevDebugMainManifest",
+            "processDevReleaseMainManifest",
+            "processPrdDebugMainManifest",
+            "processPrdReleaseMainManifest"
+        )
+    }
 }
