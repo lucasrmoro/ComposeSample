@@ -22,6 +22,10 @@ commits, edited, or marked ready for review. Runs for the same pull request canc
 older run when a newer run starts. The repository ruleset uses these check results for
 merge eligibility. CodeRabbit review is advisory and is not a required status check.
 
+Branch and title validation run first and independently. Build, Android Lint, unit
+tests, and architecture validation start in parallel only after both metadata checks
+pass. If either check fails, those Android jobs are skipped and the report shows why.
+
 After the gates finish, the Quality gate report job shows a Markdown table in the
 workflow summary, uploads `quality-gates-report.md` as an artifact, and posts a new
 comment on pull requests from branches in this repository. It minimizes older report

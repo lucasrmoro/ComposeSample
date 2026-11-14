@@ -279,8 +279,9 @@ PR titles use `<branch-type>: <description>`, matching the source branch prefix:
 resulting behavior, related issues, affected modules, and validation results.
 Use N/A with a reason for irrelevant sections; attach screenshots for visual changes.
 
-The **Validate PR title** check runs after branch validation and reruns when the
-title is edited, without requiring a new commit. For `docs/update-guide`,
+The **Validate PR title** check runs alongside branch validation and reruns when the
+title is edited, without requiring a new commit. The Android checks start only after
+both metadata checks pass. For `docs/update-guide`,
 `docs: update guide` is valid; `fix: update guide`, `docs(guide): update guide`,
 and `docs:` are invalid. The check validates format and prefix, not English prose
 quality or commit messages.
