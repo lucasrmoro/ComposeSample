@@ -10,33 +10,32 @@ import br.com.composesample.structural.network.createNetworkAuthenticator
 import br.com.composesample.structural.network.createNetworkConnectivityProvider
 import br.com.composesample.structural.network.createNetworkInterceptor
 import br.com.composesample.structural.network.http.BinaryDownloadProvider
+import br.com.composesample.structural.network.http.ConfiguredHttpClientProvider
 import br.com.composesample.structural.network.http.HttpClient
 import br.com.composesample.structural.network.http.HttpClientConfiguration
-import br.com.composesample.structural.network.http.ConfiguredHttpClientProvider
-import br.com.composesample.structural.network.http.createConfiguredHttpClientProvider
+import br.com.composesample.structural.network.http.HttpClientOptions
 import br.com.composesample.structural.network.http.JsonCodec
 import br.com.composesample.structural.network.http.NetworkComponents
 import br.com.composesample.structural.network.http.createAuthenticatedHttpClient
 import br.com.composesample.structural.network.http.createBinaryDownloadProvider
+import br.com.composesample.structural.network.http.createConfiguredHttpClientProvider
 import br.com.composesample.structural.network.http.createJsonCodec
-import br.com.composesample.structural.network.http.createUnauthenticatedHttpClient
 import okhttp3.Authenticator
 import okhttp3.Interceptor
 
 object NetworkModule {
-
     private val networkModule = dependencyModule {
-        singleton<ConfiguredHttpClientProvider> {
-            createConfiguredHttpClientProvider(
+        singleton<BinaryDownloadProvider> {
+            createBinaryDownloadProvider(
                 coroutineDispatcher = dispatcherIO,
-                appRegionProvider = get(),
                 components = get()
             )
         }
         singleton<JsonCodec> { createJsonCodec(components = get()) }
-        singleton<BinaryDownloadProvider> {
-            createBinaryDownloadProvider(
+        singleton<ConfiguredHttpClientProvider> {
+            createConfiguredHttpClientProvider(
                 coroutineDispatcher = dispatcherIO,
+                appRegionProvider = get(),
                 components = get()
             )
         }
@@ -45,7 +44,9 @@ object NetworkModule {
                 baseUrl = br.com.composesample.structural.network.impl.BuildConfig.API_BASE_URL
             )
         }
-        singleton<NetworkConnectivityProvider> { createNetworkConnectivityProvider(context = get()) }
+        singleton<NetworkConnectivityProvider> {
+            createNetworkConnectivityProvider(context = get())
+        }
         singleton<Authenticator> {
             createNetworkAuthenticator(
                 appSessionProvider = get(),
@@ -65,14 +66,14 @@ object NetworkModule {
             )
         }
         singleton<HttpClient>(UnauthenticatedHttpClient) {
-            createUnauthenticatedHttpClient(
-                components = get(),
-                baseUrl = get<HttpClientConfiguration>().baseUrl,
-                dispatcher = dispatcherIO
+            get<ConfiguredHttpClientProvider>().create(
+                HttpClientOptions(
+                    baseUrl = get<HttpClientConfiguration>().baseUrl,
+                    useAppLanguage = true
+                )
             )
         }
     }
 
     fun init() = loadModules(networkModule)
-
 }

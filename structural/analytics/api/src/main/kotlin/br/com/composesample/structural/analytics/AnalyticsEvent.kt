@@ -16,16 +16,13 @@ class AnalyticsEvent(
     }
 
     private companion object {
-
         val NAME_PATTERN = Regex("[A-Za-z][A-Za-z0-9_]{0,39}")
-
         val RESERVED_PREFIXES = listOf("firebase_", "google_", "ga_")
 
         fun requireValidName(name: String) {
             require(name.matches(NAME_PATTERN)) { "Invalid analytics name: $name" }
             require(RESERVED_PREFIXES.none(name::startsWith)) { "Reserved analytics prefix: $name" }
         }
-
     }
 
 }

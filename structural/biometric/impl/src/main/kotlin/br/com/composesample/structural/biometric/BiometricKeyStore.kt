@@ -40,11 +40,8 @@ internal class BiometricKeyStore {
     }
 
     private companion object {
-
         const val PROVIDER = "AndroidKeyStore"
-
         const val KEY_ALIAS = "viewsystem.biometric.key.v1"
-
     }
 
 }

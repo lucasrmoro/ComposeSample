@@ -7,7 +7,6 @@ data class MediaLocation(
 ) {
 
     companion object {
-
         /** Default directory inside the app's private media cache. */
         const val DEFAULT_CACHE_DIRECTORY = "media"
 
@@ -18,7 +17,6 @@ data class MediaLocation(
         /** Returns a media location in shared gallery storage. */
         fun gallery(directory: String): MediaLocation =
             MediaLocation(MediaStorageArea.GALLERY, directory)
-
     }
 
 }

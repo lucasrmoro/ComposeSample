@@ -34,4 +34,5 @@ class AndroidLibraryPlugin : BasePlugin() {
             implementation(libs.coroutines)
         }
     }
+
 }

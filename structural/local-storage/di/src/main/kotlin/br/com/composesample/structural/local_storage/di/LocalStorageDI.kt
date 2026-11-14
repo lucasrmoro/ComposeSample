@@ -1,6 +1,5 @@
 package br.com.composesample.structural.local_storage.di
 
-import br.com.composesample.featureA.dao.SomeDao
 import br.com.composesample.structural.core.ext.dispatcherIO
 import br.com.composesample.structural.di.dependencyModule
 import br.com.composesample.structural.di.factory
@@ -19,7 +18,6 @@ object LocalStorageModule {
         }
         singleton { LocalStorageFactory(context = get(), ioDispatcher = dispatcherIO) }
         singleton<PreferencesDataSource> { get<LocalStorageFactory>().createPreferencesDataSource() }
-        factory<SomeDao> { get<LocalStorageFactory>().someDao() }
     }
 
     fun init() {
