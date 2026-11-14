@@ -8,6 +8,7 @@ internal val featureDomainApiModulePathPattern = Regex("^:features:[^:]+:domain:
 internal val structuralApiModulePathPattern = Regex("^:structural:[^:]+:api$")
 internal val structuralDiModulePathPattern = Regex("^:structural:[^:]+:di$")
 internal val structuralImplModulePathPattern = Regex("^:structural:[^:]+:impl$")
+internal val featureDomainApiPackageRoots = setOf("model", "repository", "useCase")
 
 internal val architectureBasePackage: String =
     requireNotNull(System.getProperty("architectureBasePackage")) {
@@ -25,6 +26,22 @@ internal fun String.featureNameFromModulePath(): String =
 
 internal fun String.hasPackageSegment(segment: String): Boolean =
     split('.').contains(segment)
+
+internal fun String.isNavigationControllerType(): Boolean =
+    this == "androidx.navigation.NavController" || this == "androidx.navigation.NavHostController"
+
+internal fun String.isSiblingFeatureImport(modulePath: String): Boolean {
+    val ownFeature = modulePath.featureNameFromModulePath()
+    val samplePackage = "$architectureBasePackage."
+    if (!startsWith(samplePackage)) return false
+    val importedPackage = removePrefix(samplePackage)
+    val importedFeature = if (importedPackage.startsWith("features.")) {
+        importedPackage.removePrefix("features.").substringBefore('.')
+    } else {
+        importedPackage.substringBefore('.')
+    }
+    return importedFeature != ownFeature && importedFeature != "structural"
+}
 
 internal fun Module.projectDependencyPaths(includeTestDependencies: Boolean = true): Set<String> =
     dependencies

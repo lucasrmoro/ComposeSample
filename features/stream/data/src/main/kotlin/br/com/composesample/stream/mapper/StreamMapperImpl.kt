@@ -13,7 +13,6 @@ import br.com.composesample.stream.dto.seasons.SeasonRespDTO
 import br.com.composesample.stream.dto.videos.VideoRespDTO
 import br.com.composesample.stream.model.catalog.CatalogPage
 import br.com.composesample.stream.model.catalog.CatalogQuery
-import br.com.composesample.stream.model.catalog.CatalogRegion
 import br.com.composesample.stream.model.catalog.Genre
 import br.com.composesample.stream.model.credits.PersonCredit
 import br.com.composesample.stream.model.details.MediaDetails
@@ -26,6 +25,7 @@ import br.com.composesample.stream.model.seasons.EpisodeDetails
 import br.com.composesample.stream.model.seasons.SeasonDetails
 import br.com.composesample.stream.model.seasons.SeasonSummary
 import br.com.composesample.stream.model.videos.VideoReference
+import br.com.composesample.structural.localization.AppRegion
 import br.com.composesample.structural.network.http.JsonCodec
 import br.com.composesample.structural.network.http.decode
 
@@ -55,7 +55,7 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
 
     override fun payload(value: Any): String = jsonCodec.encode(value)
 
-    override fun details(payload: String?, id: MediaId, region: CatalogRegion): MediaDetails? =
+    override fun details(payload: String?, id: MediaId, region: AppRegion): MediaDetails? =
         payload?.let { jsonCodec.decode<MediaRespDTO>(it) }?.let { mediaDetails(it, id, region) }
 
     override fun genres(payload: String?): List<Genre> =
@@ -64,7 +64,7 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
     override fun season(payload: String?): SeasonDetails? =
         payload?.let { jsonCodec.decode<SeasonRespDTO>(it) }?.let(::season)
 
-    private fun summary(dto: MediaRespDTO, type: MediaType, region: CatalogRegion): MediaSummary {
+    private fun summary(dto: MediaRespDTO, type: MediaType, region: AppRegion): MediaSummary {
         val date = if (type == MediaType.MOVIE) dto.releaseDate else dto.firstAirDate
         return MediaSummary(
             id = MediaId(type = type, value = dto.id),
@@ -76,18 +76,18 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
         )
     }
 
-    private fun certification(dto: MediaRespDTO, type: MediaType, region: CatalogRegion) =
+    private fun certification(dto: MediaRespDTO, type: MediaType, region: AppRegion) =
         if (type == MediaType.MOVIE) releaseCertification(dto, region)
         else contentRating(dto, region)
 
-    private fun releaseCertification(dto: MediaRespDTO, region: CatalogRegion) =
+    private fun releaseCertification(dto: MediaRespDTO, region: AppRegion) =
         dto.releaseDates
             ?.results
             ?.firstOrNull { it.country == region.countryCode }
             ?.dates
             ?.firstNotNullOfOrNull { it.certification?.takeIf(String::isNotBlank) }
 
-    private fun contentRating(dto: MediaRespDTO, region: CatalogRegion) =
+    private fun contentRating(dto: MediaRespDTO, region: AppRegion) =
         dto.contentRatings
             ?.results
             ?.firstOrNull { it.country == region.countryCode }
@@ -108,7 +108,7 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
             official = dto.official
         )
 
-    private fun mediaDetails(dto: MediaRespDTO, id: MediaId, region: CatalogRegion) =
+    private fun mediaDetails(dto: MediaRespDTO, id: MediaId, region: AppRegion) =
         MediaDetails(
             summary = summary(dto, id.type, region),
             originalTitle = dto.originalTitle ?: dto.originalName,
@@ -135,10 +135,10 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
             episodeCount = dto.numberOfEpisodes
         )
 
-    private fun releaseDate(dto: MediaRespDTO, region: CatalogRegion) =
+    private fun releaseDate(dto: MediaRespDTO, region: AppRegion) =
         regionalReleaseDate(dto, region) ?: dto.releaseDate ?: dto.firstAirDate
 
-    private fun regionalReleaseDate(dto: MediaRespDTO, region: CatalogRegion) =
+    private fun regionalReleaseDate(dto: MediaRespDTO, region: AppRegion) =
         dto.releaseDates
             ?.results
             ?.firstOrNull { it.country == region.countryCode }
@@ -147,7 +147,7 @@ internal class StreamMapperImpl(private val jsonCodec: JsonCodec) : StreamMapper
             ?.minOrNull()
             ?.take(10)
 
-    private fun providers(dto: MediaRespDTO, region: CatalogRegion): List<WatchProvider> {
+    private fun providers(dto: MediaRespDTO, region: AppRegion): List<WatchProvider> {
         val providers = dto.watchProviders?.results?.get(region.countryCode) ?: return emptyList()
         return providerGroup(providers.subscription, ProviderCategory.SUBSCRIPTION) +
             providerGroup(providers.free, ProviderCategory.FREE) +

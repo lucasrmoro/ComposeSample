@@ -96,7 +96,8 @@ class ModuleRulesTest {
             ":structural:media-compression:api" to ":structural:media:api",
             ":structural:network:api" to ":structural:di:api",
             ":structural:permissions:api" to ":structural:di:api",
-            ":structural:push-notifications:api" to ":structural:logger:api"
+            ":structural:push-notifications:api" to ":structural:logger:api",
+            ":features:stream:domain:api" to ":structural:localization:api"
         )
     }
 
