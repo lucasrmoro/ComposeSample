@@ -79,10 +79,13 @@ class ViewModelRulesTest {
 
     private fun ClassDeclaration.propertySource(sourceLines: List<String>, property: PropertyDeclaration): String {
         if (property.sourceLine <= 0) return ""
-        val propertyIndentation = sourceLines.getOrNull(property.sourceLine - 1).orEmpty()
+        val commentMaskedLines = sourceLines.joinToString(separator = "\n")
+            .maskKotlinCommentsPreservingLineNumbers()
+            .lines()
+        val propertyIndentation = commentMaskedLines.getOrNull(property.sourceLine - 1).orEmpty()
             .takeWhile(Char::isWhitespace)
             .length
-        val unparsedMemberLines = sourceLines.mapIndexedNotNull { index, line ->
+        val unparsedMemberLines = commentMaskedLines.mapIndexedNotNull { index, line ->
             val lineIndentation = line.takeWhile(Char::isWhitespace).length
             if (lineIndentation <= propertyIndentation && unparsedMemberDeclarationPattern.containsMatchIn(line)) {
                 index + 1
@@ -92,17 +95,27 @@ class ViewModelRulesTest {
         }
         val nextMemberLine = (properties.map { it.sourceLine } + functions.map { it.sourceLine } + unparsedMemberLines)
             .filter { line -> line > property.sourceLine }
-            .minOrNull() ?: sourceLines.size + 1
-        return sourceLines
+            .minOrNull() ?: commentMaskedLines.size + 1
+        return commentMaskedLines
             .subList(property.sourceLine - 1, (nextMemberLine - 1).coerceAtMost(sourceLines.size))
             .joinToString(separator = "\n")
-            .replace(kotlinBlockCommentPattern, "")
-            .replace(kotlinLineCommentPattern, "")
+    }
+
+    private fun String.maskKotlinCommentsPreservingLineNumbers(): String =
+        replace(kotlinBlockCommentPattern) { result -> result.value.maskCommentPreservingLineNumbers() }
+            .replace(kotlinLineCommentPattern) { result -> result.value.maskCommentPreservingLineNumbers() }
+
+    private fun String.maskCommentPreservingLineNumbers(): String = buildString(length) {
+        forEach { character -> append(if (character == '\n' || character == '\r') character else ' ') }
     }
 
     private companion object {
-        val mutableStateInitializerPattern = Regex("\\bMutableStateFlow(?:<[^=]*>)?\\s*\\(")
-        val readOnlyStateInitializerPattern = Regex("\\b_uiState\\.asStateFlow\\(\\)")
+        val mutableStateInitializerPattern = Regex(
+            "(?s)^\\s*private\\s+val\\s+_uiState\\b[^=]*=\\s*MutableStateFlow(?:<[^=]*>)?\\s*\\("
+        )
+        val readOnlyStateInitializerPattern = Regex(
+            "(?s)^\\s*override\\s+val\\s+uiState\\b[^=]*=\\s*_uiState\\.asStateFlow\\(\\)"
+        )
         val kotlinBlockCommentPattern = Regex("/\\*[\\s\\S]*?\\*/")
         val kotlinLineCommentPattern = Regex("//[^\\r\\n]*")
         val unparsedMemberDeclarationPattern = Regex(
