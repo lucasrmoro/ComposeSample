@@ -3,6 +3,7 @@ package br.com.composesample.structural.assets_cache
 import br.com.composesample.structural.core.concurrency.KeyedMutex
 import java.time.Clock
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.catch
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 internal class AssetsCacheProviderImpl(
     private val assetsCacheStore: AssetsCacheStore,
@@ -53,10 +55,14 @@ internal class AssetsCacheProviderImpl(
         emitAll(
             flow {
                 val file = assetCacheWriter.download(request)
-                val refreshed =
+                val refreshed = try {
                     storeMutex.withLock {
                         assetsCacheStore.save(url = url, file = file, now = clock.millis())
                     }
+                } catch (failure: Throwable) {
+                    withContext(NonCancellable) { file.delete() }
+                    throw failure
+                }
                 emit(AssetState(file = refreshed, isRefreshing = false, failed = false))
             }.catch {
                 emit(AssetState(file = fallback, isRefreshing = false, failed = true))

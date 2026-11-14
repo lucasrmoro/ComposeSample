@@ -64,10 +64,8 @@ class DetailsViewModel(
     override fun sendEvent(event: DetailsUiEvent) {
         when (event) {
             is DetailsUiEvent.SelectSeason -> loadSeason(event.number)
-            DetailsUiEvent.Retry ->
-                state.value.selectedSeason
-                    ?.takeIf { state.value.seasonError != null }
-                    ?.let(::loadSeason) ?: bind()
+            DetailsUiEvent.RetryDetails -> bind()
+            DetailsUiEvent.RetrySeason -> state.value.selectedSeason?.let(::loadSeason)
         }
     }
 

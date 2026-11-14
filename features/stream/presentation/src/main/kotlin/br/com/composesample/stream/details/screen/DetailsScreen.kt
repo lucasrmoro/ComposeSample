@@ -113,7 +113,7 @@ private fun DetailsContent(
                         loading = state.loading,
                         empty = mediaDetails == null,
                         error = state.error,
-                        retry = { event(DetailsUiEvent.Retry) }
+                        retry = { event(DetailsUiEvent.RetryDetails) }
                     )
                 }
             }
@@ -284,7 +284,7 @@ private fun SeasonsSection(
             SampleText(text = error.asString(), style = CurrentTheme.typography.bodySmall)
             SampleButton(
                 text = stringResource(R.string.stream_retry),
-                onClick = { onEvent(DetailsUiEvent.Retry) },
+                onClick = { onEvent(DetailsUiEvent.RetrySeason) },
                 style = SampleButtonStyle.OUTLINED
             )
         }
