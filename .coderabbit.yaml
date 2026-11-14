@@ -2,6 +2,9 @@ reviews:
   review_progress: true
   commit_status: true
   fail_commit_status: true
+  tools:
+    github-checks:
+      enabled: false
   auto_review:
     enabled: true
     auto_pause_after_reviewed_commits: 0
