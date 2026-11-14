@@ -28,8 +28,9 @@ pass. If either check fails, those Android jobs are skipped and the report shows
 
 After the gates finish, the Quality gate report job shows a Markdown table in the
 workflow summary, uploads `quality-gates-report.md` as an artifact, and posts a new
-comment on pull requests from branches in this repository. It minimizes older report
-comments as outdated, leaving the latest result visible. The table lists each result,
-a short correction example, and a link to its guide. Fork pull requests retain the
+comment only when a build, lint, unit-test, or architecture failure has a GitHub check
+annotation with an exact file and line. The comment lists those locations and their
+reported violations; failures without exact locations do not create a generic comment.
+New comments minimize older report comments as outdated. Fork pull requests retain the
 workflow summary and artifact because their token cannot write comments. The report
 job also runs when a gate fails or is skipped, but stops when the workflow is cancelled.
