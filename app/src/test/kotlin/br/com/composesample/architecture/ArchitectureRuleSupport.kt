@@ -14,7 +14,9 @@ internal val structuralApiPackages: Set<String> by lazy {
     findProjectRoot()
         .resolve("structural")
         .walkTopDown()
-        .filter { file -> file.isFile && file.extension == "kt" && file.path.contains("/api/src/main/kotlin/") }
+        .filter { file ->
+            file.isFile && file.extension == "kt" && file.path.normalizedPath().contains("/api/src/main/kotlin/")
+        }
         .mapNotNull { file -> packageDeclarationPattern.find(file.readText())?.groupValues?.get(1) }
         .toSet()
 }
@@ -48,6 +50,9 @@ internal fun String.featureNameFromModulePath(): String =
 
 internal fun String.hasPackageSegment(segment: String): Boolean =
     split('.').contains(segment)
+
+internal fun String.normalizedPath(): String =
+    replace('\\', '/')
 
 internal fun String.isNavigationControllerType(): Boolean =
     this == "androidx.navigation.NavController" || this == "androidx.navigation.NavHostController"

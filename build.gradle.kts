@@ -85,6 +85,12 @@ val validateArchitectureExternalDependencies = tasks.register("validateArchitect
 
 tasks.named("architectureCheck") {
     dependsOn(validateArchitectureExternalDependencies)
+    dependsOn(
+        ":app:processDevDebugMainManifest",
+        ":app:processDevReleaseMainManifest",
+        ":app:processPrdDebugMainManifest",
+        ":app:processPrdReleaseMainManifest"
+    )
 }
 
 buildscript {
