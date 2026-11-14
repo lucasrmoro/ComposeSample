@@ -296,9 +296,11 @@ lint, unit tests, and module graph validation. After those validations pass,
 request an advisory CodeRabbit review with the PR comment
 `@coderabbitai full review`. CodeRabbit review findings and status are
 informational; neither a CodeRabbit approval nor a completed review is required
-to merge. This comment does not rerun the validation workflow. CodeRabbit
-feedback does not replace the separate human review ruleset, which requires two
-approvals and resolved review threads for other contributors.
+to merge. CodeRabbit does not analyze GitHub check results; the repository
+ruleset owns merge validation. This comment does not rerun the validation
+workflow. CodeRabbit feedback does not replace the separate human review
+ruleset, which requires two approvals and resolved review threads for other
+contributors.
 
 Merge PRs using squash, then delete the source branch locally and remotely,
 except `main` and `develop`.
