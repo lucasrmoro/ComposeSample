@@ -14,6 +14,8 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalViewConfiguration
 
@@ -26,10 +28,12 @@ fun SampleClearFocusOnOutsideTap(
     val focusManager = LocalFocusManager.current
     val viewConfiguration = LocalViewConfiguration.current
     val focusedBounds = remember { mutableStateOf<Rect?>(null) }
+    val rootCoordinates = remember { mutableStateOf<LayoutCoordinates?>(null) }
 
     Box(
         modifier = modifier
             .fillMaxSize()
+            .onGloballyPositioned { rootCoordinates.value = it }
             .onFocusedBoundsChanged { focusedBounds.value = it?.boundsInRoot() }
             .pointerInput(focusManager, viewConfiguration) {
                 awaitEachGesture {
@@ -40,7 +44,8 @@ fun SampleClearFocusOnOutsideTap(
                     val up = waitForUpOrCancellation(pass = PointerEventPass.Final)
                     if (up != null &&
                         (up.position - down.position).getDistance() <= viewConfiguration.touchSlop &&
-                        focusedBounds.value?.contains(up.position) == false
+                        rootCoordinates.value?.localToRoot(up.position)
+                            ?.let { focusedBounds.value?.contains(it) == false } == true
                     ) {
                         focusManager.clearFocus()
                     }

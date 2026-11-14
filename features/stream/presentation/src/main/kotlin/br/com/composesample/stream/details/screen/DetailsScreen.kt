@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -57,6 +58,7 @@ import br.com.composesample.structural.designsystem.components.SampleLink
 import br.com.composesample.structural.designsystem.components.SampleProfileImage
 import br.com.composesample.structural.designsystem.components.SampleScreen
 import br.com.composesample.structural.designsystem.components.SampleText
+import br.com.composesample.structural.designsystem.text.asString
 import br.com.composesample.structural.designsystem.components.SampleVideoPlayer
 import br.com.composesample.structural.designsystem.screen.BaseScreen
 import br.com.composesample.structural.designsystem.theme.ComposeSampleTheme
@@ -278,6 +280,14 @@ private fun SeasonsSection(
             }
         }
         if (state.seasonLoading && state.season == null) SampleCircularProgressIndicator()
+        state.seasonError?.let { error ->
+            SampleText(text = error.asString(), style = CurrentTheme.typography.bodySmall)
+            SampleButton(
+                text = stringResource(R.string.stream_retry),
+                onClick = { onEvent(DetailsUiEvent.Retry) },
+                style = SampleButtonStyle.OUTLINED
+            )
+        }
         state.season?.episodes?.forEach { episode ->
             SampleText(
                 text = stringResource(R.string.stream_episode, episode.number, episode.name),
@@ -313,7 +323,8 @@ private fun CastSection(cast: List<PersonCredit>) {
             horizontalArrangement = Arrangement.spacedBy(CurrentTheme.spacing.medium)
         ) {
             items(cast) { person ->
-                Column(modifier = Modifier.width(StreamDimens.portrait)) {
+                key(person.imagePath) {
+                    Column(modifier = Modifier.width(StreamDimens.portrait)) {
                     SampleProfileImage(
                         request = imageRequest(person.imagePath, ImageRole.PROFILE),
                         contentDescription = person.name,
@@ -322,6 +333,7 @@ private fun CastSection(cast: List<PersonCredit>) {
                     SampleText(text = person.name, style = CurrentTheme.typography.labelMedium)
                     person.role?.let {
                         SampleText(text = it, style = CurrentTheme.typography.labelSmall)
+                    }
                     }
                 }
             }

@@ -73,7 +73,10 @@ internal class StreamRepositoryImpl(
         streamLocalDataSource
             .save(
                 key = genreKey(type, region),
-                payload = streamMapper.payload(streamRemoteDataSource.genres(type).single())
+                payload =
+                    streamMapper.payload(
+                        streamRemoteDataSource.genres(type, region.languageTag).single()
+                    )
             )
             .single()
         emit(Unit)

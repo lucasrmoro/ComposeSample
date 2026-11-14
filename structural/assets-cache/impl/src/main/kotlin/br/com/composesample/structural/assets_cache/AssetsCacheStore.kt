@@ -47,8 +47,10 @@ internal class AssetsCacheStore(
 
     suspend fun save(url: String, file: MediaFile, now: Long): MediaFile {
         val key = hashingProvider.sha256(url)
-        val previous = fileCacheMetadataDataSource.find(namespace, key).single()
-        runCatching {
+        var previous: CachedFileMetadata? = null
+        var metadataChanged = false
+        try {
+            previous = fileCacheMetadataDataSource.find(namespace, key).single()
             trimFor(file.sizeBytes - (previous?.sizeBytes ?: 0L), key)
             fileCacheMetadataDataSource
                 .save(
@@ -60,15 +62,21 @@ internal class AssetsCacheStore(
                     )
                 )
                 .single()
-        }.onFailure {
+            metadataChanged = true
+            previous?.let(::resolve)?.let { previousFile ->
+                if (!previousFile.delete()) throw IOException(DELETE_MESSAGE)
+            }
+            return file
+        } catch (failure: Throwable) {
             withContext(NonCancellable) {
-                previous?.let { fileCacheMetadataDataSource.save(it).single() }
-                    ?: fileCacheMetadataDataSource.remove(namespace, key).single()
+                if (metadataChanged) {
+                    previous?.let { fileCacheMetadataDataSource.save(it).single() }
+                        ?: fileCacheMetadataDataSource.remove(namespace, key).single()
+                }
                 file.delete()
             }
-        }.getOrThrow()
-        previous?.let(::resolve)?.delete()
-        return file
+            throw failure
+        }
     }
 
     private suspend fun trimFor(incomingBytes: Long, protectedKey: String) {

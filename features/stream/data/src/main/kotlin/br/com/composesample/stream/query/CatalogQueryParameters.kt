@@ -23,6 +23,7 @@ internal class CatalogQueryParameters(private val clock: Clock) {
     }
 
     private fun addRegionParameter(params: MutableMap<String, String>, query: CatalogQuery) {
+        params[LANGUAGE_PARAMETER] = query.region.languageTag
         if (query.type == MediaType.MOVIE) params[REGION_PARAMETER] = query.region.countryCode
     }
 
@@ -71,6 +72,7 @@ internal class CatalogQueryParameters(private val clock: Clock) {
         const val INCLUDE_ADULT_PARAMETER = "include_adult"
         const val FALSE_VALUE = "false"
         const val REGION_PARAMETER = "region"
+        const val LANGUAGE_PARAMETER = "language"
         const val QUERY_PARAMETER = "query"
         const val GENRE_PARAMETER = "with_genres"
         const val RELEASE_DATE_PARAMETER = "release_date"

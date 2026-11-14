@@ -12,6 +12,6 @@ import kotlinx.coroutines.flow.Flow
 interface StreamRemoteDataSource {
     fun page(query: CatalogQuery, page: Int): Flow<PageRespDTO>
     fun details(id: MediaId): Flow<MediaRespDTO>
-    fun genres(type: MediaType): Flow<GenresRespDTO>
+    fun genres(type: MediaType, languageTag: String): Flow<GenresRespDTO>
     fun season(id: MediaId, number: Int): Flow<SeasonRespDTO>
 }

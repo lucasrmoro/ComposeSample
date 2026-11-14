@@ -37,11 +37,11 @@ internal class StreamRemoteDataSourceImpl(
             )
         }.flowOn(coroutineDispatcher)
 
-    override fun genres(type: MediaType) =
+    override fun genres(type: MediaType, languageTag: String) =
         call {
             val path = if (type == MediaType.MOVIE) MOVIE_GENRES_PATH else SERIES_GENRES_PATH
             httpClient.get<GenresRespDTO>(
-                HttpRequest(path = path)
+                HttpRequest(path = path, query = mapOf(LANGUAGE_PARAMETER to languageTag))
             )
         }.flowOn(coroutineDispatcher)
 
@@ -93,6 +93,7 @@ internal class StreamRemoteDataSourceImpl(
         const val MOVIE_DETAIL_SECTIONS = "credits,videos,release_dates,watch/providers"
         const val SERIES_DETAIL_SECTIONS = "credits,videos,content_ratings,watch/providers"
         const val APPEND_PARAMETER = "append_to_response"
+        const val LANGUAGE_PARAMETER = "language"
     }
 
 }

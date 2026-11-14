@@ -10,6 +10,7 @@ data class DetailsUiState(
     val selectedSeason: Int? = null,
     val loading: Boolean = true,
     val seasonLoading: Boolean = false,
+    val seasonError: UiText? = null,
     val online: Boolean = true,
     val error: UiText? = null
 )

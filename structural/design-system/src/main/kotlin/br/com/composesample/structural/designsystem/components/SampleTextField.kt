@@ -50,7 +50,7 @@ fun SampleTextField(
     singleLine: Boolean = false,
     style: SampleTextFieldStyle = SampleTextFieldStyle.OUTLINED,
     keyboardAction: SampleKeyboardAction = SampleKeyboardAction.DEFAULT,
-    onKeyboardAction: () -> Unit = {},
+    onKeyboardAction: (() -> Unit)? = null,
     leadingIcon: IconToken? = null,
     leadingIconDescription: String? = null,
     trailingIcon: IconToken? = null,
@@ -71,7 +71,13 @@ fun SampleTextField(
         label = textFieldText(label),
         placeholder = textFieldText(placeholder),
         leadingIcon = textFieldIcon(leadingIcon, leadingIconDescription),
-        trailingIcon = textFieldIcon(trailingIcon, trailingIconDescription, onTrailingIconClick)
+        trailingIcon =
+            textFieldIcon(
+                trailingIcon,
+                trailingIconDescription,
+                enabled,
+                onTrailingIconClick
+            )
     )
 }
 
@@ -142,13 +148,14 @@ private fun textFieldText(text: String?): (@Composable () -> Unit)? = text?.let 
 private fun textFieldIcon(
     icon: IconToken?,
     contentDescription: String?,
+    enabled: Boolean = true,
     onClick: (() -> Unit)? = null
 ): (@Composable () -> Unit)? = icon?.let { iconToken ->
     {
         if (onClick == null) {
             TextFieldIcon(icon = iconToken, contentDescription = contentDescription)
         } else {
-            IconButton(onClick = onClick) {
+            IconButton(onClick = onClick, enabled = enabled) {
                 TextFieldIcon(icon = iconToken, contentDescription = contentDescription)
             }
         }
@@ -185,8 +192,8 @@ private fun SampleKeyboardAction.toImeAction(): ImeAction = when (this) {
     SampleKeyboardAction.SEND -> ImeAction.Send
 }
 
-private fun SampleKeyboardAction.toKeyboardActions(onAction: () -> Unit): KeyboardActions {
-    val action: KeyboardActionScope.() -> Unit = { onAction() }
+private fun SampleKeyboardAction.toKeyboardActions(onAction: (() -> Unit)?): KeyboardActions {
+    val action: (KeyboardActionScope.() -> Unit)? = onAction?.let { handler -> { handler() } }
     return when (this) {
         SampleKeyboardAction.DEFAULT, SampleKeyboardAction.NONE -> KeyboardActions.Default
         SampleKeyboardAction.DONE -> KeyboardActions(onDone = action)

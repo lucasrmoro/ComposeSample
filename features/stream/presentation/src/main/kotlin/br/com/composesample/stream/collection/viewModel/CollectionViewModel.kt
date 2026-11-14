@@ -87,8 +87,10 @@ class CollectionViewModel(
         pageJob?.cancel()
         job = viewModelScope.launch {
             appRegionProvider.region.collectLatest { region ->
+                pageJob?.cancel()
+                pageJob = null
                 val query = initialQuery.copy(region = region.toCatalogRegion())
-                state.update { it.copy(query = query, loading = true, error = null) }
+                state.update { it.copy(query = query, loading = true, paging = false, error = null) }
                 coroutineScope {
                     launch {
                         observeCatalogUseCase(query)

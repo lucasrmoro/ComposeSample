@@ -1,5 +1,6 @@
 package br.com.composesample.structural.assets_cache
 
+import br.com.composesample.structural.core.concurrency.KeyedMutex
 import java.time.Clock
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -19,10 +20,11 @@ internal class AssetsCacheProviderImpl(
     private val coroutineDispatcher: CoroutineDispatcher
 ) : AssetsCacheProvider {
 
-    private val mutex = Mutex()
+    private val urlMutex = KeyedMutex<String>()
+    private val storeMutex = Mutex()
 
     override fun observe(request: AssetRequest, previousUrl: String?): Flow<AssetState> = flow {
-        mutex.withLock { load(request, previousUrl) }
+        urlMutex.withLock(request.url) { load(request, previousUrl) }
     }.flowOn(coroutineDispatcher)
 
     private suspend fun FlowCollector<AssetState>.load(
@@ -30,15 +32,17 @@ internal class AssetsCacheProviderImpl(
         previousUrl: String?
     ) {
         val url = request.url
-        val current = assetsCacheStore.find(url = url)
-        val fallback = current?.file ?: previousUrl?.let { assetsCacheStore.find(url = it) }?.file
+        val current = storeMutex.withLock { assetsCacheStore.find(url = url) }
+        val fallback = current?.file ?: previousUrl?.let { previous ->
+            storeMutex.withLock { assetsCacheStore.find(url = previous) }?.file
+        }
         val now = clock.millis()
         val needsRefresh =
             current?.let {
                 now - it.downloadedAt >= assetsCacheConfiguration.maximumAgeMillis
             } ?: true
 
-        val accessUpdate = assetsCacheStore.touch(url = url, now = now)
+        val accessUpdate = storeMutex.withLock { assetsCacheStore.touch(url = url, now = now) }
         fallback?.let {
             emit(
                 AssetState(file = it, isRefreshing = needsRefresh, failed = accessUpdate.isFailure)
@@ -49,7 +53,10 @@ internal class AssetsCacheProviderImpl(
         emitAll(
             flow {
                 val file = assetCacheWriter.download(request)
-                val refreshed = assetsCacheStore.save(url = url, file = file, now = clock.millis())
+                val refreshed =
+                    storeMutex.withLock {
+                        assetsCacheStore.save(url = url, file = file, now = clock.millis())
+                    }
                 emit(AssetState(file = refreshed, isRefreshing = false, failed = false))
             }.catch {
                 emit(AssetState(file = fallback, isRefreshing = false, failed = true))

@@ -64,7 +64,10 @@ class DetailsViewModel(
     override fun sendEvent(event: DetailsUiEvent) {
         when (event) {
             is DetailsUiEvent.SelectSeason -> loadSeason(event.number)
-            DetailsUiEvent.Retry -> bind()
+            DetailsUiEvent.Retry ->
+                state.value.selectedSeason
+                    ?.takeIf { state.value.seasonError != null }
+                    ?.let(::loadSeason) ?: bind()
         }
     }
 
@@ -74,7 +77,13 @@ class DetailsViewModel(
             appRegionProvider.region.collectLatest { region ->
                 seasonJob?.cancel()
                 state.update {
-                    it.copy(loading = true, error = null, selectedSeason = null, season = null)
+                    it.copy(
+                        loading = true,
+                        error = null,
+                        selectedSeason = null,
+                        season = null,
+                        seasonError = null
+                    )
                 }
                 coroutineScope {
                     launch {
@@ -104,22 +113,40 @@ class DetailsViewModel(
 
     private fun loadSeason(number: Int) {
         seasonJob?.cancel()
-        state.update { it.copy(selectedSeason = number, seasonLoading = true, season = null) }
+        state.update {
+            it.copy(
+                selectedSeason = number,
+                seasonLoading = true,
+                season = null,
+                seasonError = null
+            )
+        }
         val region = appRegionProvider.region.value.toCatalogRegion()
         seasonJob = viewModelScope.launch {
             coroutineScope {
                 launch {
                     observeSeasonUseCase(mediaId, number, region)
-                        .onError(ignoreUnauthorized = false) { fail() }
+                        .onError(ignoreUnauthorized = false) {
+                            state.update {
+                                it.copy(seasonError = UiText.StringResource(R.string.stream_load_error))
+                            }
+                        }
                         .onSuccess {
                             val season = this
-                            state.update { it.copy(season = season) }
+                            state.update { it.copy(season = season, seasonError = null) }
                         }
                 }
                 launch {
                     refreshSeasonUseCase(mediaId, number, region)
-                        .onCompletion { state.update { it.copy(seasonLoading = false) } }
-                        .onError(ignoreUnauthorized = false) { fail() }
+                        .onCompletion {
+                            if (currentCoroutineContext().isActive)
+                                state.update { it.copy(seasonLoading = false) }
+                        }
+                        .onError(ignoreUnauthorized = false) {
+                            state.update {
+                                it.copy(seasonError = UiText.StringResource(R.string.stream_load_error))
+                            }
+                        }
                         .onSuccess {}
                 }
             }

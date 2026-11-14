@@ -4,6 +4,7 @@ plugins { alias(libs.plugins.sample.android.library) }
 
 dependencies {
     implementation(project(Modules.Structural.AssetsCache.API))
+    implementation(project(Modules.Structural.Core.MAIN))
     implementation(project(Modules.Structural.DI.API))
     implementation(project(Modules.Structural.LocalStorage.API))
     implementation(project(Modules.Structural.Media.API))
