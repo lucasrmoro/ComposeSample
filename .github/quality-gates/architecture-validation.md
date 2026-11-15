@@ -1,10 +1,11 @@
 # Architecture validation
 
-The architecture gate runs `./gradlew architectureCheck`. Konture reads the Gradle
-project layout and Kotlin declarations/imports, then the app's local unit-test task
-executes the rules in `app/src/test/kotlin/br/com/composesample/architecture/`. A root
-Gradle task checks external dependency coordinates against exact allowlists. The gate
-runs explicitly in pull request validation and is not attached to app builds.
+Locally, run `./gradlew architectureCheck`. Konture reads the Gradle project layout
+and Kotlin declarations/imports. The `:architecture-tests:test` task checks this
+repository, and a root Gradle task also checks external dependency coordinates against
+exact allowlists. The gate is not attached to app builds. See the
+[end-to-end guide](../../architecture-tests/how-to-add-architecture-rule.md) for
+adding a rule and its isolated fixtures.
 
 ## ModuleRules
 
@@ -72,25 +73,48 @@ runs explicitly in pull request validation and is not attached to app builds.
 
 ## NavigationRules
 
+- Every feature presentation module declares `<basePackage>.<feature>.navigation`
+  with all three files: `<Feature>EntryPointImpl.kt`, `<Feature>NavHost.kt`, and
+  `<Feature>Routes.kt`.
+- That package contains only those filenames with the matching feature prefix;
+  extra files and navigation subpackages are rejected. These checks govern package
+  and file organization, not the full semantics of each file's declarations.
 - Navigation controller references stay in feature navigation packages.
 - Feature route declarations use the feature name as their prefix.
 
 ## ApplicationRules
 
-- Exactly one Activity class is declared in `:app` and exactly one Activity is declared
-  across source manifests; launcher Activity source does not import navigation or
-  feature presentation code.
+- `:app` declares exactly one Activity class, and its merged manifest declares one
+  project Activity for each supported variant.
+- A separate rule forbids Activity subclasses in every other module. Together these
+  checks enforce a single project Activity, owned by `:app`.
+- The host boundary applies to Activity subclasses in `:app`; navigation or feature
+  presentation imports are forbidden there. An Activity without navigation imports
+  is valid. Ordinary classes named `SomethingActivity` are not classified by name.
+- Classification recognizes Android/AndroidX Activity base types, including
+  `Activity`, `ComponentActivity`, `FragmentActivity`, and `AppCompatActivity`, and
+  follows superclass declarations available in the project. It does not depend on a
+  `NavController` import. New external Activity base types require updating
+  `AndroidActivityTypes` when their hierarchy is not present in the project.
 
 ## CoroutineRules
 
 - Production Kotlin does not use `GlobalScope`.
-- Direct `Dispatchers` references are limited to the core dispatcher provider module.
+- Direct `Dispatchers` references, including member imports such as `Dispatchers.IO`,
+  `Default`, `Main.immediate`, and `Unconfined`, are limited to `:structural:core:di`.
+- `MainScope` is forbidden because it selects a dispatcher implicitly. Explicit
+  `CoroutineScope` contexts may use injected dispatchers; lifecycle scopes and
+  structured `coroutineScope` / `supervisorScope` builders remain supported.
+- `newSingleThreadContext`, `newFixedThreadPoolContext`, and JVM/Android
+  `asCoroutineDispatcher` factories are restricted to the dispatcher provider module.
+  Consumers receive dispatchers through constructors; DI selects them with the existing
+  `DispatcherIO`, `DispatcherMain`, and `DispatcherDefault` qualifiers.
 
 ## Scope and limitations
 
 These are architecture boundary rules, not general Kotlin conventions. The gate does
 not check formatting, complexity, DTO JSON annotations, mapper/data-source patterns,
-dispatcher injection quality beyond direct `Dispatchers` references, cancellation
+dispatcher qualifier provenance or arbitrary custom scope context expressions, cancellation
 handling, Compose lifecycle collection, or individual Compose component usage. Those
 implementation and style checks belong in ktlint, Detekt, Android Lint, or focused
 convention checks. Konture inspects Kotlin declarations; Java source declarations are

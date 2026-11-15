@@ -58,7 +58,9 @@ class ModuleRulesTest {
     }
 
     private fun String.isApprovedModulePath(): Boolean {
-        if (this == ":" || this == ":app" || this == ":features" || this == ":structural") return true
+        if (this == ":" || this == ":app" || this == ":architecture-tests" ||
+            this == ":features" || this == ":structural"
+        ) return true
 
         val segments = removePrefix(":").split(':')
         return when (segments.firstOrNull()) {

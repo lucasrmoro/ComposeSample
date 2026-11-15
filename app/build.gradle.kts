@@ -67,18 +67,4 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.navigation.compose)
-    testImplementation(libs.androidx.junit)
-    testImplementation(libs.konture)
-}
-
-tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
-    systemProperty("architectureBasePackage", requireNotNull(android.namespace))
-    if (name == "testDevDebugUnitTest") {
-        dependsOn(
-            "processDevDebugMainManifest",
-            "processDevReleaseMainManifest",
-            "processPrdDebugMainManifest",
-            "processPrdReleaseMainManifest"
-        )
-    }
 }

@@ -27,6 +27,7 @@ internal val architectureBasePackage: String =
     }
 
 internal fun findProjectRoot(): File {
+    System.getProperty("architectureProjectRoot")?.let { return File(it).absoluteFile }
     var directory = File(System.getProperty("user.dir") ?: ".").absoluteFile
     while (!directory.resolve("settings.gradle.kts").exists()) {
         val parent = directory.parentFile ?: break

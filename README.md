@@ -325,8 +325,11 @@ locally with:
 ```
 
 The task generates the Konture layout from the Gradle project graph and runs the
-architecture tests in the app test source set. See the gate documentation for the
-current rules and their scope.
+architecture rules against the current project. The rules live in the standalone
+`architecture-tests` module, which is not part of the app dependency graph. See the
+gate documentation for the current rules and their scope. To add a rule and its
+fixtures, follow the
+[end-to-end guide](architecture-tests/how-to-add-architecture-rule.md).
 
 ```sh
 ./gradlew :app:testDevDebugUnitTest

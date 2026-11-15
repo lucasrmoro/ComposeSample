@@ -44,6 +44,7 @@ dependencyResolutionManagement {
 rootProject.name = "Compose - Sample"
 
 include(":app")
+include(":architecture-tests")
 // Structural
 include(
     ":structural",

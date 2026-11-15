@@ -13,30 +13,27 @@ class ApplicationRulesTest {
 
     @Test
     fun `the project must declare exactly one activity in the app module`() {
+        val activityTypes = activityTypes()
+        Konture.modules {
+            that().matching { module -> module.path == ":app" }
+            should().satisfy { module: Module, violations: MutableList<String> ->
+                val activities = module.classes.filter(activityTypes::isActivity)
+                if (activities.size != 1) {
+                    violations.add("The app must declare exactly one Activity; found ${activities.size}")
+                }
+                violations.addAll(mergedManifestViolations())
+            }
+        }
+    }
+
+    @Test
+    fun `activities must be declared only in the app module`() {
+        val activityTypes = activityTypes()
         Konture.modules {
             that().matching { true }
             should().satisfy { module: Module, violations: MutableList<String> ->
-                val activities = module.classes.filter { declaration ->
-                    declaration.supertypes.any { supertype -> supertype.substringAfterLast('.').endsWith("Activity") }
-                }
-                if (module.path == ":app" && activities.size != 1) {
-                    violations.add("The app must declare exactly one Activity; found ${activities.size}")
-                }
-                if (module.path != ":app" && activities.isNotEmpty()) {
+                if (module.path != ":app" && module.classes.any(activityTypes::isActivity)) {
                     violations.add("Activity declarations are only allowed in :app, found in ${module.path}")
-                }
-                if (module.path == ":app") {
-                    supportedVariants.forEach { variant ->
-                        val manifest = findProjectRoot().resolve(
-                            "app/build/intermediates/merged_manifest/$variant/process${variant.replaceFirstChar(Char::uppercase)}MainManifest/AndroidManifest.xml"
-                        )
-                        val activities = manifest.takeIf(File::exists)?.let(::activityNamesFromMergedManifest)
-                        if (activities == null || activities.size != 1) {
-                            violations.add(
-                                "The $variant merged manifest must declare exactly one Activity; found ${activities?.size ?: "no manifest"}"
-                            )
-                        }
-                    }
                 }
             }
         }
@@ -44,13 +41,11 @@ class ApplicationRulesTest {
 
     @Test
     fun `launcher activity must only host the app content`() {
+        val activityTypes = activityTypes()
         Konture.files {
             that().satisfy { file: FileDeclarationContext ->
                 file.modulePath == ":app" &&
-                    file.declaration.classes.any { declaration ->
-                        declaration.name.endsWith("Activity") ||
-                            declaration.supertypes.any { supertype -> supertype.substringAfterLast('.').endsWith("Activity") }
-                    }
+                    file.declaration.classes.any(activityTypes::isActivity)
             }
             should().satisfy(description = "launcher Activity host boundary", predicate = { file: FileDeclarationContext ->
                 file.declaration.imports.none { import ->
@@ -61,6 +56,20 @@ class ApplicationRulesTest {
                 }
             })
         }
+    }
+
+    private fun activityTypes(): AndroidActivityTypes = AndroidActivityTypes(
+        classes = Konture.projectGraph.getAllModules().flatMap { it.classes }
+    )
+
+    private fun mergedManifestViolations(): List<String> = supportedVariants.mapNotNull { variant ->
+        val manifest = findProjectRoot().resolve(
+            "app/build/intermediates/merged_manifest/$variant/" +
+                "process${variant.replaceFirstChar(Char::uppercase)}MainManifest/AndroidManifest.xml"
+        )
+        val activities = manifest.takeIf(File::exists)?.let(::activityNamesFromMergedManifest)
+        if (activities?.size == 1) return@mapNotNull null
+        "The $variant merged manifest must declare exactly one Activity; found ${activities?.size ?: "no manifest"}"
     }
 
     private fun activityNamesFromMergedManifest(manifest: File): Set<String> {
