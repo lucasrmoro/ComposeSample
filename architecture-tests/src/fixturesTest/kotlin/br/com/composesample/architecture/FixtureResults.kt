@@ -6,6 +6,7 @@ import javax.xml.parsers.DocumentBuilderFactory
 internal data class FixtureTestResult(
     val skipped: Boolean,
     val failureType: String?,
+    val failureMessage: String?,
     val failure: String
 )
 
@@ -26,7 +27,9 @@ internal data class FixtureResult(
         if (result.failureType != "java.lang.AssertionError") {
             return "Expected an architecture assertion; found ${result.failureType ?: "PASS"}"
         }
-        if (!result.failure.contains(diagnostic, ignoreCase = true)) return "Expected diagnostic '$diagnostic' was absent"
+        if (!result.failureMessage.orEmpty().contains(diagnostic, ignoreCase = true)) {
+            return "Expected diagnostic '$diagnostic' was absent from the assertion message"
+        }
         return null
     }
 
@@ -91,6 +94,7 @@ internal fun readFixtureResults(project: File, evidence: File): FixtureResult {
                 FixtureTestResult(
                     skipped = element.getElementsByTagName("skipped").length > 0,
                     failureType = failure?.attributes?.getNamedItem("type")?.nodeValue,
+                    failureMessage = failure?.attributes?.getNamedItem("message")?.nodeValue,
                     failure = failure?.textContent.orEmpty()
                 )
             )
