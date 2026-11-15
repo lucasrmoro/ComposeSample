@@ -13,6 +13,7 @@ concurrency:
 jobs:
   branch-validation:
     name: Validate branch name
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
@@ -27,6 +28,7 @@ jobs:
 
   pull-request-title-validation:
     name: Validate PR title
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
@@ -41,6 +43,7 @@ jobs:
 
   build:
     name: Build
+    if: ${{ !github.event.pull_request.draft }}
     needs: [branch-validation, pull-request-title-validation]
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -56,6 +59,7 @@ jobs:
 
   lint:
     name: Lint
+    if: ${{ !github.event.pull_request.draft }}
     needs: [branch-validation, pull-request-title-validation]
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -71,6 +75,7 @@ jobs:
 
   unit-tests:
     name: Unit tests
+    if: ${{ !github.event.pull_request.draft }}
     needs: [branch-validation, pull-request-title-validation]
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -86,6 +91,7 @@ jobs:
 
   architecture-validation:
     name: Architecture validation
+    if: ${{ !github.event.pull_request.draft }}
     needs: [branch-validation, pull-request-title-validation]
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -108,7 +114,7 @@ jobs:
       - lint
       - unit-tests
       - architecture-validation
-    if: ${{ !cancelled() }}
+    if: ${{ !github.event.pull_request.draft && !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
