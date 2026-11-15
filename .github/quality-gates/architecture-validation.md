@@ -1,11 +1,26 @@
 # Architecture validation
 
 Locally, run `./gradlew architectureCheck`. Konture reads the Gradle project layout
-and Kotlin declarations/imports. The `:architecture-tests:test` task checks this
-repository, and a root Gradle task also checks external dependency coordinates against
-exact allowlists. The gate is not attached to app builds. See the
-[end-to-end guide](../../architecture-tests/how-to-add-architecture-rule.md) for
-adding a rule and its isolated fixtures.
+and Kotlin declarations/imports. The task first runs
+`:architecture-tests:architectureFixturesTest` to prove the rules catch representative
+violations, then `:architecture-tests:test` checks this repository. A root Gradle task
+also checks external dependency coordinates against exact allowlists. In pull request
+validation, fixtures and the project gate appear as separate sequential steps; the
+project step runs only after the fixture step succeeds. The gate is not attached to app
+builds. See the
+[fixture README](../../architecture-tests/src/fixturesTest/resources/fixtures/README.md)
+for the scenario matrix.
+
+For implementing a new rule, adding its valid/invalid fixtures, and verifying the
+pipeline integration, follow the [end-to-end guide](../../architecture-tests/how-to-add-architecture-rule.md).
+
+Fixture coverage is checked per JUnit rule method discovered in the compiled rules
+JAR. Every method needs a valid fixture that passes and an invalid fixture that fails
+with its mapped assertion diagnostic. Missing, duplicate, or obsolete mappings and
+skipped or missing JUnit results fail the gate. The generated method coverage report
+is `architecture-tests/build/reports/architecture-fixtures/coverage.md`; its fixture
+directories retain JUnit XML evidence and build logs. This checks behavioral examples
+per method, not every line or branch inside a rule.
 
 ## ModuleRules
 

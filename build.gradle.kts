@@ -15,6 +15,7 @@ tasks.register("architectureCheck") {
     description = "Runs Kotlin architecture boundary tests with Konture."
     dependsOn("generateArchitectureLayout")
     dependsOn(":architecture-tests:test")
+    dependsOn(":architecture-tests:architectureFixturesTest")
 }
 
 project(":architecture-tests").tasks.configureEach {

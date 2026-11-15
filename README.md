@@ -324,11 +324,10 @@ locally with:
 ./gradlew architectureCheck
 ```
 
-The task generates the Konture layout from the Gradle project graph and runs the
-architecture rules against the current project. The rules live in the standalone
-`architecture-tests` module, which is not part of the app dependency graph. See the
-gate documentation for the current rules and their scope. To add a rule and its
-fixtures, follow the
+The task validates the architecture rules against fixture projects first, then checks
+the current project graph and Kotlin sources. Fixture projects are isolated from the
+app build. See the fixture README and gate documentation for scenarios and rule scope.
+To add a rule and its fixtures, follow the
 [end-to-end guide](architecture-tests/how-to-add-architecture-rule.md).
 
 ```sh
