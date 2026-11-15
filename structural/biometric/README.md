@@ -20,14 +20,14 @@ registers a shared `BiometricProviderFactory` that retains Keystore access and
 creates a `BiometricProvider` per Activity. Consumers depend on `biometric/api`;
 `impl` declares no DI bindings and does not depend on `di`.
 
-A adaptação ao ciclo de vida pertence ao design-system. O app também carrega
-`DesignSystemModule.init()` de `design-system/di` antes de abrir uma tela consumidora.
-Isso registra o binding qualificado `ScreenBiometricProvider`. Somente telas Compose
-que usam biometria declaram a dependência de `biometric/api` e obtêm um provider com
-a `FragmentActivity` host e o escopo de ciclo de vida da tela. A Activity launcher
-estende `FragmentActivity` apenas porque o AndroidX BiometricPrompt exige esse host;
-a UI continua em Compose. O adaptador cancela operações quando a tela é destruída ou
-a coroutine chamadora é cancelada.
+Lifecycle adaptation belongs to the design system. The app also loads
+`DesignSystemModule.init()` from `design-system/di` before opening a consuming screen.
+This registers the qualified `ScreenBiometricProvider` binding. Only Compose screens
+that use biometrics declare a dependency on `biometric/api` and obtain a provider with
+the host `FragmentActivity` and the screen's lifecycle scope. The launcher Activity
+extends `FragmentActivity` because AndroidX BiometricPrompt requires that host;
+the UI remains in Compose. The adapter cancels operations when the screen is destroyed
+or the calling coroutine is cancelled.
 
 Persistence is registered by `LocalStorageModule.init()` from `local-storage/di`.
 

@@ -14,7 +14,20 @@ tasks.register("architectureCheck") {
     group = "verification"
     description = "Runs Kotlin architecture boundary tests with Konture."
     dependsOn("generateArchitectureLayout")
-    dependsOn(":app:testDevDebugUnitTest")
+    dependsOn(":architecture-tests:test")
+    dependsOn(":architecture-tests:architectureFixturesTest")
+}
+
+project(":architecture-tests").tasks.configureEach {
+    if (name == "test") {
+        mustRunAfter(":architecture-tests:architectureFixturesTest")
+        dependsOn(
+            ":app:processDevDebugMainManifest",
+            ":app:processDevReleaseMainManifest",
+            ":app:processPrdDebugMainManifest",
+            ":app:processPrdReleaseMainManifest"
+        )
+    }
 }
 
 val architectureBaseExternalDependencies = setOf(
@@ -85,23 +98,6 @@ val validateArchitectureExternalDependencies = tasks.register("validateArchitect
 
 tasks.named("architectureCheck") {
     dependsOn(validateArchitectureExternalDependencies)
-    dependsOn(
-        ":app:processDevDebugMainManifest",
-        ":app:processDevReleaseMainManifest",
-        ":app:processPrdDebugMainManifest",
-        ":app:processPrdReleaseMainManifest"
-    )
-}
-
-project(":app").tasks.configureEach {
-    if (name == "testDevDebugUnitTest") {
-        dependsOn(
-            ":app:processDevDebugMainManifest",
-            ":app:processDevReleaseMainManifest",
-            ":app:processPrdDebugMainManifest",
-            ":app:processPrdReleaseMainManifest"
-        )
-    }
 }
 
 buildscript {

@@ -3,16 +3,16 @@
 `permissions/api` exposes `PermissionsProvider`, `Permission`, and `PermissionResult`.
 The contract accepts one or more permissions without exposing Activity or platform APIs.
 
-O app depende de `permissions/di` e carrega `PermissionsModule.init()` antes de abrir
-telas. Este módulo registra uma factory por `ComponentActivity` por meio da função de
-criação em `permissions/impl`. A implementação usa a Activity Result API e deve ser
-obtida pelo host Compose em `onCreate`, antes de `STARTED`. Activities nunca são
-retidas em singletons.
+The app depends on `permissions/di` and loads `PermissionsModule.init()` before opening
+screens. This module registers a factory per `ComponentActivity` through the creation
+function in `permissions/impl`. The implementation uses the Activity Result API and
+must be obtained by the Compose host in `onCreate`, before `STARTED`. Activities are
+never retained in singletons.
 
-`PermissionsProvider.isGranted()` verifica o estado atual da permissão sem abrir um
-prompt. O binding de contexto da aplicação serve para verificações em serviços; as
-solicitações ainda usam o provider ligado à Activity. Telas Compose devem coletar os
-flows de solicitação no ciclo de vida da tela.
+`PermissionsProvider.isGranted()` checks the current permission state without opening
+a prompt. The application context binding supports checks in services; requests still
+use the Activity-bound provider. Compose screens must collect request flows within
+the screen lifecycle.
 
 Collecting `requestPermissions(vararg permissions)` starts a request, preserves
 argument order, and processes one permission at a time. New requests enter a

@@ -18,6 +18,11 @@ other DI layers can use them without circular dependencies. Implementations rece
 dispatchers through constructors instead of accessing `Dispatchers` directly;
 concrete values are selected in `core/di`.
 
+The architecture gate also rejects direct dispatcher member imports and dispatcher
+factories outside `core/di`, plus `GlobalScope` and `MainScope`. Explicit
+`CoroutineScope` construction uses an injected dispatcher and an owned job;
+structured builders and lifecycle scopes retain their lifecycle ownership.
+
 The `UiViewModel` contract exposes `uiState` as a `StateFlow` and `uiEffect` as a
 `Flow` for screen lifecycle adapters. `BaseViewModel` implements this contract,
 requires subclasses to override `sendEvent`, and provides buffered one-off effect
