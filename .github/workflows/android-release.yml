@@ -80,6 +80,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: android-signing-${{ matrix.flavor }}
+    env:
+      APK_NAME: ComposeSample-${{ matrix.flavor }}-release-${{ needs.version.outputs.tag }}.apk
     permissions:
       contents: read
       id-token: write
@@ -127,21 +129,21 @@ jobs:
           "$sdk_tools/zipalign" -P 16 -f 4 candidate/unsigned.apk "$temporary/aligned.apk"
           "$sdk_tools/apksigner" sign --ks "$temporary/release.keystore" --ks-key-alias "$RELEASE_KEY_ALIAS" \
               --ks-pass env:RELEASE_STORE_PASSWORD --key-pass env:RELEASE_KEY_PASSWORD \
-              --out signed/ComposeSample.apk "$temporary/aligned.apk"
+              --out "signed/$APK_NAME" "$temporary/aligned.apk"
           unset RELEASE_STORE_PASSWORD RELEASE_KEY_PASSWORD
-          rm -f signed/ComposeSample.apk.idsig
-          "$sdk_tools/zipalign" -c -P 16 4 signed/ComposeSample.apk
-          "$sdk_tools/apksigner" verify --verbose --print-certs signed/ComposeSample.apk > "$temporary/certificate"
+          rm -f "signed/$APK_NAME.idsig"
+          "$sdk_tools/zipalign" -c -P 16 4 "signed/$APK_NAME"
+          "$sdk_tools/apksigner" verify --verbose --print-certs "signed/$APK_NAME" > "$temporary/certificate"
           actual="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' "$temporary/certificate")"
           expected="$(printf '%s' "$RELEASE_CERT_SHA256" | tr -d ':' | tr '[:upper:]' '[:lower:]')"
           [[ "$expected" =~ ^[0-9a-f]{64}$ && "$actual" == "$expected" ]]
           [[ "$(grep -c '^Signer #[0-9]* certificate SHA-256 digest:' "$temporary/certificate")" == 1 ]]
           printf '%s\n' "$actual" > signed/signing-certificate-sha256.txt
           cp candidate/release.json candidate/RELEASE_NOTES.md candidate/sbom.cdx.json signed/
-          (cd signed && sha256sum ComposeSample.apk release.json RELEASE_NOTES.md sbom.cdx.json signing-certificate-sha256.txt > SHA256SUMS)
+          (cd signed && sha256sum "$APK_NAME" release.json RELEASE_NOTES.md sbom.cdx.json signing-certificate-sha256.txt > SHA256SUMS)
       - uses: actions/attest@v4
         with:
-          subject-path: signed/ComposeSample.apk
+          subject-path: signed/${{ env.APK_NAME }}
       - uses: actions/upload-artifact@v4
         with:
           name: signed-${{ matrix.flavor }}
@@ -154,6 +156,8 @@ jobs:
     needs: [version, sign]
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      APK_NAME: ComposeSample-${{ matrix.flavor }}-release-${{ needs.version.outputs.tag }}.apk
     permissions:
       contents: read
     strategy:
@@ -170,7 +174,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PREVIOUS_TAG: ${{ needs.version.outputs.previous-tag }}
-        run: gh release download "$PREVIOUS_TAG" --repo "$GITHUB_REPOSITORY" --pattern ComposeSample.apk --dir previous
+        run: |
+          gh release download "$PREVIOUS_TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern "ComposeSample-prd-release-$PREVIOUS_TAG.apk" --output previous.apk
       - name: Enable emulator hardware acceleration
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' |
@@ -185,8 +191,8 @@ jobs:
           arch: x86_64
           target: google_apis
           script: |
-            if [[ -f previous/ComposeSample.apk ]]; then adb install previous/ComposeSample.apk; fi
-            adb install -r signed/ComposeSample.apk
+            if [[ -f previous.apk ]]; then adb install previous.apk; fi
+            adb install -r "signed/$APK_NAME"
             set -o pipefail; adb shell am start -W -n "$APK_PACKAGE/br.com.composesample.activity.LauncherActivity" | grep 'Status: ok'
             sleep 5
             adb shell pidof "$APK_PACKAGE"
@@ -198,6 +204,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: android-publication
+    env:
+      APK_NAME: ComposeSample-prd-release-${{ needs.version.outputs.tag }}.apk
     permissions:
       contents: write
       attestations: read
@@ -212,7 +220,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           (cd signed && sha256sum --check SHA256SUMS)
-          gh attestation verify signed/ComposeSample.apk --repo "$GITHUB_REPOSITORY" \
+          gh attestation verify "signed/$APK_NAME" --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/android-release.yml"
       - name: Publish immutable release
         uses: actions/github-script@v8
@@ -229,7 +237,7 @@ jobs:
             const fs = require('node:fs');
             const { createHash } = require('node:crypto');
             const { TAG: tag, REVISION: revision, PREVIOUS_TAG: previousTag, PARENT: parent,
-              VERSION: version, VERSION_CODE: versionCode } = process.env;
+              VERSION: version, VERSION_CODE: versionCode, APK_NAME: apkName } = process.env;
             if (process.env.RELEASE_PUBLICATION_ENABLED !== 'true') {
               throw new Error('Enable immutable releases and configure the publication environment.');
             }
@@ -254,7 +262,7 @@ jobs:
                 throw new Error(`Publish ${previousTag} before retrying ${tag}.`);
               }
             }
-            const names = ['ComposeSample.apk', 'RELEASE_NOTES.md', 'release.json', 'sbom.cdx.json',
+            const names = [apkName, 'RELEASE_NOTES.md', 'release.json', 'sbom.cdx.json',
               'signing-certificate-sha256.txt', 'SHA256SUMS'];
             if (fs.readdirSync('signed').sort().join('\n') !== names.slice().sort().join('\n')) {
               throw new Error('Signed release asset inventory differs from policy.');

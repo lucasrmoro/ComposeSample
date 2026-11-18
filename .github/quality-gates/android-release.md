@@ -91,12 +91,15 @@ change. Never publish a failed APK to unblock the queue.
 
 Download the production assets and verify the checksums and public signer.
 Compare the certificate against the independently recorded fingerprint.
+The APK name includes the flavor, build type, and release tag. For example,
+the production APK for `v1.1.0` is `ComposeSample-prd-release-v1.1.0.apk`.
 
 ```sh
+apk=ComposeSample-prd-release-v1.1.0.apk
 sha256sum -c SHA256SUMS
-apksigner verify --verbose --print-certs ComposeSample.apk
-gh attestation verify ComposeSample.apk --repo lucasrmoro/ComposeSample
-adb install -r ComposeSample.apk
+apksigner verify --verbose --print-certs "$apk"
+gh attestation verify "$apk" --repo lucasrmoro/ComposeSample
+adb install -r "$apk"
 ```
 
 Both variants use R8 shrinking, optimization and obfuscation. The APK checks
