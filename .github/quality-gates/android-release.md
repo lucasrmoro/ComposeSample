@@ -1,33 +1,43 @@
 # Android release policy
 
-Every reviewed update to `main` carries a version decision, including documentation
-and configuration changes. Update the two fields in `release.properties` and replace
-`RELEASE_NOTES.md` with notes headed `# Version X.Y.Z`. The same version becomes
-Android's version name, the `vX.Y.Z` tag, and the GitHub Release title. Android's
-`versionCode` must increase and cannot exceed 2,100,000,000.
+The pipeline derives the version from the verified PR title and the immutable
+squash commit subject on `main`. Use the validated PR title as the squash subject.
+A GitHub-added pull request number is permitted. Keep the source branch type and
+the title prefix aligned. A release preview displays the calculated version on
+each PR. Release notes use the reviewed subject from the merged commit.
 
-| Change | Example from 1.4.2 (code 42) |
+| PR title | Version from 1.4.2 (code 42) |
 | --- | --- |
-| Compatible fix, documentation or configuration | 1.4.3 (43) |
-| New backwards-compatible feature | 1.5.0 (43) |
-| Breaking change | 2.0.0 (43), with impact and migration in the notes |
-| Production hotfix | Branch `hotfix/fix-startup` from the latest supported main release; target current main with a matching PR title and use the next unused version/code. |
+| `bugfix: fix startup` | 1.4.3 (43) |
+| `feature: add offline browsing` | 1.5.0 (43) |
+| `feature: [breaking] change login contract` | 2.0.0 (43) |
+| `hotfix: fix startup` | 1.4.3 (43) |
+| `docs:`, `ci:`, `refactor:`, `build:`, or `chore:` | 1.4.3 (43) |
+
+Use `[breaking]` immediately after the title prefix for incompatible changes.
+Describe impact and migration in the PR. Use a patch when a reviewed change does
+not add a compatible feature or break compatibility.
+
+The workflow replays main’s first-parent commits from the legacy baseline
+(version 1.0.0, Android code 1). Every accepted revision increments the code by
+one, including docs and CI changes. Retrying the same SHA yields the same version.
+The pipeline passes the calculated version to Gradle and uses it for the tag and
+release title. The default for local builds remains the legacy version and code.
 
 Use `main` directly for reviewed work. If an integration branch called `develop`
 is explicitly reinstated, apply that branch's review gates, promote through a
 reviewed PR to `main` with a fresh release version, and back-merge production
 hotfixes into `develop` through a reviewed PR. Use the existing source-branch
-and title conventions. An overlapping PR must update from `main` and pick a
-version and code above its latest accepted revision. Version bumps happen in
-reviewed PRs. Do not create independent post-merge version commits.
+and title conventions. An overlapping PR updates from `main` so the preview
+uses the latest accepted revision. The automation never commits a version bump.
 
 Support the most recent production release. For rollback, revert the relevant
-source via a reviewed PR and choose a new version and higher code. Keep the
+source via a reviewed PR. The pipeline gives the rollback a higher code. Keep the
 original signing key and preserve the old immutable release.
 
 ## Repository setup before the first merge
 
-- Enable immutable releases in the repository settings. Protect `main` from
+- Configure squash merges to default to the pull request title. Enable immutable releases in the repository settings. Protect `main` from
   unreviewed updates and require up-to-date status checks, including
   **Validate release version**, before merging. Configure the required check
   after it first appears on this PR.

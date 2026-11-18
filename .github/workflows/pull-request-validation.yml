@@ -56,6 +56,9 @@ jobs:
           persist-credentials: false
       - name: Check release version
         uses: ./.github/actions/release-version
+        with:
+          revision: HEAD
+          preview-title: ${{ github.event.pull_request.title }}
 
   build:
     name: Build

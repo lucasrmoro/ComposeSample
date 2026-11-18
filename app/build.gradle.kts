@@ -2,8 +2,6 @@ import br.com.composesample.ProjectConfig
 import br.com.composesample.ext.stringBuildConfigField
 import br.com.composesample.modules.Modules
 import groovy.json.JsonOutput
-import java.io.StringReader
-import java.util.Properties
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 
 plugins {
@@ -11,17 +9,16 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-val releaseVersion = Properties().apply {
-    load(StringReader(providers.fileContents(rootProject.layout.projectDirectory.file("release.properties")).asText.get()))
-}
+val releaseVersion = providers.gradleProperty("appReleaseVersion").orElse("1.0.0")
+val releaseCode = providers.gradleProperty("appReleaseCode").map(String::toInt).orElse(1)
 val tmdbReadAccessToken = gradle.extra["tmdbReadAccessToken"] as String
 
 android {
     defaultConfig {
         applicationId = ProjectConfig.APP_ID
         targetSdk = ProjectConfig.TARGET_SDK
-        versionCode = releaseVersion.getProperty("versionCode").toInt()
-        versionName = releaseVersion.getProperty("versionName")
+        versionCode = releaseCode.get()
+        versionName = releaseVersion.get()
         stringBuildConfigField(name = "TMDB_READ_ACCESS_TOKEN", value = "")
     }
     buildTypes.named("debug") {

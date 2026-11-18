@@ -38,21 +38,11 @@ jobs:
           ref: main
           fetch-depth: 0
           persist-credentials: false
-      - name: Validate first-parent history and version
+      - name: Resolve version
         id: version
-        shell: bash
-        env:
-          REVISION: ${{ inputs.revision || github.sha }}
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          [[ "$REVISION" =~ ^[0-9a-f]{40}$ ]]
-          git rev-list --first-parent HEAD > "$RUNNER_TEMP/main-revisions"
-          grep -Fxq "$REVISION" "$RUNNER_TEMP/main-revisions"
-          gh api "repos/$GITHUB_REPOSITORY/commits/$REVISION/pulls" |
-            jq -e --arg revision "$REVISION" 'any(.[]; .base.ref == "main" and .merged_at != null and .merge_commit_sha == $revision)' > /dev/null
-          script="$RUNNER_TEMP/validate-release.py"
-          git show "$REVISION:.github/actions/release-version/validate.py" > "$script"
-          python3 "$script" "$REVISION" --release --output "$GITHUB_OUTPUT"
+        uses: ./.github/actions/release-version
+        with:
+          revision: ${{ inputs.revision || github.sha }}
 
   build:
     name: Build and validate ${{ matrix.flavor }} release
@@ -98,11 +88,6 @@ jobs:
       matrix:
         flavor: [prd, dev]
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ needs.version.outputs.commit }}
-          sparse-checkout: .github/actions/release-package
-          persist-credentials: false
       - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
@@ -121,7 +106,38 @@ jobs:
           RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
           RELEASE_CERT_SHA256: ${{ vars.RELEASE_CERT_SHA256 }}
-        run: bash .github/actions/release-package/sign.sh
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+
+          : "${RELEASE_KEYSTORE_BASE64:?Configure the production keystore in the signing environment}"
+          : "${RELEASE_KEY_ALIAS:?Configure the signing alias}"
+          : "${RELEASE_STORE_PASSWORD:?Configure the keystore password}"
+          : "${RELEASE_KEY_PASSWORD:?Configure the key password}"
+          : "${RELEASE_CERT_SHA256:?Configure the expected SHA-256 signing certificate fingerprint}"
+
+          temporary="$(mktemp -d)"
+          trap 'rm -rf -- "$temporary"' EXIT
+          sdk_tools="$ANDROID_HOME/build-tools/36.0.0"
+          printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 -d > "$temporary/release.keystore"
+          unset RELEASE_KEYSTORE_BASE64
+          mkdir -p signed
+          "$sdk_tools/zipalign" -P 16 -f 4 candidate/unsigned.apk "$temporary/aligned.apk"
+          "$sdk_tools/apksigner" sign --ks "$temporary/release.keystore" --ks-key-alias "$RELEASE_KEY_ALIAS" \
+              --ks-pass env:RELEASE_STORE_PASSWORD --key-pass env:RELEASE_KEY_PASSWORD \
+              --out signed/ComposeSample.apk "$temporary/aligned.apk"
+          unset RELEASE_STORE_PASSWORD RELEASE_KEY_PASSWORD
+          rm -f signed/ComposeSample.apk.idsig
+          "$sdk_tools/zipalign" -c -P 16 4 signed/ComposeSample.apk
+          "$sdk_tools/apksigner" verify --verbose --print-certs signed/ComposeSample.apk > "$temporary/certificate"
+          actual="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' "$temporary/certificate")"
+          expected="$(printf '%s' "$RELEASE_CERT_SHA256" | tr -d ':' | tr '[:upper:]' '[:lower:]')"
+          [[ "$expected" =~ ^[0-9a-f]{64}$ && "$actual" == "$expected" ]]
+          [[ "$(grep -c '^Signer #[0-9]* certificate SHA-256 digest:' "$temporary/certificate")" == 1 ]]
+          printf '%s\n' "$actual" > signed/signing-certificate-sha256.txt
+          cp candidate/release.json candidate/RELEASE_NOTES.md candidate/sbom.cdx.json signed/
+          (cd signed && sha256sum ComposeSample.apk release.json RELEASE_NOTES.md sbom.cdx.json signing-certificate-sha256.txt > SHA256SUMS)
       - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
         with:
           subject-path: signed/ComposeSample.apk
@@ -144,11 +160,6 @@ jobs:
       matrix:
         flavor: [prd, dev]
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ needs.version.outputs.commit }}
-          sparse-checkout: .github/actions/release-package
-          persist-credentials: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: signed-${{ matrix.flavor }}
@@ -158,7 +169,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PREVIOUS_TAG: ${{ needs.version.outputs.previous-tag }}
-        run: gh release download "$PREVIOUS_TAG" --pattern ComposeSample.apk --dir previous
+        run: gh release download "$PREVIOUS_TAG" --repo "$GITHUB_REPOSITORY" --pattern ComposeSample.apk --dir previous
       - name: Enable emulator hardware acceleration
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' |
@@ -167,12 +178,18 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         env:
-          FLAVOR: ${{ matrix.flavor }}
+          APK_PACKAGE: ${{ matrix.flavor == 'dev' && 'br.com.composesample.dev' || 'br.com.composesample' }}
         with:
           api-level: 36
           arch: x86_64
           target: google_apis
-          script: bash .github/actions/release-package/smoke.sh
+          script: |
+            if [[ -f previous/ComposeSample.apk ]]; then adb install previous/ComposeSample.apk; fi
+            adb install -r signed/ComposeSample.apk
+            set -o pipefail; adb shell am start -W -n "$APK_PACKAGE/br.com.composesample.activity.LauncherActivity" | grep 'Status: ok'
+            sleep 5
+            adb shell pidof "$APK_PACKAGE"
+            crash_log="$(adb logcat -b crash -d)" && ! grep -F "Process: $APK_PACKAGE," <<< "$crash_log"
 
   publish:
     name: Publish production APK
@@ -184,18 +201,21 @@ jobs:
       contents: write
       attestations: read
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ needs.version.outputs.commit }}
-          sparse-checkout: .github/actions/release-package
-          persist-credentials: false
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: signed-prd
           path: signed
-      - name: Publish immutable release
+      - name: Verify signed artifact provenance
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+        run: |
+          (cd signed && sha256sum --check SHA256SUMS)
+          gh attestation verify signed/ComposeSample.apk --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/android-release.yml"
+      - name: Publish immutable release
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        env:
           RELEASE_PUBLICATION_ENABLED: ${{ vars.RELEASE_PUBLICATION_ENABLED }}
           TAG: ${{ needs.version.outputs.tag }}
           REVISION: ${{ needs.version.outputs.commit }}
@@ -203,4 +223,89 @@ jobs:
           PREVIOUS_TAG: ${{ needs.version.outputs.previous-tag }}
           VERSION: ${{ needs.version.outputs.version }}
           VERSION_CODE: ${{ needs.version.outputs.code }}
-        run: python3 .github/actions/release-package/publish.py
+        with:
+          script: |
+            const fs = require('node:fs');
+            const { createHash } = require('node:crypto');
+            const { TAG: tag, REVISION: revision, PREVIOUS_TAG: previousTag, PARENT: parent,
+              VERSION: version, VERSION_CODE: versionCode } = process.env;
+            if (process.env.RELEASE_PUBLICATION_ENABLED !== 'true') {
+              throw new Error('Enable immutable releases and configure the publication environment.');
+            }
+            const repo = github.rest.repos;
+            const releases = async () => github.paginate(repo.listReleases, context.repo);
+            const lookup = async name => (await releases()).find(item => item.tag_name === name);
+            const tagCommit = async name => {
+              try {
+                let { data: { object } } = await github.rest.git.getRef({ ...context.repo, ref: `tags/${name}` });
+                while (object.type === 'tag') {
+                  ({ data: { object } } = await github.rest.git.getTag({ ...context.repo, tag_sha: object.sha }));
+                }
+                return object.type === 'commit' ? object.sha : undefined;
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                return undefined;
+              }
+            };
+            if (previousTag) {
+              const previous = await lookup(previousTag);
+              if (!previous?.immutable || previous.draft || (await tagCommit(previousTag)) !== parent) {
+                throw new Error(`Publish ${previousTag} before retrying ${tag}.`);
+              }
+            }
+            const names = ['ComposeSample.apk', 'RELEASE_NOTES.md', 'release.json', 'sbom.cdx.json',
+              'signing-certificate-sha256.txt', 'SHA256SUMS'];
+            if (fs.readdirSync('signed').sort().join('\n') !== names.slice().sort().join('\n')) {
+              throw new Error('Signed release asset inventory differs from policy.');
+            }
+            const metadata = JSON.parse(fs.readFileSync('signed/release.json', 'utf8'));
+            if (metadata.sourceCommit !== revision || metadata.versionName !== version ||
+                metadata.versionCode !== Number(versionCode) || metadata.flavor !== 'prd') {
+              throw new Error('Signed APK metadata differs from the approved revision.');
+            }
+            const existingTag = await tagCommit(tag);
+            if (existingTag && existingTag !== revision) throw new Error(`${tag} points to another revision.`);
+            let release = await lookup(tag);
+            if (!release) {
+              ({ data: release } = await repo.createRelease({
+                ...context.repo, tag_name: tag, target_commitish: revision, name: tag,
+                body: fs.readFileSync('signed/RELEASE_NOTES.md', 'utf8'), draft: true
+              }));
+            }
+            if (release.name !== tag || release.target_commitish !== revision) {
+              throw new Error('Release name or target differs from the approved revision.');
+            }
+            const verifyAssets = assets => {
+              const existing = new Set();
+              for (const asset of assets) {
+                if (!names.includes(asset.name)) throw new Error(`Unexpected release asset ${asset.name}.`);
+                const data = fs.readFileSync(`signed/${asset.name}`);
+                const digest = `sha256:${createHash('sha256').update(data).digest('hex')}`;
+                if (asset.digest !== digest) {
+                  throw new Error(`${asset.name} differs from the original release asset. Retry with the original artifact.`);
+                }
+                existing.add(asset.name);
+              }
+              return existing;
+            };
+            const existing = verifyAssets(release.assets);
+            if (release.draft) {
+              for (const name of names.filter(name => !existing.has(name))) {
+                const data = fs.readFileSync(`signed/${name}`);
+                await repo.uploadReleaseAsset({
+                  ...context.repo, release_id: release.id, name, data,
+                  headers: { 'content-type': 'application/octet-stream', 'content-length': data.length }
+                });
+              }
+              const assets = await github.paginate(repo.listReleaseAssets, {
+                ...context.repo, release_id: release.id
+              });
+              if (verifyAssets(assets).size !== names.length) throw new Error('Incomplete draft release.');
+              await repo.updateRelease({ ...context.repo, release_id: release.id, draft: false });
+            } else if (existing.size !== names.length) {
+              throw new Error('Published release has missing assets.');
+            }
+            const final = await lookup(tag);
+            if (!final?.immutable || final.draft || (await tagCommit(tag)) !== revision) {
+              throw new Error('The release must be immutable and its tag must identify the approved revision.');
+            }

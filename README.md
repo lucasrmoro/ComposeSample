@@ -279,7 +279,8 @@ segment), and `task/stream-page/76-add-stream-page` (issue-number prefix) are
 invalid names. See the [branch validation guide](.github/quality-gates/validate-branch-name.md)
 for more valid and invalid examples.
 
-Every pull request to `main` updates `release.properties` and `RELEASE_NOTES.md`.
+The Android release pipeline derives the version from the reviewed PR title.
+Use that title as the squash commit subject when merging to `main`.
 See the [Android release policy](.github/quality-gates/android-release.md) for version
 rules, signing setup, artifact verification, and recovery.
 

@@ -1,13 +1,91 @@
-name: Validate release version
-description: Validate the version and release notes of the checked-out merge revision
+name: Resolve Android release version
+description: Calculate the next semantic version and Android version code from main history
+inputs:
+  revision:
+    description: Exact commit SHA or HEAD for the current PR merge ref
+    required: true
+  preview-title:
+    description: PR title for an unsigned preview
+    required: false
+outputs:
+  commit:
+    description: Exact revision
+    value: ${{ steps.version.outputs.commit }}
+  parent:
+    description: Previous main revision
+    value: ${{ steps.version.outputs.parent }}
+  version:
+    description: Calculated semantic version
+    value: ${{ steps.version.outputs.version }}
+  code:
+    description: Android version code
+    value: ${{ steps.version.outputs.code }}
+  tag:
+    description: Calculated release tag
+    value: ${{ steps.version.outputs.tag }}
+  previous_tag:
+    description: Expected immutable release for the preceding revision
+    value: ${{ steps.version.outputs.previous_tag }}
 runs:
   using: composite
   steps:
-    - shell: bash
-      run: |
-        base="$(git ls-remote origin refs/heads/main | cut -f1)"
-        if [[ "$(git rev-parse HEAD^1)" != "$base" ]]; then
-          echo "This merge revision is stale. Update the PR from main and rerun validation."
-          exit 1
-        fi
-        python3 "$GITHUB_ACTION_PATH/validate.py" HEAD
+    - id: version
+      uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+      env:
+        REVISION: ${{ inputs.revision }}
+        PREVIEW_TITLE: ${{ inputs.preview-title }}
+      with:
+        script: |
+          const { execFileSync } = require('node:child_process');
+          const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
+          const baseline = 'fac9fc388387651aac858957d85107fb5bb43e51';
+          const commitTitle = sha => git('show', '-s', '--format=%s', sha);
+          const titlePattern = /^(feature|bugfix|hotfix|docs|ci|refactor|build|chore): (\S[^\r\n]*)$/;
+          const bump = ([major, minor, patch], title) => {
+            const match = titlePattern.exec(title);
+            if (!match) throw new Error('Use the validated PR title as the squash subject.');
+            if (match[2].startsWith('[breaking] ')) return [major + 1, 0, 0];
+            return match[1] === 'feature' ? [major, minor + 1, 0] : [major, minor, patch + 1];
+          };
+
+          const { REVISION: revision, PREVIEW_TITLE: previewTitle } = process.env;
+          if (previewTitle ? revision !== 'HEAD' : !/^[0-9a-f]{40}$/.test(revision)) {
+            throw new Error('Expected an exact approved commit SHA or the PR merge ref.');
+          }
+          const commit = git('rev-parse', `${revision}^{commit}`);
+          const parent = git('rev-parse', `${commit}^1`);
+          if (previewTitle) {
+            const main = git('ls-remote', 'origin', 'refs/heads/main').split(/\s+/)[0];
+            if (parent !== main) throw new Error('Update the PR from main and rerun validation.');
+          } else {
+            if (!git('rev-list', '--first-parent', 'HEAD').split('\n').includes(commit)) {
+              throw new Error('The release revision must be on main’s first-parent history.');
+            }
+            const { data: pulls } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              ...context.repo, commit_sha: commit
+            });
+            const merged = pulls.find(pr => pr.merged_at && pr.base.ref === 'main' && pr.merge_commit_sha === commit);
+            if (!merged || titlePattern.exec(commitTitle(commit))?.[1] !== merged.head.ref.split('/')[0]) {
+              throw new Error('The revision must come from a merged PR with the matching squash subject.');
+            }
+          }
+
+          const history = git('rev-list', '--first-parent', parent).split('\n');
+          const index = history.indexOf(baseline);
+          if (index < 0) throw new Error('The legacy release baseline must be in main history.');
+          const previous = history.slice(0, index).reverse().reduce(
+            (value, sha) => bump(value, commitTitle(sha)), [1, 0, 0]
+          );
+          const previousTag = index ? `v${previous.join('.')}` : '';
+          const version = bump(previous, previewTitle || commitTitle(commit)).join('.');
+          const code = index + 2;
+          if (code > 2100000000) throw new Error('Android versionCode limit exceeded.');
+          const tag = `v${version}`;
+          if (git('tag', '--list', tag) &&
+              (previewTitle || git('rev-parse', `${tag}^{commit}`) !== commit)) {
+            throw new Error(`${tag} already belongs to a different release.`);
+          }
+          for (const [key, value] of Object.entries({ commit, parent, version, code, tag, previous_tag: previousTag })) {
+            core.setOutput(key, value);
+          }
+          await core.summary.addRaw(`Android release version **${tag}** (versionCode ${code})\n`).write();

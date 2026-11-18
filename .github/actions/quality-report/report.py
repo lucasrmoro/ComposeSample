@@ -22,7 +22,7 @@ GATES = (
         "release-version",
         "Validate release version",
         "android-release.md",
-        "Update from main, then increase both versions in `release.properties` and update `RELEASE_NOTES.md`.",
+        "Update from main and ensure the PR title describes the intended release increment.",
     ),
     (
         "build",
