@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 
+// Gradle produces this inventory from the resolved runtime graph for the selected APK flavor.
 const inventoryPath = `app/build/reports/release/${process.env.FLAVOR}-dependencies.json`;
 const dependencies = JSON.parse(fs.readFileSync(inventoryPath, 'utf8'));
 if (!dependencies.length) throw new Error('Empty release dependency inventory.');
@@ -31,6 +32,7 @@ for (let start = 0; start < queries.length; start += 100) {
     });
 }
 
+// Fail the release gate when OSV reports a known advisory so it is reviewed before signing.
 if (findings.length) throw new Error(`Review release dependency advisories:\n${findings.join('\n')}`);
 
 // CycloneDX preserves the resolved coordinates in a format supported by dependency scanners.

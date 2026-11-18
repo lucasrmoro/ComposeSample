@@ -7,7 +7,8 @@ case "$FLAVOR" in
     *) echo "Unsupported release flavor: $FLAVOR"; exit 2 ;;
 esac
 
-# R8 exhausted the default heap while shrinking devRelease.
+# Release builds shrink and obfuscate code with R8, which needs more heap than the default runner setting.
+# The explicit Gradle properties make the version shown by Android match the reviewed release calculation.
 ./gradlew ":app:assemble$variant" ":app:lint$variant" ":app:test${variant}UnitTest" \
     :app:writeReleaseInventory "-PreleaseFlavor=$FLAVOR" \
     '-Dorg.gradle.jvmargs=-Xmx4g -Dfile.encoding=UTF-8' \
