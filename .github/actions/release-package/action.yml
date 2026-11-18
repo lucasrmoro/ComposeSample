@@ -86,7 +86,7 @@ runs:
             --arg flavor "$FLAVOR" '{sourceCommit:$sha,versionName:$version,versionCode:$code,flavor:$flavor}' > candidate/release.json
 
     - name: Audit dependencies and write CycloneDX inventory
-      uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+      uses: actions/github-script@v8
       env:
         FLAVOR: ${{ inputs.flavor }}
       with:
