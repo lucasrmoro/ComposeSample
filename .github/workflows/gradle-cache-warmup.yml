@@ -1,0 +1,53 @@
+name: Gradle cache warmup
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gradle-cache-warmup-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Warm build cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/build
+
+  lint:
+    name: Warm lint cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/android-lint
+
+  unit-tests:
+    name: Warm unit test cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/unit-tests
+
+  architecture-validation:
+    name: Warm architecture cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/architecture-validation

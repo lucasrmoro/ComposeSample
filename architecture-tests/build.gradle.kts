@@ -14,6 +14,8 @@ dependencies {
 tasks.test {
     systemProperty("architectureBasePackage", "br.com.composesample")
     systemProperty("architectureProjectRoot", rootProject.rootDir.absolutePath)
+    outputs.upToDateWhen { false }
+    outputs.doNotCacheIf("Architecture rules inspect repository files outside the test classpath") { true }
 }
 
 val fixtureSupport = (extensions.getByName("sourceSets") as SourceSetContainer).create("fixtureSupport")

@@ -55,6 +55,7 @@ val architectureExternalDependenciesByModule = mapOf(
 val validateArchitectureExternalDependencies = tasks.register("validateArchitectureExternalDependencies") {
     group = "verification"
     description = "Checks external dependencies against architecture allowlists for restricted modules."
+    mustRunAfter(":architecture-tests:architectureFixturesTest")
 
     doLast {
         val restrictedModules = allprojects.filter { project ->

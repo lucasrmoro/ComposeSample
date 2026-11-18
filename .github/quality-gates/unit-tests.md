@@ -4,9 +4,9 @@ The unit-test gate runs `./gradlew :app:testDevDebugUnitTest` on pull requests. 
 executes local JVM tests in the app module's `devDebug` test variant; it does not run
 instrumented tests.
 
-The app test source set includes the Konture architecture tests. These checks therefore
-also run as part of the unit-test gate and through the separate architecture-validation
-gate.
+Konture architecture tests live in `:architecture-tests` and run through the separate
+architecture-validation gate. The app unit-test task may report `NO-SOURCE` when the
+app has no local JVM tests; compilation of its dependencies still runs as required.
 
 To reproduce the gate locally, use JDK 17 and Android SDK 36 and run:
 

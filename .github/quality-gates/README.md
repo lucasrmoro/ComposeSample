@@ -8,6 +8,17 @@ Lint, unit tests, and architecture validation share the `android-setup` action f
 JDK, Android SDK, and Gradle setup. The workflow defines triggers, permissions,
 concurrency, and jobs.
 
+Gradle build cache and parallel module execution are enabled in `gradle.properties`.
+The shared setup action is the only Gradle User Home cache manager. Same-repository
+pull requests can save cache entries in their own merge-ref scope; fork pull requests
+only read existing entries. Cache keys distinguish jobs, so parallel runners save
+separate entries. Gradle validates task inputs before reusing cached outputs.
+
+The `Gradle cache warmup` workflow runs the four gates separately after pushes to
+`main`, creating shared cache entries for new pull requests. This adds post-merge
+runner work without adding a prerequisite or changing the required pull request
+checks. No duplicate Gradle cache action is configured.
+
 | Gate | Documentation |
 | --- | --- |
 | Validate branch name | [validate-branch-name.md](validate-branch-name.md) |

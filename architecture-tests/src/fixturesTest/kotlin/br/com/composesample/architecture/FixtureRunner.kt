@@ -1,14 +1,14 @@
 package br.com.composesample.architecture
 
-import org.gradle.testkit.runner.BuildResult
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome
-import org.gradle.testkit.runner.UnexpectedBuildFailure
 import java.io.File
 import java.nio.file.Files
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorCompletionService
 import java.util.concurrent.Executors
+import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome
+import org.gradle.testkit.runner.UnexpectedBuildFailure
 
 internal class FixtureRunner(
     private val fixturesRoot: File,
@@ -70,6 +70,7 @@ internal class FixtureRunner(
                 "-ParchitectureRuleClasses=$rule",
                 "--console=plain",
                 "--max-workers=1",
+                "--no-build-cache",
                 "--stacktrace"
             )
         return try {
