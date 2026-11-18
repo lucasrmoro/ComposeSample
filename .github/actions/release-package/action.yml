@@ -16,39 +16,68 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: ./.github/actions/android-setup
-    - name: Build and inspect candidate
+    - name: Verify the approved main revision
       shell: bash
       env:
-        FLAVOR: ${{ inputs.flavor }}
-        VERSION: ${{ inputs.version }}
-        VERSION_CODE: ${{ inputs.code }}
         APPROVED_REVISION: ${{ inputs.revision }}
       run: |
         set -euo pipefail
+        # The version job approves the SHA. Verify that the checkout matches it before running Gradle.
         if [[ "$GITHUB_REF" != refs/heads/main || "$GITHUB_REF_PROTECTED" != true ||
               ( "$GITHUB_EVENT_NAME" != push && "$GITHUB_EVENT_NAME" != workflow_dispatch ) ||
               ! "$APPROVED_REVISION" =~ ^[0-9a-f]{40}$ || "$(git rev-parse HEAD)" != "$APPROVED_REVISION" ]]; then
             echo "Release APKs require the reviewed revision already merged into protected main."
             exit 1
         fi
+
+    - name: Set up Android build tools
+      uses: ./.github/actions/android-setup
+
+    - name: Assemble the unsigned APK and run Android checks
+      shell: bash
+      env:
+        FLAVOR: ${{ inputs.flavor }}
+        VERSION: ${{ inputs.version }}
+        VERSION_CODE: ${{ inputs.code }}
+      run: |
+        set -euo pipefail
         case "$FLAVOR" in
             dev) variant=DevRelease ;;
             prd) variant=PrdRelease ;;
-            *) exit 2 ;;
+            *) echo "Unsupported release flavor: $FLAVOR"; exit 2 ;;
         esac
 
+        # R8 exhausted the default heap while shrinking devRelease.
         ./gradlew ":app:assemble$variant" ":app:lint$variant" ":app:test${variant}UnitTest" \
             :app:writeReleaseInventory "-PreleaseFlavor=$FLAVOR" \
             '-Dorg.gradle.jvmargs=-Xmx4g -Dfile.encoding=UTF-8' \
             "-PappReleaseVersion=$VERSION" "-PappReleaseCode=$VERSION_CODE"
-        if [[ "$FLAVOR" == prd ]]; then
-            ./gradlew architectureCheck
-        fi
+
+    - name: Check project architecture
+      # Both flavors share the same module graph and source revision.
+      if: inputs.flavor == 'prd'
+      shell: bash
+      run: ./gradlew architectureCheck
+
+    - name: Confirm that R8 obfuscated the app
+      shell: bash
+      env:
+        FLAVOR: ${{ inputs.flavor }}
+      run: |
+        set -euo pipefail
         mapping="app/build/outputs/mapping/${FLAVOR}Release/mapping.txt"
         test -s "$mapping"
-        # R8's mapping must include at least one renamed application class.
+        # A mapping file can exist even if all application class names were kept.
         awk '/^br\.com\.composesample\.[^ ]+ -> / { target=$3; sub(/:$/, "", target); if ($1 != target) found=1 } END { exit !found }' "$mapping"
+
+    - name: Stage the APK and inspect its packaged manifest
+      shell: bash
+      env:
+        FLAVOR: ${{ inputs.flavor }}
+        VERSION: ${{ inputs.version }}
+        VERSION_CODE: ${{ inputs.code }}
+      run: |
+        set -euo pipefail
         mkdir -p candidate
         cp "app/build/outputs/apk/$FLAVOR/release/app-$FLAVOR-release-unsigned.apk" candidate/unsigned.apk
         package=br.com.composesample
@@ -66,12 +95,17 @@ runs:
         apkanalyzer manifest print "$apk" > "$manifest"
         xml() { xmlstarlet sel -N a=http://schemas.android.com/apk/res/android -t "$@" "$manifest"; }
         [[ "$(xml -v '/manifest/application/@a:usesCleartextTraffic')" == false ]]
+        # A network security config can override the manifest's cleartext setting.
         [[ "$(xml -v 'count(/manifest/application[@a:testOnly="true" or @a:networkSecurityConfig] | /manifest/instrumentation)')" == 0 ]]
         launcher='count(/manifest/application/*[self::activity or self::activity-alias][@a:exported="true"]/intent-filter[action/@a:name="android.intent.action.MAIN" and category/@a:name="android.intent.category.LAUNCHER"])'
         [[ "$(xml -v "$launcher")" == 1 ]]
         test_components='count(/manifest/application/*[starts-with(@a:name, "androidx.test.") or starts-with(@a:targetActivity, "androidx.test.")])'
         [[ "$(xml -v "$test_components")" == 0 ]]
 
+    - name: Scan the merged change and APK for secrets
+      shell: bash
+      run: |
+        set -euo pipefail
         scan="$(mktemp -d)"
         trap 'rm -rf -- "$scan"' EXIT
         curl --fail --silent --show-error --location \
@@ -79,8 +113,18 @@ runs:
             --output "$scan/gitleaks.tar.gz"
         echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $scan/gitleaks.tar.gz" | sha256sum --check --status
         tar -xzf "$scan/gitleaks.tar.gz" -C "$scan" gitleaks
+        # Scan the squash commit against its main parent and redact any findings.
         "$scan/gitleaks" git --redact=100 --log-opts="HEAD^1..HEAD"
         "$scan/gitleaks" dir --redact=100 --max-decode-depth=2 --max-archive-depth=1 candidate
+
+    - name: Write release notes and source metadata
+      shell: bash
+      env:
+        FLAVOR: ${{ inputs.flavor }}
+        VERSION: ${{ inputs.version }}
+        VERSION_CODE: ${{ inputs.code }}
+      run: |
+        set -euo pipefail
         printf '# Version %s\n\n- %s\n' "$VERSION" "$(git show -s --format=%s HEAD)" > candidate/RELEASE_NOTES.md
         jq -n --arg sha "$(git rev-parse HEAD)" --arg version "$VERSION" --argjson code "$VERSION_CODE" \
             --arg flavor "$FLAVOR" '{sourceCommit:$sha,versionName:$version,versionCode:$code,flavor:$flavor}' > candidate/release.json
@@ -98,6 +142,7 @@ runs:
             package: { ecosystem: 'Maven', name: `${group}:${name}` }, version
           }));
           const findings = [];
+          // Query the resolved runtime versions, including transitive dependencies, in bounded batches.
           for (let start = 0; start < queries.length; start += 100) {
             const batch = queries.slice(start, start + 100);
             const response = await fetch('https://api.osv.dev/v1/querybatch', {
