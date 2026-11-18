@@ -70,11 +70,6 @@ dependencies {
     implementation(project(Modules.Structural.VideoPlayer.DI))
     implementation(project(Modules.Feature.Login.DI))
     implementation(project(Modules.Feature.Stream.DI))
-    constraints {
-        implementation(libs.guava) {
-            because("Use the Android release that fixes GHSA-xxph-c9ww-hj94")
-        }
-    }
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.foundation)

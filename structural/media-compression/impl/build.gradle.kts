@@ -11,4 +11,9 @@ dependencies {
     implementation(libs.androidx.media3.transformer)
     implementation(libs.androidx.core.ktx)
     implementation(libs.coroutines)
+    constraints {
+        implementation(libs.guava) {
+            because("Use the Android release that fixes GHSA-xxph-c9ww-hj94 in Media3's runtime graph")
+        }
+    }
 }
