@@ -7,6 +7,6 @@ plugins {
 dependencies {
     api(project(Modules.Structural.Session.API))
     api(project(Modules.Structural.Network.API))
-    implementation(libs.bundles.android)
     api(project(Modules.Structural.DI.API))
+    implementation(libs.bundles.android)
 }

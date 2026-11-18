@@ -23,6 +23,7 @@ checks. No duplicate Gradle cache action is configured.
 | --- | --- |
 | Validate branch name | [validate-branch-name.md](validate-branch-name.md) |
 | Validate PR title | [validate-pull-request-title.md](validate-pull-request-title.md) |
+| Validate release version | [android-release.md](android-release.md) |
 | Build | [build.md](build.md) |
 | Android Lint | [android-lint.md](android-lint.md) |
 | Unit tests | [unit-tests.md](unit-tests.md) |

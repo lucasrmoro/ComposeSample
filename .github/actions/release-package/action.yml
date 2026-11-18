@@ -1,0 +1,23 @@
+name: Build checked release candidate
+description: Run release gates and stage an unsigned APK and public metadata
+inputs:
+  flavor:
+    description: Android product flavor
+    required: true
+  version:
+    description: Reviewed version name
+    required: true
+  code:
+    description: Reviewed Android version code
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: ./.github/actions/android-setup
+    - name: Build and inspect candidate
+      shell: bash
+      env:
+        FLAVOR: ${{ inputs.flavor }}
+        VERSION: ${{ inputs.version }}
+        VERSION_CODE: ${{ inputs.code }}
+      run: bash "$GITHUB_ACTION_PATH/build.sh"

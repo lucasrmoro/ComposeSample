@@ -1,0 +1,13 @@
+name: Validate release version
+description: Validate the version and release notes of the checked-out merge revision
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        base="$(git ls-remote origin refs/heads/main | cut -f1)"
+        if [[ "$(git rev-parse HEAD^1)" != "$base" ]]; then
+          echo "This merge revision is stale. Update the PR from main and rerun validation."
+          exit 1
+        fi
+        python3 "$GITHUB_ACTION_PATH/validate.py" HEAD

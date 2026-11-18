@@ -19,6 +19,12 @@ GATES = (
         "For `feature/add-login`, use `feature: add login`.",
     ),
     (
+        "release-version",
+        "Validate release version",
+        "android-release.md",
+        "Update from main, then increase both versions in `release.properties` and update `RELEASE_NOTES.md`.",
+    ),
+    (
         "build",
         "Build",
         "build.md",

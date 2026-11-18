@@ -1,0 +1,3 @@
+activity br.com.composesample.activity.LauncherActivity
+receiver androidx.profileinstaller.ProfileInstallReceiver
+receiver com.google.firebase.iid.FirebaseInstanceIdReceiver
