@@ -58,6 +58,13 @@ limited to one. To change the suite concurrency, use a value from 1 to 4:
 ./gradlew :architecture-tests:architectureFixturesTest -ParchitectureFixtureWorkers=1
 ```
 
+Fixture builds disable Gradle build-cache reuse so every valid/invalid case runs its
+assertions and produces fresh XML evidence. Real-project architecture tests also
+disable up-to-date and build-cache reuse because they read repository files outside
+their test classpath. Compilation and other compatible preparation tasks can still
+use the build cache. CI invokes `architectureCheck` once; both real-project JUnit
+tests and the external dependency allowlist gate run after the fixture suite.
+
 Fixture builds use Gradle's built-in Java library plugin and register
 `src/main/kotlin` as an analysis source directory. They do not load the Kotlin Gradle
 plugin or compile production fixture sources. Konture still analyzes the actual Kotlin

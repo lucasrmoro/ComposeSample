@@ -4,10 +4,10 @@ Locally, run `./gradlew architectureCheck`. Konture reads the Gradle project lay
 and Kotlin declarations/imports. The task first runs
 `:architecture-tests:architectureFixturesTest` to prove the rules catch representative
 violations, then `:architecture-tests:test` checks this repository. A root Gradle task
-also checks external dependency coordinates against exact allowlists. In pull request
-validation, fixtures and the project gate appear as separate sequential steps; the
-project step runs only after the fixture step succeeds. The gate is not attached to app
-builds. See the
+also checks external dependency coordinates against exact allowlists. Pull request
+validation uses one `architectureCheck` invocation. Task dependencies and ordering
+constraints ensure the fixtures succeed before the real-project tests and allowlist
+assertions execute. The gate is not attached to app builds. See the
 [fixture README](../../architecture-tests/src/fixturesTest/resources/fixtures/README.md)
 for the scenario matrix.
 

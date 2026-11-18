@@ -5,9 +5,6 @@ runs:
   steps:
     - name: Set up Android build
       uses: ./.github/actions/android-setup
-    - name: Validate architecture fixtures
+    - name: Validate fixtures before project architecture
       shell: bash
-      run: ./gradlew :architecture-tests:architectureFixturesTest
-    - name: Validate project architecture
-      shell: bash
-      run: ./gradlew architectureCheck -x :architecture-tests:architectureFixturesTest
+      run: ./gradlew architectureCheck
