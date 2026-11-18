@@ -57,7 +57,7 @@ runs:
         xml() { xmlstarlet sel -N a=http://schemas.android.com/apk/res/android -t "$@" "$manifest"; }
         [[ "$(xml -v '/manifest/application/@a:usesCleartextTraffic')" == false ]]
         [[ "$(xml -v 'count(/manifest/application[@a:testOnly="true" or @a:networkSecurityConfig] | /manifest/instrumentation)')" == 0 ]]
-        [[ "$(xml -v 'count(/manifest/application/activity)')" == 1 ]]
+        [[ "$(xml -v 'count(/manifest/application/activity[not(@a:name="br.com.composesample.activity.LauncherActivity" or (@a:name="com.google.android.gms.common.api.GoogleApiActivity" and @a:exported="false"))])')" == 0 ]]
         xml -m '/manifest/application/*[@a:exported="true" or (not(@a:exported) and intent-filter)]' \
             -v 'concat(local-name(), " ", @a:name)' -n | LC_ALL=C sort > "$RUNNER_TEMP/components"
         diff -u "$GITHUB_ACTION_PATH/exported-components.txt" "$RUNNER_TEMP/components"
