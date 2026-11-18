@@ -100,8 +100,9 @@ adb install -r ComposeSample.apk
 ```
 
 Both variants use R8 shrinking, optimization and obfuscation. The APK checks
-verify package/version, manifest restrictions, and intended exported
-components and permissions. Keep backend authorization and confidential
+verify package and version, require a single exported launcher, and reject
+debuggable APKs, cleartext traffic, and test components. Android Lint checks
+manifest security as part of each release build. Keep backend authorization and confidential
 credentials server-side. The release build deliberately omits the local
 TMDB token, so catalog features that rely on that token require a server-side
 integration before distributing a fully functional catalog. Exercise those
