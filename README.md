@@ -247,16 +247,20 @@ see the corresponding service READMEs for initialization and unavailable behavio
 
 ## Development workflow
 
-During initial setup, `main` is the only long-lived branch. Name work branches
+During initial setup, `main` is the only long-lived branch. Name non-task work branches
 `<type>/<short-description>`, using English lowercase kebab-case without issue
 numbers.
+
+Task branches use `task/<parent-name>/<task-name>`. Both names start with a letter
+and use English lowercase kebab-case without issue-number prefixes. The parent
+name must match the description of the target `feature/*` or `bugfix/*` branch.
 
 | Branch example | Purpose | Flow through PRs |
 | --- | --- | --- |
 | `feature/add-login` | New capability | `main` → `feature` → `main` |
 | `bugfix/session-expiration` | Normal development correction | `main` → `bugfix` → `main` |
 | `hotfix/login-crash` | Urgent correction to a published version | `main` → `hotfix` → `main` |
-| `task/create-login-screen` | Part of a feature or bugfix | Parent `feature` or `bugfix` → `task` → same parent |
+| `task/add-login/create-login-screen` | Part of a feature or bugfix | Parent `feature` or `bugfix` → `task` → same parent |
 | `docs/update-setup-guide` | Independent documentation | `main` → `docs` → `main` |
 | `ci/add-pull-request-validation` | Independent CI changes | `main` → `ci` → `main` |
 | `refactor/simplify-navigation` | Independent restructuring | `main` → `refactor` → `main` |
@@ -267,6 +271,13 @@ For larger features or bugfixes, merge task PRs into their parent first, validat
 its combined behavior, then open the parent PR into `main`. Tasks belonging to a
 feature or bugfix follow this flow even when they involve documentation, tests,
 or CI.
+
+For example, `task/stream-page/add-stream-page` can target `feature/stream-page`
+or `bugfix/stream-page`. Targeting `feature/login` or `main` is invalid.
+`task/add-stream-page` (missing segment), `task/stream-page/add/extra` (extra
+segment), and `task/stream-page/76-add-stream-page` (issue-number prefix) are
+invalid names. See the [branch validation guide](.github/quality-gates/validate-branch-name.md)
+for more valid and invalid examples.
 
 ### Issues and pull requests
 
@@ -287,8 +298,9 @@ and `docs:` are invalid. The check validates format and prefix, not English pros
 quality or commit messages.
 
 The **Validate branch name** check validates branch names and PR targets on PR
-creation, reopening, updates, and edits. It validates destination types, not a
-task's original parent or creation point, and does not prevent branch creation.
+creation, reopening, updates, and edits. It validates destination types and matching
+task parent names. It does not verify a task's original creation point or prevent
+branch creation.
 Fork runs may require maintainer approval according to the repository's Actions
 settings.
 
