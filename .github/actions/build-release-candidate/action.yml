@@ -1,4 +1,4 @@
-name: Prepare unsigned Android release candidate
+name: Build unsigned Android release candidate
 description: Build and validate an unsigned APK, then stage it with release metadata
 inputs:
   flavor:

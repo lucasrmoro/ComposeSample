@@ -61,7 +61,7 @@ jobs:
           ref: ${{ needs.version.outputs.commit }}
           fetch-depth: 2
           persist-credentials: false
-      - uses: ./.github/actions/prepare-release-candidate
+      - uses: ./.github/actions/build-release-candidate
         with:
           flavor: ${{ matrix.flavor }}
           version: ${{ needs.version.outputs.version }}
