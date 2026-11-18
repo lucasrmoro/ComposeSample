@@ -1,5 +1,5 @@
-name: Resolve Android release version
-description: Calculate the next semantic version and Android version code from main history
+name: Resolve approved release details
+description: Verify the approved revision and calculate its release version, code, and tag
 inputs:
   revision:
     description: Exact commit SHA or HEAD for the current PR merge ref

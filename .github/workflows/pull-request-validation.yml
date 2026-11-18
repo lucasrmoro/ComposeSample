@@ -55,7 +55,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: Check release version
-        uses: ./.github/actions/release-version
+        uses: ./.github/actions/resolve-release-details
         with:
           revision: HEAD
           preview-title: ${{ github.event.pull_request.title }}

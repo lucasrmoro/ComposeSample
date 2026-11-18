@@ -38,9 +38,9 @@ jobs:
           ref: main
           fetch-depth: 0
           persist-credentials: false
-      - name: Resolve version
+      - name: Resolve approved release details
         id: version
-        uses: ./.github/actions/release-version
+        uses: ./.github/actions/resolve-release-details
         with:
           revision: ${{ inputs.revision || github.sha }}
 
@@ -61,7 +61,7 @@ jobs:
           ref: ${{ needs.version.outputs.commit }}
           fetch-depth: 2
           persist-credentials: false
-      - uses: ./.github/actions/release-package
+      - uses: ./.github/actions/prepare-release-candidate
         with:
           flavor: ${{ matrix.flavor }}
           version: ${{ needs.version.outputs.version }}

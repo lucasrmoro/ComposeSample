@@ -1,5 +1,5 @@
-name: Build checked release candidate
-description: Run release gates and stage an unsigned APK and public metadata
+name: Prepare unsigned Android release candidate
+description: Build and validate an unsigned APK, then stage it with release metadata
 inputs:
   flavor:
     description: Android product flavor
