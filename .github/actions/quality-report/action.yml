@@ -12,13 +12,3 @@ runs:
       env:
         GATE_RESULTS_JSON: ${{ inputs.results-json }}
       run: python3 "$GITHUB_ACTION_PATH/report.py"
-    - name: Publish report in pull request
-      if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
-      uses: actions/github-script@v8
-      env:
-        GATE_RESULTS_JSON: ${{ inputs.results-json }}
-      with:
-        # Keep GitHub API pagination and comment management in the adjacent helper for easier review.
-        script: |
-          const publishReport = require(`${process.env.GITHUB_ACTION_PATH}/publish-report.js`);
-          await publishReport({ github, context });

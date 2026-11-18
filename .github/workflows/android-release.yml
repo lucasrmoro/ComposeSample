@@ -84,13 +84,16 @@ jobs:
       APK_NAME: ComposeSample-${{ matrix.flavor }}-release-${{ needs.version.outputs.tag }}.apk
     permissions:
       contents: read
-      id-token: write
-      attestations: write
     strategy:
       fail-fast: false
       matrix:
         flavor: [prd, dev]
     steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ needs.version.outputs.commit }}
+          fetch-depth: 1
+          persist-credentials: false
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -112,6 +115,33 @@ jobs:
           RELEASE_CERT_SHA256: ${{ vars.RELEASE_CERT_SHA256 }}
         with:
           apk-name: ${{ env.APK_NAME }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verified-signature-${{ matrix.flavor }}
+          path: signed/
+          retention-days: 14
+          if-no-files-found: error
+
+  attest:
+    name: Attest ${{ matrix.flavor }} release
+    needs: [version, sign]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    strategy:
+      fail-fast: false
+      matrix:
+        flavor: [prd, dev]
+    env:
+      APK_NAME: ComposeSample-${{ matrix.flavor }}-release-${{ needs.version.outputs.tag }}.apk
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-signature-${{ matrix.flavor }}
+          path: signed
       - uses: actions/attest@v4
         with:
           subject-path: signed/${{ env.APK_NAME }}
@@ -124,7 +154,7 @@ jobs:
 
   smoke:
     name: Install and launch ${{ matrix.flavor }} APK
-    needs: [version, sign]
+    needs: [version, attest]
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
@@ -136,6 +166,11 @@ jobs:
       matrix:
         flavor: [prd, dev]
     steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ needs.version.outputs.commit }}
+          fetch-depth: 1
+          persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           name: signed-${{ matrix.flavor }}
@@ -162,7 +197,7 @@ jobs:
 
   publish:
     name: Publish production APK
-    needs: [version, smoke]
+    needs: [version, attest, smoke]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: android-publication
@@ -172,6 +207,11 @@ jobs:
       contents: write
       attestations: read
     steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ needs.version.outputs.commit }}
+          fetch-depth: 1
+          persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           name: signed-prd
