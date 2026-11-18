@@ -49,12 +49,17 @@ runs:
           };
 
           const { REVISION: revision, PREVIEW_TITLE: previewTitle } = process.env;
-          if (previewTitle ? revision !== 'HEAD' : !/^[0-9a-f]{40}$/.test(revision)) {
+          const preview = context.eventName === 'pull_request';
+          const releaseEvent = ['push', 'workflow_dispatch'].includes(context.eventName);
+          if (!preview && (!releaseEvent || context.ref !== 'refs/heads/main' || process.env.GITHUB_REF_PROTECTED !== 'true')) {
+            throw new Error('Android release builds require an update or recovery on protected main.');
+          }
+          if (preview ? revision !== 'HEAD' || !previewTitle : !/^[0-9a-f]{40}$/.test(revision) || previewTitle) {
             throw new Error('Expected an exact approved commit SHA or the PR merge ref.');
           }
           const commit = git('rev-parse', `${revision}^{commit}`);
           const parent = git('rev-parse', `${commit}^1`);
-          if (previewTitle) {
+          if (preview) {
             const main = git('ls-remote', 'origin', 'refs/heads/main').split(/\s+/)[0];
             if (parent !== main) throw new Error('Update the PR from main and rerun validation.');
           } else {
@@ -82,7 +87,7 @@ runs:
           if (code > 2100000000) throw new Error('Android versionCode limit exceeded.');
           const tag = `v${version}`;
           if (git('tag', '--list', tag) &&
-              (previewTitle || git('rev-parse', `${tag}^{commit}`) !== commit)) {
+              (preview || git('rev-parse', `${tag}^{commit}`) !== commit)) {
             throw new Error(`${tag} already belongs to a different release.`);
           }
           for (const [key, value] of Object.entries({ commit, parent, version, code, tag, previous_tag: previousTag })) {

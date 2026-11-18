@@ -62,7 +62,10 @@ original signing key and preserve the old immutable release.
 
 ## Publishing and recovery
 
-The workflow accepts an exact reviewed first-parent commit from `main`.
+Production APK generation starts only after a PR is merged into protected `main`.
+The workflow checks that the requested SHA is the merged commit of a PR targeting
+`main`, is on its first-parent history, and is checked out before Gradle starts.
+The PR workflow only previews the release version and runs the existing gates.
 It runs release assembly, lint, local tests, architecture checks, a redacted
 Gitleaks scan of the release change and packaged artifact, and an OSV audit of
 resolved Maven runtime components. Hosted runners sign each flavor separately

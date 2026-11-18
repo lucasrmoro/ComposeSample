@@ -10,6 +10,9 @@ inputs:
   code:
     description: Reviewed Android version code
     required: true
+  revision:
+    description: Exact commit approved by the release version job
+    required: true
 runs:
   using: composite
   steps:
@@ -20,8 +23,15 @@ runs:
         FLAVOR: ${{ inputs.flavor }}
         VERSION: ${{ inputs.version }}
         VERSION_CODE: ${{ inputs.code }}
+        APPROVED_REVISION: ${{ inputs.revision }}
       run: |
         set -euo pipefail
+        if [[ "$GITHUB_REF" != refs/heads/main || "$GITHUB_REF_PROTECTED" != true ||
+              ( "$GITHUB_EVENT_NAME" != push && "$GITHUB_EVENT_NAME" != workflow_dispatch ) ||
+              ! "$APPROVED_REVISION" =~ ^[0-9a-f]{40}$ || "$(git rev-parse HEAD)" != "$APPROVED_REVISION" ]]; then
+            echo "Release APKs require the reviewed revision already merged into protected main."
+            exit 1
+        fi
         case "$FLAVOR" in
             dev) variant=DevRelease ;;
             prd) variant=PrdRelease ;;
