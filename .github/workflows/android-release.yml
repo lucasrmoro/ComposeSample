@@ -33,7 +33,7 @@ jobs:
       tag: ${{ steps.version.outputs.tag }}
       previous-tag: ${{ steps.version.outputs.previous_tag }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           ref: main
           fetch-depth: 0
@@ -89,14 +89,14 @@ jobs:
       matrix:
         flavor: [prd, dev]
     steps:
-      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+      - uses: android-actions/setup-android@v3
         with:
           packages: build-tools;36.0.0
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/download-artifact@v4
         with:
           name: unsigned-${{ matrix.flavor }}
           path: candidate
@@ -139,10 +139,10 @@ jobs:
           printf '%s\n' "$actual" > signed/signing-certificate-sha256.txt
           cp candidate/release.json candidate/RELEASE_NOTES.md candidate/sbom.cdx.json signed/
           (cd signed && sha256sum ComposeSample.apk release.json RELEASE_NOTES.md sbom.cdx.json signing-certificate-sha256.txt > SHA256SUMS)
-      - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+      - uses: actions/attest@v4
         with:
           subject-path: signed/ComposeSample.apk
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@v4
         with:
           name: signed-${{ matrix.flavor }}
           path: signed/
@@ -161,7 +161,7 @@ jobs:
       matrix:
         flavor: [prd, dev]
     steps:
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/download-artifact@v4
         with:
           name: signed-${{ matrix.flavor }}
           path: signed
@@ -177,7 +177,7 @@ jobs:
             sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
+      - uses: reactivecircus/android-emulator-runner@v2
         env:
           APK_PACKAGE: ${{ matrix.flavor == 'dev' && 'br.com.composesample.dev' || 'br.com.composesample' }}
         with:
@@ -202,7 +202,7 @@ jobs:
       contents: write
       attestations: read
     steps:
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      - uses: actions/download-artifact@v4
         with:
           name: signed-prd
           path: signed
@@ -215,7 +215,7 @@ jobs:
           gh attestation verify signed/ComposeSample.apk --repo "$GITHUB_REPOSITORY" \
             --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/android-release.yml"
       - name: Publish immutable release
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        uses: actions/github-script@v8
         env:
           RELEASE_PUBLICATION_ENABLED: ${{ vars.RELEASE_PUBLICATION_ENABLED }}
           TAG: ${{ needs.version.outputs.tag }}
