@@ -68,8 +68,11 @@ The workflow checks that the requested SHA is the merged commit of a PR targetin
 The PR workflow only previews the release version and runs the existing gates.
 It runs release assembly, lint, local tests, architecture checks, a redacted
 Gitleaks scan of the release change and packaged artifact, and an OSV audit of
-resolved Maven runtime components. Hosted runners sign each flavor separately
-and verify its expected certificate. The smoke jobs install and launch both
+resolved Maven runtime components. `release-package` orchestrates these checks;
+APK validation, secret scanning, and dependency auditing live in separate local
+actions, with their implementation scripts beside each action definition.
+Hosted runners sign each flavor separately and verify its expected certificate.
+The smoke jobs install and launch both
 APKs on an emulator and test upgrading production from the prior published APK
 when one exists. Production publishes only after both smoke jobs pass.
 

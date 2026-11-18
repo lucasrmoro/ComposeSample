@@ -1,0 +1,8 @@
+name: Scan release secrets
+description: Scan the reviewed change and unsigned APK for leaked credentials
+runs:
+  using: composite
+  steps:
+    - name: Run Gitleaks on source change and APK
+      shell: bash
+      run: bash "$GITHUB_ACTION_PATH/scan-release-secrets.sh"
