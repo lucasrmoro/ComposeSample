@@ -21,7 +21,11 @@ android {
         versionName = releaseVersion.get()
         stringBuildConfigField(name = "TMDB_READ_ACCESS_TOKEN", value = "")
     }
+    productFlavors.named("dev") {
+        applicationIdSuffix = ".dev"
+    }
     buildTypes.named("debug") {
+        applicationIdSuffix = ".debug"
         stringBuildConfigField(name = "TMDB_READ_ACCESS_TOKEN", value = tmdbReadAccessToken)
     }
 }

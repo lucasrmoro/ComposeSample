@@ -9,6 +9,12 @@ val tmdbReadAccessToken =
 gradle.extra["tmdbReadAccessToken"] = tmdbReadAccessToken
 
 pluginManagement {
+    buildscript {
+        dependencies {
+            // Kotlin 2.4 requires R8 9.1.29 or newer; AGP 8.12.3 bundles an older R8 version.
+            classpath("com.android.tools:r8:9.4.14")
+        }
+    }
     includeBuild("build-logic")
     repositories {
         google {
