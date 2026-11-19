@@ -3,6 +3,21 @@ set -euo pipefail
 
 mapping="app/build/outputs/mapping/${FLAVOR}Release/mapping.txt"
 test -s "$mapping"
+# Read the compiler that produced this APK's mapping, since AGP also bundles an older R8.
+r8_version="$(sed -n 's/^# compiler_version: //p' "$mapping")"
+if [[ ! "$r8_version" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+    printf 'Missing or unexpected R8 compiler version in %s: %s\n' "$mapping" "$r8_version" >&2
+    exit 1
+fi
+major="${BASH_REMATCH[1]}"
+minor="${BASH_REMATCH[2]}"
+patch="${BASH_REMATCH[3]}"
+if (( major < 9 || (major == 9 && (minor < 1 || (minor == 1 && patch < 29))) )); then
+    printf 'Kotlin 2.4 requires R8 9.1.29 or newer, but the release used %s.\n' "$r8_version" >&2
+    exit 1
+fi
+printf 'R8 compiler version: %s\n' "$r8_version"
+
 # R8 writes original-name -> obfuscated-name rows here; require at least one app class to change name.
 awk '/^br\.com\.composesample\.[^ ]+ -> / { target=$3; sub(/:$/, "", target); if ($1 != target) found=1 } END { exit !found }' "$mapping"
 
