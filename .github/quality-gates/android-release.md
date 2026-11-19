@@ -80,7 +80,7 @@ The build validates both APKs before signing. Production publishes after both
 flavors are signed and attested.
 
 A failed revision stays pending for recovery. Use **Re-run failed jobs** to
-reuse the original signed artifacts, or dispatch **Android release** from
+reuse the original signed artifacts, or dispatch **Build Android Release** from
 `main` with the exact SHA after resolving an external issue. For example,
 if `v1.5.0` failed during a draft upload, rerun its failed publication job.
 It compares existing bytes and uploads only missing assets. It never moves an
