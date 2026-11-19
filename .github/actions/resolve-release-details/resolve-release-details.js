@@ -1,6 +1,7 @@
 const { execFileSync } = require('node:child_process');
 
 const LEGACY_BASELINE = 'fac9fc388387651aac858957d85107fb5bb43e51';
+const INITIAL_RELEASE_VERSION = [1, 0, 0];
 const TITLE_PATTERN = /^(feature|bugfix|hotfix|docs|ci|refactor|build|chore): (\S[^\r\n]*)$/;
 
 function git(...args) {
@@ -61,16 +62,20 @@ async function verifyRevision(commit, preview, context, github) {
 }
 
 function calculateRelease(parent, commit, previewTitle) {
-    // Replay first-parent titles from the last legacy build to reconstruct SemVer without a version file.
+    // Replay first-parent titles after the legacy baseline; the first accepted revision starts at 1.0.0.
     const history = git('rev-list', '--first-parent', parent).split('\n');
     const baselineIndex = history.indexOf(LEGACY_BASELINE);
     if (baselineIndex < 0) throw new Error('The legacy release baseline must be in main history.');
 
-    const previousVersion = history.slice(0, baselineIndex).reverse().reduce(
-        (version, sha) => incrementVersion(version, commitTitle(sha)), [1, 0, 0]
+    const acceptedRevisions = history.slice(0, baselineIndex).reverse();
+    const firstRelease = acceptedRevisions.length === 0;
+    const previousVersion = acceptedRevisions.slice(1).reduce(
+        (version, sha) => incrementVersion(version, commitTitle(sha)), INITIAL_RELEASE_VERSION
     );
-    const previousTag = baselineIndex ? `v${previousVersion.join('.')}` : '';
-    const version = incrementVersion(previousVersion, previewTitle || commitTitle(commit)).join('.');
+    const previousTag = firstRelease ? '' : `v${previousVersion.join('.')}`;
+    const version = firstRelease
+        ? INITIAL_RELEASE_VERSION.join('.')
+        : incrementVersion(previousVersion, previewTitle || commitTitle(commit)).join('.');
     // Android's legacy APK used code 1; add one for every accepted main revision after that baseline.
     const code = baselineIndex + 2;
     if (code > 2100000000) throw new Error('Android versionCode limit exceeded.');

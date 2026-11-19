@@ -18,9 +18,11 @@ Use `[breaking]` immediately after the title prefix for incompatible changes.
 Describe impact and migration in the PR. Use a patch when a reviewed change does
 not add a compatible feature or break compatibility.
 
-The workflow replays main’s first-parent commits from the legacy baseline
-(version 1.0.0, Android code 1). Every accepted revision increments the code by
-one, including docs and CI changes. Retrying the same SHA yields the same version.
+The first accepted revision after the legacy baseline starts at version 1.0.0,
+regardless of its PR title. Later revisions bump SemVer from the validated PR
+title. The legacy APK used Android code 1; every accepted revision increments
+the code by one, including docs and CI changes. Retrying the same SHA yields the
+same version.
 The pipeline passes the calculated version to Gradle and uses it for the tag and
 release title. The default for local builds remains the legacy version and code.
 The APK attestation records both the selected source commit and workflow revision,
