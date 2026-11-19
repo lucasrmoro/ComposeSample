@@ -4,7 +4,6 @@ import br.com.composesample.BuildTypes
 import br.com.composesample.ConfigField.API_BASE_URL
 import br.com.composesample.ConfigField.API_BASE_URL_DEV
 import br.com.composesample.ConfigField.API_BASE_URL_PRD
-import br.com.composesample.Flavors.DEBUG_APP_ID_SUFFIX
 import br.com.composesample.Flavors.DEBUG_APP_VERSION_NAME_SUFFIX
 import br.com.composesample.Flavors.DEFAULT_DIMEN
 import br.com.composesample.Flavors.DEV
@@ -13,7 +12,6 @@ import br.com.composesample.ProjectConfig
 import br.com.composesample.ext.stringBuildConfigField
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
-import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.dsl.VariantDimension
 import com.android.build.gradle.BaseExtension
 import org.gradle.accessors.dm.LibrariesForLibs
@@ -94,22 +92,13 @@ abstract class BasePlugin : Plugin<Project> {
         buildTypes {
             getByName(BuildTypes.DEBUG) {
                 versionNameSuffix = DEBUG_APP_VERSION_NAME_SUFFIX
-                if (this is ApplicationExtension) {
-                    applicationIdSuffix = DEBUG_APP_ID_SUFFIX
-                }
-                if (this is ApplicationExtension || this is LibraryExtension) {
-                    isMinifyEnabled = false
-                    isShrinkResources = false
-                }
                 isDebuggable = true
             }
 
             getByName(BuildTypes.RELEASE) {
-                if (this is ApplicationExtension || this is LibraryExtension) {
+                if (this@setupBuildTypes is ApplicationExtension) {
                     isMinifyEnabled = true
                     isShrinkResources = true
-                }
-                if (this is ApplicationExtension) {
                     proguardFiles(
                         getDefaultProguardFile(ProjectConfig.PROGUARD_ANDROID_OPTIMIZE),
                         ProjectConfig.PROGUARD_RULES

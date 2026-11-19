@@ -1,0 +1,56 @@
+name: Publish Android release
+description: Verify signed production assets and publish an immutable GitHub release
+inputs:
+  publication-enabled:
+    description: Repository release settings and publication environment are ready
+    required: true
+  tag:
+    description: Calculated release tag
+    required: true
+  revision:
+    description: Approved source commit
+    required: true
+  parent:
+    description: First parent of the approved source commit
+    required: true
+  previous-tag:
+    description: Immutable release expected for the preceding main revision
+    required: true
+  version:
+    description: Calculated semantic version
+    required: true
+  version-code:
+    description: Calculated Android version code
+    required: true
+  apk-name:
+    description: Signed production APK file name
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Verify checksums and exact source revision in attestation
+      shell: bash
+      env:
+        APK_NAME: ${{ inputs.apk-name }}
+        REVISION: ${{ inputs.revision }}
+        VERSION: ${{ inputs.version }}
+        VERSION_CODE: ${{ inputs.version-code }}
+        GH_TOKEN: ${{ github.token }}
+      run: bash "$GITHUB_ACTION_PATH/verify-attestation.sh"
+
+    - name: Publish verified immutable release
+      uses: actions/github-script@v8
+      env:
+        RELEASE_PUBLICATION_ENABLED: ${{ inputs.publication-enabled }}
+        TAG: ${{ inputs.tag }}
+        REVISION: ${{ inputs.revision }}
+        PARENT: ${{ inputs.parent }}
+        PREVIOUS_TAG: ${{ inputs.previous-tag }}
+        VERSION: ${{ inputs.version }}
+        VERSION_CODE: ${{ inputs.version-code }}
+        APK_NAME: ${{ inputs.apk-name }}
+      with:
+        # github-script supplies the authenticated API client; release policy is implemented beside this action.
+        script: |
+          const publishRelease = require(`${process.env.GITHUB_ACTION_PATH}/publish-android-release.js`);
+          await publishRelease({ github, context });

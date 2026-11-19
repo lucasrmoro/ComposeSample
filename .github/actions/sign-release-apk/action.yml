@@ -1,0 +1,14 @@
+name: Sign and verify release APK
+description: Align an unsigned APK, sign it, and verify the expected certificate
+inputs:
+  apk-name:
+    description: Final APK file name
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Align, sign, and verify APK
+      shell: bash
+      env:
+        APK_NAME: ${{ inputs.apk-name }}
+      run: bash "$GITHUB_ACTION_PATH/sign-release-apk.sh"

@@ -1,22 +1,37 @@
 import br.com.composesample.ProjectConfig
 import br.com.composesample.ext.stringBuildConfigField
 import br.com.composesample.modules.Modules
+import groovy.json.JsonOutput
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 
 plugins {
     alias(libs.plugins.sample.android.app)
     alias(libs.plugins.compose.compiler)
 }
 
+val releaseVersion = providers.gradleProperty("appReleaseVersion").orElse("1.0.0")
+val releaseCode = providers.gradleProperty("appReleaseCode").map(String::toInt).orElse(1)
 val tmdbReadAccessToken = gradle.extra["tmdbReadAccessToken"] as String
 
 android {
     defaultConfig {
         applicationId = ProjectConfig.APP_ID
         targetSdk = ProjectConfig.TARGET_SDK
-        versionCode = ProjectConfig.VERSION_CODE
-        versionName = ProjectConfig.VERSION_NAME
+        versionCode = releaseCode.get()
+        versionName = releaseVersion.get()
+        stringBuildConfigField(name = "TMDB_READ_ACCESS_TOKEN", value = "")
+    }
+    productFlavors.named("dev") {
+        applicationIdSuffix = ".dev"
+    }
+    buildTypes.named("debug") {
+        applicationIdSuffix = ".debug"
         stringBuildConfigField(name = "TMDB_READ_ACCESS_TOKEN", value = tmdbReadAccessToken)
     }
+}
+
+androidComponents.onVariants(androidComponents.selector().withBuildType("release").withFlavor("default" to "dev")) {
+    it.applicationId.set("${ProjectConfig.APP_ID}.dev")
 }
 
 dependencies {
@@ -67,4 +82,25 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.navigation.compose)
+}
+
+tasks.register("writeReleaseInventory") {
+    val flavor = providers.gradleProperty("releaseFlavor").orElse("prd")
+    val output = layout.buildDirectory.file(flavor.map { "reports/release/$it-dependencies.json" })
+    outputs.file(output)
+    outputs.upToDateWhen { false }
+    doLast {
+        val variant = flavor.get()
+        require(variant == "dev" || variant == "prd")
+        val components = configurations.getByName("${variant}ReleaseRuntimeClasspath")
+            .incoming.resolutionResult.allComponents
+            .mapNotNull { it.id as? ModuleComponentIdentifier }
+            .map { mapOf("group" to it.group, "name" to it.module, "version" to it.version) }
+            .distinct()
+            .sortedBy { "${it["group"]}:${it["name"]}:${it["version"]}" }
+        output.get().asFile.apply {
+            parentFile.mkdirs()
+            writeText(JsonOutput.prettyPrint(JsonOutput.toJson(components)))
+        }
+    }
 }

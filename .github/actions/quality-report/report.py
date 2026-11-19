@@ -19,6 +19,12 @@ GATES = (
         "For `feature/add-login`, use `feature: add login`.",
     ),
     (
+        "release-version",
+        "Validate release version",
+        "android-release.md",
+        "Update from main and ensure the PR title describes the intended release increment.",
+    ),
+    (
         "build",
         "Build",
         "build.md",
@@ -44,6 +50,7 @@ GATES = (
     ),
 )
 
+# Keep labels aligned with the job result names sent by the workflow's quality-report job.
 RESULT_LABELS = {
     "success": "✅ Passed",
     "failure": "❌ Failed",
@@ -53,7 +60,9 @@ RESULT_LABELS = {
 
 
 def main():
+    # The workflow passes each prerequisite job result as JSON; absent jobs are shown as skipped.
     results = json.loads(os.environ["GATE_RESULTS_JSON"])
+    # The event payload identifies the PR source commit used for links to gate documentation.
     event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text(encoding="utf-8"))
     head = event["pull_request"]["head"]
     source_url = f"{os.environ['GITHUB_SERVER_URL']}/{head['repo']['full_name']}/blob/{head['sha']}"
@@ -86,6 +95,7 @@ def main():
         )
     )
     report = "\n".join(lines)
+    # Save the same report as an artifact and in GitHub's run summary for easy review.
     Path("quality-gates-report.md").write_text(report, encoding="utf-8")
     with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a", encoding="utf-8") as summary:
         summary.write(report)

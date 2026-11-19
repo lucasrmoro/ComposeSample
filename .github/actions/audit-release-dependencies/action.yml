@@ -1,0 +1,14 @@
+name: Audit release dependencies
+description: Check resolved Maven dependencies with OSV and write a CycloneDX SBOM
+inputs:
+  flavor:
+    description: Android product flavor
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Check advisories and create dependency inventory
+      shell: bash
+      env:
+        FLAVOR: ${{ inputs.flavor }}
+      run: node "$GITHUB_ACTION_PATH/audit-release-dependencies.mjs"

@@ -1,0 +1,63 @@
+name: Build unsigned Android release candidate
+description: Build and validate an unsigned APK, then stage it with release metadata
+inputs:
+  flavor:
+    description: Android product flavor
+    required: true
+  version:
+    description: Reviewed version name
+    required: true
+  code:
+    description: Reviewed Android version code
+    required: true
+  revision:
+    description: Exact commit approved by the release version job
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Verify the approved main revision
+      shell: bash
+      env:
+        APPROVED_REVISION: ${{ inputs.revision }}
+      run: bash "$GITHUB_ACTION_PATH/verify-revision.sh"
+
+    - name: Set up Android build tools
+      uses: ./.github/actions/android-setup
+
+    - name: Assemble the unsigned APK and run Android checks
+      shell: bash
+      env:
+        FLAVOR: ${{ inputs.flavor }}
+        VERSION: ${{ inputs.version }}
+        VERSION_CODE: ${{ inputs.code }}
+      run: bash "$GITHUB_ACTION_PATH/build-release.sh"
+
+    - name: Check project architecture
+      # Both flavors share the same module graph and source revision.
+      if: inputs.flavor == 'prd'
+      shell: bash
+      run: ./gradlew architectureCheck
+
+    - name: Validate the obfuscated APK and packaged manifest
+      uses: ./.github/actions/validate-release-apk
+      with:
+        flavor: ${{ inputs.flavor }}
+        version: ${{ inputs.version }}
+        code: ${{ inputs.code }}
+
+    - name: Scan the merged change and APK for secrets
+      uses: ./.github/actions/scan-release-secrets
+
+    - name: Audit dependencies and write CycloneDX inventory
+      uses: ./.github/actions/audit-release-dependencies
+      with:
+        flavor: ${{ inputs.flavor }}
+
+    - name: Write release notes and source metadata
+      shell: bash
+      env:
+        FLAVOR: ${{ inputs.flavor }}
+        VERSION: ${{ inputs.version }}
+        VERSION_CODE: ${{ inputs.code }}
+      run: bash "$GITHUB_ACTION_PATH/write-release-metadata.sh"

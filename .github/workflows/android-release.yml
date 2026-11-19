@@ -1,0 +1,195 @@
+name: Build Android Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      revision:
+        description: Full SHA of an approved commit on main to retry
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: android-release-main
+  queue: max
+
+jobs:
+  version:
+    name: Resolve approved release revision
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      commit: ${{ steps.version.outputs.commit }}
+      parent: ${{ steps.version.outputs.parent }}
+      version: ${{ steps.version.outputs.version }}
+      code: ${{ steps.version.outputs.code }}
+      tag: ${{ steps.version.outputs.tag }}
+      previous-tag: ${{ steps.version.outputs.previous_tag }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Resolve approved release details
+        id: version
+        uses: ./.github/actions/resolve-release-details
+        with:
+          revision: ${{ inputs.revision || github.sha }}
+
+  build:
+    name: Build and validate ${{ matrix.flavor }} release
+    needs: version
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        flavor: [prd, dev]
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ needs.version.outputs.commit }}
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: ./.github/actions/build-release-candidate
+        with:
+          flavor: ${{ matrix.flavor }}
+          version: ${{ needs.version.outputs.version }}
+          code: ${{ needs.version.outputs.code }}
+          revision: ${{ needs.version.outputs.commit }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-${{ matrix.flavor }}
+          path: candidate/
+          retention-days: 7
+          if-no-files-found: error
+
+  sign:
+    name: Sign ${{ matrix.flavor }} release
+    needs: [version, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: android-signing-${{ matrix.flavor }}
+    env:
+      APK_NAME: ComposeSample-${{ matrix.flavor }}-release-${{ needs.version.outputs.tag }}.apk
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        flavor: [prd, dev]
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: build-tools;36.0.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: unsigned-${{ matrix.flavor }}
+          path: candidate
+      - name: Sign and verify APK
+        uses: ./.github/actions/sign-release-apk
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_KEY_ALIAS: ${{ vars.RELEASE_KEY_ALIAS }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          RELEASE_CERT_SHA256: ${{ vars.RELEASE_CERT_SHA256 }}
+        with:
+          apk-name: ${{ env.APK_NAME }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verified-signature-${{ matrix.flavor }}
+          path: signed/
+          retention-days: 14
+          if-no-files-found: error
+
+  attest:
+    name: Attest ${{ matrix.flavor }} release
+    needs: [version, sign]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    strategy:
+      fail-fast: false
+      matrix:
+        flavor: [prd, dev]
+    env:
+      APK_NAME: ComposeSample-${{ matrix.flavor }}-release-${{ needs.version.outputs.tag }}.apk
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-signature-${{ matrix.flavor }}
+          path: signed
+      - uses: ./.github/actions/attest-release-apk
+        with:
+          apk-name: ${{ env.APK_NAME }}
+          source-commit: ${{ needs.version.outputs.commit }}
+          version: ${{ needs.version.outputs.version }}
+          version-code: ${{ needs.version.outputs.code }}
+          flavor: ${{ matrix.flavor }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: signed-${{ matrix.flavor }}
+          path: signed/
+          retention-days: 14
+          if-no-files-found: error
+
+  publish:
+    name: Publish production APK
+    needs: [version, attest]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: android-publication
+    env:
+      APK_NAME: ComposeSample-prd-release-${{ needs.version.outputs.tag }}.apk
+    permissions:
+      contents: write
+      attestations: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: signed-prd
+          path: signed
+      - name: Publish immutable release
+        uses: ./.github/actions/publish-android-release
+        with:
+          publication-enabled: ${{ vars.RELEASE_PUBLICATION_ENABLED }}
+          tag: ${{ needs.version.outputs.tag }}
+          revision: ${{ needs.version.outputs.commit }}
+          parent: ${{ needs.version.outputs.parent }}
+          previous-tag: ${{ needs.version.outputs.previous-tag }}
+          version: ${{ needs.version.outputs.version }}
+          version-code: ${{ needs.version.outputs.code }}
+          apk-name: ${{ env.APK_NAME }}

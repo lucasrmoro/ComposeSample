@@ -1,0 +1,41 @@
+name: Resolve approved release details
+description: Verify the approved revision and calculate its release version, code, and tag
+inputs:
+  revision:
+    description: Exact commit SHA or HEAD for the current PR merge ref
+    required: true
+  preview-title:
+    description: PR title for an unsigned preview
+    required: false
+outputs:
+  commit:
+    description: Exact revision
+    value: ${{ steps.version.outputs.commit }}
+  parent:
+    description: Previous main revision
+    value: ${{ steps.version.outputs.parent }}
+  version:
+    description: Calculated semantic version
+    value: ${{ steps.version.outputs.version }}
+  code:
+    description: Android version code
+    value: ${{ steps.version.outputs.code }}
+  tag:
+    description: Calculated release tag
+    value: ${{ steps.version.outputs.tag }}
+  previous_tag:
+    description: Expected immutable release for the preceding revision
+    value: ${{ steps.version.outputs.previous_tag }}
+runs:
+  using: composite
+  steps:
+    - id: version
+      uses: actions/github-script@v8
+      env:
+        REVISION: ${{ inputs.revision }}
+        PREVIEW_TITLE: ${{ inputs.preview-title }}
+      with:
+        # github-script provides the authenticated GitHub client; the calculation lives in the adjacent JS file.
+        script: |
+          const resolveReleaseDetails = require(`${process.env.GITHUB_ACTION_PATH}/resolve-release-details.js`);
+          await resolveReleaseDetails({ github, context, core });

@@ -1,0 +1,22 @@
+name: Validate release APK
+description: Verify R8 output and inspect release APK metadata and manifest security
+inputs:
+  flavor:
+    description: Android product flavor
+    required: true
+  version:
+    description: Expected Android version name
+    required: true
+  code:
+    description: Expected Android version code
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Validate APK and merged manifest
+      shell: bash
+      env:
+        FLAVOR: ${{ inputs.flavor }}
+        VERSION: ${{ inputs.version }}
+        VERSION_CODE: ${{ inputs.code }}
+      run: bash "$GITHUB_ACTION_PATH/validate-release-apk.sh"
