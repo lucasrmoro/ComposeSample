@@ -7,13 +7,21 @@ on:
 permissions: {}
 
 concurrency:
-  group: pull-request-validation-${{ github.event.pull_request.number }}-${{ (github.actor == 'coderabbitai[bot]' || github.triggering_actor == 'coderabbitai[bot]') && 'coderabbit' || 'normal' }}
+  # Ignored edits must not cancel validation already running for the PR.
+  group: >-
+    pull-request-validation-${{ github.event.pull_request.number }}-${{
+      github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' &&
+      (github.event.action != 'edited' || github.event.changes.title || github.event.changes.base) &&
+      'normal' || 'ignored' }}
   cancel-in-progress: true
 
 jobs:
   branch-validation:
     name: Validate branch name
-    if: ${{ github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' && !github.event.pull_request.draft }}
+    if: >-
+      ${{ !github.event.pull_request.draft &&
+          github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' &&
+          (github.event.action != 'edited' || github.event.changes.title || github.event.changes.base) }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
@@ -28,7 +36,10 @@ jobs:
 
   pull-request-title-validation:
     name: Validate PR title
-    if: ${{ github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' && !github.event.pull_request.draft }}
+    if: >-
+      ${{ !github.event.pull_request.draft &&
+          github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' &&
+          (github.event.action != 'edited' || github.event.changes.title || github.event.changes.base) }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
@@ -43,7 +54,11 @@ jobs:
 
   release-version:
     name: Validate release version
-    if: ${{ github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' && !github.event.pull_request.draft && github.base_ref == 'main' }}
+    if: >-
+      ${{ !github.event.pull_request.draft &&
+          github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' &&
+          (github.event.action != 'edited' || github.event.changes.title || github.event.changes.base) &&
+          github.base_ref == 'main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -134,7 +149,11 @@ jobs:
       - lint
       - unit-tests
       - architecture-validation
-    if: ${{ github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' && !github.event.pull_request.draft && !cancelled() }}
+    if: >-
+      ${{ !github.event.pull_request.draft &&
+          github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' &&
+          (github.event.action != 'edited' || github.event.changes.title || github.event.changes.base) &&
+          !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:

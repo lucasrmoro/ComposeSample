@@ -30,10 +30,12 @@ There is no separate cache warmup workflow or extra post-merge Gradle run.
 | Unit tests | [unit-tests.md](unit-tests.md) |
 | Architecture validation | [architecture-validation.md](architecture-validation.md) |
 
-The workflow runs for pull requests when they are opened, reopened, updated with new
-commits, edited, or marked ready for review. Runs for the same pull request cancel an
-older run when a newer run starts. The repository ruleset uses these check results for
-merge eligibility. CodeRabbit review is advisory and is not a required status check.
+The workflow validates pull requests when they are opened, reopened, updated with new
+commits, retargeted, renamed, or marked ready for review. Edits limited to the pull
+request description skip every job and leave active validation running. A newer
+validation run for the same pull request cancels the older validation run. The
+repository ruleset uses these check results for merge eligibility. CodeRabbit review
+is advisory and is not a required status check.
 
 Branch and title validation run first and independently. Build, Android Lint, unit
 tests, and architecture validation start in parallel only after both metadata checks
