@@ -23,6 +23,8 @@ The workflow replays main’s first-parent commits from the legacy baseline
 one, including docs and CI changes. Retrying the same SHA yields the same version.
 The pipeline passes the calculated version to Gradle and uses it for the tag and
 release title. The default for local builds remains the legacy version and code.
+The APK attestation records both the selected source commit and workflow revision,
+so a retry of an older commit remains traceable to the code that built its APK.
 
 Use `main` directly for reviewed work. If an integration branch called `develop`
 is explicitly reinstated, apply that branch's review gates, promote through a
@@ -101,7 +103,8 @@ the production APK for `v1.1.0` is `ComposeSample-prd-release-v1.1.0.apk`.
 apk=ComposeSample-prd-release-v1.1.0.apk
 sha256sum -c SHA256SUMS
 apksigner verify --verbose --print-certs "$apk"
-gh attestation verify "$apk" --repo lucasrmoro/ComposeSample
+gh attestation verify "$apk" --repo lucasrmoro/ComposeSample \
+  --predicate-type https://github.com/lucasrmoro/ComposeSample/attestations/android-release/v1
 adb install -r "$apk"
 ```
 

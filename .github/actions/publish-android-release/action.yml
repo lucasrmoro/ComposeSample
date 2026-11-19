@@ -28,6 +28,16 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Verify checksums and exact source revision in attestation
+      shell: bash
+      env:
+        APK_NAME: ${{ inputs.apk-name }}
+        REVISION: ${{ inputs.revision }}
+        VERSION: ${{ inputs.version }}
+        VERSION_CODE: ${{ inputs.version-code }}
+        GH_TOKEN: ${{ github.token }}
+      run: bash "$GITHUB_ACTION_PATH/verify-attestation.sh"
+
     - name: Publish verified immutable release
       uses: actions/github-script@v8
       env:

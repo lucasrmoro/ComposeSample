@@ -91,7 +91,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
         with:
-          ref: ${{ needs.version.outputs.commit }}
+          ref: ${{ github.sha }}
           fetch-depth: 1
           persist-credentials: false
       - uses: actions/setup-java@v5
@@ -138,13 +138,22 @@ jobs:
     env:
       APK_NAME: ComposeSample-${{ matrix.flavor }}-release-${{ needs.version.outputs.tag }}.apk
     steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           name: verified-signature-${{ matrix.flavor }}
           path: signed
-      - uses: actions/attest@v4
+      - uses: ./.github/actions/attest-release-apk
         with:
-          subject-path: signed/${{ env.APK_NAME }}
+          apk-name: ${{ env.APK_NAME }}
+          source-commit: ${{ needs.version.outputs.commit }}
+          version: ${{ needs.version.outputs.version }}
+          version-code: ${{ needs.version.outputs.code }}
+          flavor: ${{ matrix.flavor }}
       - uses: actions/upload-artifact@v4
         with:
           name: signed-${{ matrix.flavor }}
@@ -168,7 +177,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
         with:
-          ref: ${{ needs.version.outputs.commit }}
+          ref: ${{ github.sha }}
           fetch-depth: 1
           persist-credentials: false
       - uses: actions/download-artifact@v4
@@ -209,21 +218,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
         with:
-          ref: ${{ needs.version.outputs.commit }}
+          ref: ${{ github.sha }}
           fetch-depth: 1
           persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           name: signed-prd
           path: signed
-      - name: Verify signed artifact provenance
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          (cd signed && sha256sum --check SHA256SUMS)
-          gh attestation verify "signed/$APK_NAME" --repo "$GITHUB_REPOSITORY" \
-            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/android-release.yml"
       - name: Publish immutable release
         uses: ./.github/actions/publish-android-release
         with:

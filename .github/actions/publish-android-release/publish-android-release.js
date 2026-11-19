@@ -63,6 +63,22 @@ function verifyAssetDigests(assets, names) {
     return existing;
 }
 
+async function removeIncompleteDraftAssets(github, context, release, names) {
+    const repo = github.rest.repos;
+    const incompleteAssets = release.assets.filter(asset => asset.state === 'starter');
+
+    for (const asset of incompleteAssets) {
+        if (!names.includes(asset.name)) {
+            throw new Error(`Unexpected incomplete release asset ${asset.name}.`);
+        }
+        // GitHub can leave a `starter` placeholder after a failed upload; delete only that known incomplete draft asset.
+        await repo.deleteReleaseAsset({ ...context.repo, asset_id: asset.id });
+    }
+
+    const incompleteIds = new Set(incompleteAssets.map(asset => asset.id));
+    return release.assets.filter(asset => !incompleteIds.has(asset.id));
+}
+
 async function createDraftIfMissing(github, context, tag, revision, notes) {
     let release = await findRelease(github, context, tag);
     if (release) return release;
@@ -127,11 +143,14 @@ module.exports = async ({ github, context }) => {
         throw new Error('Release name or target differs from the approved revision.');
     }
 
-    const existing = verifyAssetDigests(release.assets, names);
     if (release.draft) {
+        // A failed upload may leave an empty `starter` asset; remove it so this retry can upload the original bytes.
+        const completedAssets = await removeIncompleteDraftAssets(github, context, release, names);
+        const existing = verifyAssetDigests(completedAssets, names);
         await uploadMissingAssets(github, context, release, names, existing);
-    } else if (existing.size !== names.length) {
-        throw new Error('Published release has missing assets.');
+    } else {
+        const existing = verifyAssetDigests(release.assets, names);
+        if (existing.size !== names.length) throw new Error('Published release has missing assets.');
     }
 
     // Confirm GitHub applied immutable-release settings and kept the tag on the approved source.

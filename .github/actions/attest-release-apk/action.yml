@@ -1,0 +1,37 @@
+name: Attest Android release APK
+description: Sign APK provenance that identifies the exact source revision and release variant
+inputs:
+  apk-name:
+    description: Signed APK file name
+    required: true
+  source-commit:
+    description: Exact source commit used to build the APK
+    required: true
+  version:
+    description: Release version name
+    required: true
+  version-code:
+    description: Android version code
+    required: true
+  flavor:
+    description: Android product flavor
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Write release provenance predicate
+      shell: bash
+      env:
+        APK_NAME: ${{ inputs.apk-name }}
+        SOURCE_COMMIT: ${{ inputs.source-commit }}
+        VERSION_NAME: ${{ inputs.version }}
+        VERSION_CODE: ${{ inputs.version-code }}
+        FLAVOR: ${{ inputs.flavor }}
+      run: node "$GITHUB_ACTION_PATH/write-provenance-predicate.js"
+
+    - name: Attest signed APK
+      uses: actions/attest@v4
+      with:
+        subject-path: signed/${{ inputs.apk-name }}
+        predicate-type: https://github.com/lucasrmoro/ComposeSample/attestations/android-release/v1
+        predicate-path: release-predicate.json
