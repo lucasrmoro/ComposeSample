@@ -14,10 +14,11 @@ pull requests can save cache entries in their own merge-ref scope; fork pull req
 only read existing entries. Cache keys distinguish jobs, so parallel runners save
 separate entries. Gradle validates task inputs before reusing cached outputs.
 
-The `Gradle cache warmup` workflow runs the four gates separately after pushes to
-`main`, creating shared cache entries for new pull requests. This adds post-merge
-runner work without adding a prerequisite or changing the required pull request
-checks. No duplicate Gradle cache action is configured.
+The `Build Android Release` workflow runs Gradle on the default `main` branch for
+both release flavors, including assembly, lint, unit tests, and architecture
+validation. The shared setup action saves the Gradle User Home cache at the end
+of each build job, so those runs also warm the cache for later pull requests.
+There is no separate cache warmup workflow or extra post-merge Gradle run.
 
 | Gate | Documentation |
 | --- | --- |
