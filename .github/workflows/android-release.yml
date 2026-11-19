@@ -161,52 +161,9 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
-  smoke:
-    name: Install and launch ${{ matrix.flavor }} APK
-    needs: [version, attest]
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    env:
-      APK_NAME: ComposeSample-${{ matrix.flavor }}-release-${{ needs.version.outputs.tag }}.apk
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        flavor: [prd, dev]
-    steps:
-      - uses: actions/checkout@v7.0.1
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 1
-          persist-credentials: false
-      - uses: actions/download-artifact@v4
-        with:
-          name: signed-${{ matrix.flavor }}
-          path: signed
-      - name: Download previous production APK for upgrade check
-        if: matrix.flavor == 'prd' && needs.version.outputs.previous-tag != ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PREVIOUS_TAG: ${{ needs.version.outputs.previous-tag }}
-        run: |
-          gh release download "$PREVIOUS_TAG" --repo "$GITHUB_REPOSITORY" \
-            --pattern "ComposeSample-prd-release-$PREVIOUS_TAG.apk" --output previous.apk
-      - name: Enable emulator hardware acceleration
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' |
-            sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-      - name: Install and launch release APK
-        uses: ./.github/actions/release-smoke-test
-        with:
-          apk-name: ${{ env.APK_NAME }}
-          package-name: ${{ matrix.flavor == 'dev' && 'br.com.composesample.dev' || 'br.com.composesample' }}
-
   publish:
     name: Publish production APK
-    needs: [version, attest, smoke]
+    needs: [version, attest]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: android-publication

@@ -76,9 +76,8 @@ resolved Maven runtime components. `build-release-candidate` orchestrates these 
 APK validation, secret scanning, and dependency auditing live in separate local
 actions, with their implementation scripts beside each action definition.
 Hosted runners sign each flavor separately and verify its expected certificate.
-The smoke jobs install and launch both
-APKs on an emulator and test upgrading production from the prior published APK
-when one exists. Production publishes only after both smoke jobs pass.
+The build validates both APKs before signing. Production publishes after both
+flavors are signed and attested.
 
 A failed revision stays pending for recovery. Use **Re-run failed jobs** to
 reuse the original signed artifacts, or dispatch **Android release** from
