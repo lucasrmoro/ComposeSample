@@ -7,13 +7,13 @@ on:
 permissions: {}
 
 concurrency:
-  group: pull-request-validation-${{ github.event.pull_request.number }}
+  group: pull-request-validation-${{ github.event.pull_request.number }}-${{ (github.actor == 'coderabbitai[bot]' || github.triggering_actor == 'coderabbitai[bot]') && 'coderabbit' || 'normal' }}
   cancel-in-progress: true
 
 jobs:
   branch-validation:
     name: Validate branch name
-    if: ${{ !github.event.pull_request.draft }}
+    if: ${{ github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' && !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
@@ -28,7 +28,7 @@ jobs:
 
   pull-request-title-validation:
     name: Validate PR title
-    if: ${{ !github.event.pull_request.draft }}
+    if: ${{ github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' && !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
@@ -43,7 +43,7 @@ jobs:
 
   release-version:
     name: Validate release version
-    if: ${{ !github.event.pull_request.draft && github.base_ref == 'main' }}
+    if: ${{ github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' && !github.event.pull_request.draft && github.base_ref == 'main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -62,7 +62,7 @@ jobs:
 
   build:
     name: Build
-    if: ${{ !github.event.pull_request.draft }}
+    if: ${{ github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' && !github.event.pull_request.draft }}
     needs: [branch-validation, pull-request-title-validation]
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -78,7 +78,7 @@ jobs:
 
   lint:
     name: Lint
-    if: ${{ !github.event.pull_request.draft }}
+    if: ${{ github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' && !github.event.pull_request.draft }}
     needs: [branch-validation, pull-request-title-validation]
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -94,7 +94,7 @@ jobs:
 
   unit-tests:
     name: Unit tests
-    if: ${{ !github.event.pull_request.draft }}
+    if: ${{ github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' && !github.event.pull_request.draft }}
     needs: [branch-validation, pull-request-title-validation]
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -134,7 +134,7 @@ jobs:
       - lint
       - unit-tests
       - architecture-validation
-    if: ${{ !github.event.pull_request.draft && !cancelled() }}
+    if: ${{ github.actor != 'coderabbitai[bot]' && github.triggering_actor != 'coderabbitai[bot]' && !github.event.pull_request.draft && !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:
