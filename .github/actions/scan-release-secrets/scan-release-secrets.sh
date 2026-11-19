@@ -14,6 +14,4 @@ tar -xzf "$scan/gitleaks.tar.gz" -C "$scan" gitleaks
 "$scan/gitleaks" git --redact=100 --log-opts="HEAD^1..HEAD"
 # Scan the release staging files, then safely unpack the APK because Gitleaks does not identify .apk as a ZIP archive.
 "$scan/gitleaks" dir --redact=100 --max-decode-depth=2 --max-archive-depth=1 candidate
-python3 "$GITHUB_ACTION_PATH/extract-apk.py" candidate/unsigned.apk "$scan/apk"
-# Inspect extracted assets and resources where build-time or dependency-supplied credentials could be embedded.
-"$scan/gitleaks" dir --redact=100 --max-decode-depth=2 --max-archive-depth=1 "$scan/apk"
+bash "$GITHUB_ACTION_PATH/scan-apk-contents.sh" "$scan/gitleaks" candidate/unsigned.apk "$scan/apk"

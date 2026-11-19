@@ -75,6 +75,10 @@ Gitleaks scan of the release change and packaged artifact, and an OSV audit of
 resolved Maven runtime components. `build-release-candidate` orchestrates these checks;
 APK validation, secret scanning, and dependency auditing live in separate local
 actions, with their implementation scripts beside each action definition.
+To verify APK secret scanning locally, run
+`bash .github/actions/scan-release-secrets/verify-apk-secret-scan.sh` with
+Gitleaks 8.30.1 on your PATH. The fixture checks that a clean APK passes and that
+a synthetic token inside an APK asset blocks the scan.
 Hosted runners sign each flavor separately and verify its expected certificate.
 The build validates both APKs before signing. Production publishes after both
 flavors are signed and attested.
