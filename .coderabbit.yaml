@@ -1,4 +1,5 @@
 reviews:
+  high_level_summary_in_walkthrough: true
   review_progress: true
   commit_status: true
   fail_commit_status: true
